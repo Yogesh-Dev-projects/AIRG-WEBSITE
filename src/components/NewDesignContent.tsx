@@ -1387,14 +1387,14 @@ export default function NewDesignContent() {
                   </div>
 
 
-                  <h1 className="font-headline tracking-tighter leading-[0.88] uppercase">
-                    <span className="block text-3xl sm:text-5xl md:text-6xl lg:text-6xl xl:text-7xl font-black text-[#1a1a2e]">
+                  <h1 className="font-headline tracking-tighter leading-[0.88] uppercase max-w-full">
+                    <span className="block text-3xl sm:text-4xl md:text-5xl lg:text-5xl xl:text-6xl 2xl:text-7xl font-black text-[#1a1a2e]">
                       Empowering
                     </span>
-                    <span className="block text-3xl sm:text-5xl md:text-6xl lg:text-6xl xl:text-7xl font-black text-[#EE2C3C]">
+                    <span className="block text-3xl sm:text-4xl md:text-5xl lg:text-5xl xl:text-6xl 2xl:text-7xl font-black text-[#EE2C3C]">
                       The Next Gen
                     </span>
-                    <span className="block text-2xl sm:text-4xl md:text-5xl lg:text-5xl xl:text-6xl font-black text-[#1a1a2e]/30 overflow-hidden h-[1.15em] relative">
+                    <span className="block text-2xl sm:text-3xl md:text-4xl lg:text-4xl xl:text-5xl 2xl:text-6xl font-black text-[#1a1a2e]/30 overflow-hidden h-[1.15em] relative">
                       <AnimatePresence mode="wait">
                         <motion.span
                           key={wordIndex}
