@@ -1391,7 +1391,7 @@ export default function NewDesignContent() {
                     <span className="block text-4xl sm:text-6xl md:text-7xl lg:text-7xl xl:text-8xl font-black text-[#1a1a2e]">
                       Empowering
                     </span>
-                    <span className="block text-4xl sm:text-6xl md:text-7xl lg:text-7xl xl:text-8xl font-black text-[#EE2C3C]">
+                    <span className="block text-3xl sm:text-5xl md:text-5xl lg:text-5xl xl:text-6xl font-black text-[#EE2C3C] whitespace-nowrap">
                       The Next Gen
                     </span>
                     <span className="block text-3xl sm:text-5xl md:text-6xl lg:text-5xl xl:text-6xl font-black text-[#1a1a2e]/30 overflow-hidden h-[1.15em] relative">
