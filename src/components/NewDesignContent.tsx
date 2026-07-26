@@ -1378,8 +1378,8 @@ export default function NewDesignContent() {
                 <div className="absolute bottom-[5%] left-[-5%] w-[500px] h-[500px] bg-primary/8 rounded-full blur-[130px] animate-pulse" style={{ animationDuration: "9s" }} />
                 <div className="absolute bottom-[5%] right-[-5%] w-[500px] h-[500px] bg-primary/8 rounded-full blur-[130px] animate-pulse" style={{ animationDuration: "9s" }} />
               </div>
-              <div className="relative z-10 w-full max-w-[1440px] mx-auto px-5 md:px-20 grid lg:grid-cols-2 gap-12 lg:gap-16 items-center pt-4 pb-16">
-                <div className="space-y-8 relative">
+              <div className="relative z-10 w-full max-w-[1440px] mx-auto px-5 md:px-12 lg:px-16 grid lg:grid-cols-12 gap-8 lg:gap-8 items-center pt-4 pb-16">
+                <div className="lg:col-span-7 space-y-8 relative">
                   {/* High-Tech UI Accents */}
                   <div className="absolute left-[-20px] top-0 h-full w-[2.5px] bg-gradient-to-b from-[#EE2C3C] via-[#EE2C3C]/20 to-transparent">
                     <div className="absolute top-0 left-[-4px] w-2 h-2 bg-primary rounded-full animate-pulse" />
@@ -1388,13 +1388,13 @@ export default function NewDesignContent() {
 
 
                   <h1 className="font-headline tracking-tighter leading-[0.88] uppercase max-w-full">
-                    <span className="block text-3xl sm:text-4xl md:text-5xl lg:text-5xl xl:text-6xl 2xl:text-7xl font-black text-[#1a1a2e]">
+                    <span className="block text-4xl sm:text-6xl md:text-7xl lg:text-6xl xl:text-7xl 2xl:text-8xl font-black text-[#1a1a2e]">
                       Empowering
                     </span>
-                    <span className="block text-3xl sm:text-4xl md:text-5xl lg:text-5xl xl:text-6xl 2xl:text-7xl font-black text-[#EE2C3C]">
+                    <span className="block text-4xl sm:text-6xl md:text-7xl lg:text-6xl xl:text-7xl 2xl:text-8xl font-black text-[#EE2C3C]">
                       The Next Gen
                     </span>
-                    <span className="block text-2xl sm:text-3xl md:text-4xl lg:text-4xl xl:text-5xl 2xl:text-6xl font-black text-[#1a1a2e]/30 overflow-hidden h-[1.15em] relative">
+                    <span className="block text-3xl sm:text-5xl md:text-6xl lg:text-4xl xl:text-5xl 2xl:text-6xl font-black text-[#1a1a2e]/30 overflow-hidden h-[1.15em] relative">
                       <AnimatePresence mode="wait">
                         <motion.span
                           key={wordIndex}
@@ -1428,7 +1428,7 @@ export default function NewDesignContent() {
 
                 </div>
 
-                 <div className="hidden lg:flex justify-center items-center relative h-[560px] w-full rounded-[3.5rem] overflow-hidden bg-white border border-black/5 shadow-[0_4px_30px_rgba(0,0,0,0.03)]">
+                 <div className="hidden lg:flex lg:col-span-5 justify-center items-center relative h-[520px] w-full rounded-[3.5rem] overflow-hidden bg-white border border-black/5 shadow-[0_4px_30px_rgba(0,0,0,0.03)]">
                   {/* Rich layered background */}
                   <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, #1a1a2e 1px, transparent 0)', backgroundSize: '24px 24px' }}></div>
                   
