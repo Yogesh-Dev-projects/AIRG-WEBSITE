@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>AIR G INTERNATIONAL | Innovation Labs</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&amp;family=Inter:wght@100..900&amp;family=JetBrains+Mono:wght@100..800&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary-fixed": "#d8e2ff",
+                        "tertiary": "#ffb595",
+                        "on-primary-fixed-variant": "#004493",
+                        "on-error-container": "#ffdad6",
+                        "outline": "#8b90a0",
+                        "secondary-fixed": "#ffdad5",
+                        "on-secondary-fixed": "#410001",
+                        "on-primary-container": "#00285c",
+                        "surface-container-high": "#292a2e",
+                        "on-error": "#690005",
+                        "on-tertiary-fixed-variant": "#7c2e00",
+                        "inverse-primary": "#005bc1",
+                        "secondary": "#ffb4aa",
+                        "surface-bright": "#38393d",
+                        "inverse-surface": "#e3e2e7",
+                        "surface-container-low": "#1a1b1f",
+                        "surface-tint": "#adc6ff",
+                        "surface": "#121317",
+                        "primary": "#adc6ff",
+                        "on-secondary-fixed-variant": "#930005",
+                        "error-container": "#93000a",
+                        "on-surface": "#e3e2e7",
+                        "on-primary": "#002e69",
+                        "surface-variant": "#343539",
+                        "outline-variant": "#414755",
+                        "on-secondary-container": "#ffd2cc",
+                        "tertiary-fixed": "#ffdbcc",
+                        "surface-container-highest": "#343539",
+                        "inverse-on-surface": "#2f3034",
+                        "on-surface-variant": "#c1c6d7",
+                        "background": "#121317",
+                        "on-background": "#e3e2e7",
+                        "primary-fixed-dim": "#adc6ff",
+                        "primary-container": "#4b8eff",
+                        "on-secondary": "#690003",
+                        "error": "#ffb4ab",
+                        "tertiary-container": "#ef6719",
+                        "on-primary-fixed": "#001a41",
+                        "surface-container": "#1e1f23",
+                        "surface-container-lowest": "#0d0e12",
+                        "on-tertiary-container": "#4c1a00",
+                        "tertiary-fixed-dim": "#ffb595",
+                        "on-tertiary-fixed": "#351000",
+                        "on-tertiary": "#571e00",
+                        "secondary-container": "#c5020b",
+                        "surface-dim": "#121317",
+                        "secondary-fixed-dim": "#ffb4aa"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "unit": "8px",
+                        "section-gap": "160px",
+                        "margin-mobile": "20px",
+                        "gutter": "24px",
+                        "margin-desktop": "80px",
+                        "container-max": "1440px"
+                    },
+                    "fontFamily": {
+                        "body-lg": ["Inter"],
+                        "label-mono": ["JetBrains Mono"],
+                        "display-lg": ["Geist"],
+                        "headline-md": ["Geist"],
+                        "display-lg-mobile": ["Geist"],
+                        "headline-lg": ["Geist"],
+                        "body-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                        "label-mono": ["12px", {"lineHeight": "16px", "letterSpacing": "0.1em", "fontWeight": "500"}],
+                        "display-lg": ["72px", {"lineHeight": "80px", "letterSpacing": "0.05em", "fontWeight": "700"}],
+                        "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                        "display-lg-mobile": ["40px", {"lineHeight": "48px", "letterSpacing": "0.02em", "fontWeight": "700"}],
+                        "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "0.02em", "fontWeight": "600"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .scanning-line {
+            height: 1px;
+            width: 100%;
+            background: linear-gradient(90deg, transparent, #4b8eff, transparent);
+            position: absolute;
+            top: 0;
+            left: 0;
+            opacity: 0.3;
+        }
+        .glow-blue {
+            filter: drop-shadow(0 0 10px rgba(173, 198, 255, 0.4));
+        }
+        .glow-red {
+            filter: drop-shadow(0 0 10px rgba(255, 180, 170, 0.4));
+        }
+        .grid-bg {
+            background-image: 
+                radial-gradient(circle at 2px 2px, rgba(255, 255, 255, 0.05) 1px, transparent 0);
+            background-size: 40px 40px;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background font-body-md overflow-x-hidden grid-bg">
+<!-- TopAppBar -->
+<header class="docked full-width top-0 sticky z-50 bg-transparent backdrop-blur-xl dark:bg-surface/30 border-b border-outline-variant/10 backdrop-blur-2xl transition-all duration-500 ease-in-out cursor-pointer">
+<div class="flex justify-between items-center w-full px-margin-mobile md:px-margin-desktop py-unit max-w-container-max mx-auto">
+<div class="flex items-center gap-unit">
+<span class="material-symbols-outlined text-primary" data-icon="rocket_launch">rocket_launch</span>
+<h1 class="font-headline-md text-headline-md font-bold tracking-tighter text-primary uppercase">AIR G INTERNATIONAL</h1>
+</div>
+<nav class="hidden md:flex gap-gutter">
+<a class="text-on-surface-variant font-medium hover:text-primary transition-colors duration-300" href="#">SYSTEMS</a>
+<a class="text-primary font-bold border-b-2 border-primary pb-1" href="#">INNOVATION</a>
+<a class="text-on-surface-variant font-medium hover:text-primary transition-colors duration-300" href="#">PROTOCOL</a>
+</nav>
+<div class="flex items-center gap-unit">
+<span class="material-symbols-outlined text-primary" data-icon="menu">menu</span>
+</div>
+</div>
+</header>
+<main class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop pb-section-gap">
+<!-- Hero Section -->
+<section class="relative py-section-gap flex flex-col items-center text-center">
+<div class="absolute inset-0 overflow-hidden -z-10">
+<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/10 rounded-full blur-[120px]"></div>
+<div class="absolute top-1/4 right-0 w-[400px] h-[400px] bg-secondary/5 rounded-full blur-[100px]"></div>
+</div>
+<span class="font-label-mono text-label-mono text-primary tracking-[0.3em] uppercase mb-unit">Strategic Infrastructure</span>
+<h2 class="font-display-lg-mobile md:font-display-lg text-display-lg-mobile md:text-display-lg uppercase tracking-tighter leading-none mb-gutter max-w-4xl">
+                16 <span class="text-primary">Nexus Nodes</span>
+</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl mx-auto mb-gutter">
+                A distributed network of deep-tech facilities operating at the edge of physical possibility. Precision engineered for the kinetic horizon.
+            </p>
+<div class="flex gap-gutter mt-unit">
+<div class="flex items-center gap-2 px-4 py-2 glass-panel rounded-full">
+<span class="w-2 h-2 bg-primary rounded-full animate-pulse"></span>
+<span class="font-label-mono text-[10px] text-on-surface uppercase tracking-widest">Global Sync Active</span>
+</div>
+<div class="flex items-center gap-2 px-4 py-2 glass-panel rounded-full border-primary/20">
+<span class="material-symbols-outlined text-xs text-primary" data-icon="grid_view">grid_view</span>
+<span class="font-label-mono text-[10px] text-on-surface uppercase tracking-widest">16 Active Cores</span>
+</div>
+</div>
+</section>
+<!-- Lab Catalog Grid -->
+<section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-gutter">
+<!-- Lab 01 -->
+<div class="glass-panel p-gutter rounded-xl relative overflow-hidden group hover:bg-surface-variant/20 transition-all duration-500">
+<div class="scanning-line group-hover:translate-y-[200px] transition-transform duration-[3000ms] ease-linear"></div>
+<div class="flex justify-between items-start mb-gutter">
+<span class="font-label-mono text-label-mono text-outline uppercase">LAB-01</span>
+<span class="font-label-mono text-[10px] px-2 py-1 bg-primary/10 text-primary rounded border border-primary/20">OPERATIONAL</span>
+</div>
+<h3 class="font-headline-md text-headline-md mb-unit uppercase tracking-tight">Quantum Core</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mb-gutter h-24 overflow-hidden">Sub-atomic computing clusters architected for multi-dimensional encryption and strategic simulation.</p>
+<div class="pt-gutter border-t border-outline-variant/10 flex items-center justify-between">
+<button class="font-label-mono text-label-mono text-primary flex items-center gap-2 group/btn">
+                        LAUNCH PHASE <span class="material-symbols-outlined text-sm transition-transform group-hover/btn:translate-x-1" data-icon="arrow_forward">arrow_forward</span>
+</button>
+<span class="material-symbols-outlined text-outline-variant text-xl group-hover:text-primary transition-colors" data-icon="hub">hub</span>
+</div>
+</div>
+<!-- Lab 02 -->
+<div class="glass-panel p-gutter rounded-xl relative overflow-hidden group hover:bg-surface-variant/20 transition-all duration-500">
+<div class="flex justify-between items-start mb-gutter">
+<span class="font-label-mono text-label-mono text-outline uppercase">LAB-02</span>
+<span class="font-label-mono text-[10px] px-2 py-1 bg-secondary/10 text-secondary rounded border border-secondary/20">SYNCING</span>
+</div>
+<h3 class="font-headline-md text-headline-md mb-unit uppercase tracking-tight">Neural Systems</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mb-gutter h-24 overflow-hidden">Synthetic cognition arrays designed to augment command-level decision making and predictive logistics.</p>
+<div class="pt-gutter border-t border-outline-variant/10 flex items-center justify-between">
+<button class="font-label-mono text-label-mono text-primary flex items-center gap-2 group/btn">
+                        LAUNCH PHASE <span class="material-symbols-outlined text-sm transition-transform group-hover/btn:translate-x-1" data-icon="arrow_forward">arrow_forward</span>
+</button>
+<span class="material-symbols-outlined text-outline-variant text-xl group-hover:text-secondary transition-colors" data-icon="psychology">psychology</span>
+</div>
+</div>
+<!-- Lab 03 -->
+<div class="glass-panel p-gutter rounded-xl relative overflow-hidden group hover:bg-surface-variant/20 transition-all duration-500">
+<div class="flex justify-between items-start mb-gutter">
+<span class="font-label-mono text-label-mono text-outline uppercase">LAB-03</span>
+<span class="font-label-mono text-[10px] px-2 py-1 bg-primary/10 text-primary rounded border border-primary/20">OPERATIONAL</span>
+</div>
+<h3 class="font-headline-md text-headline-md mb-unit uppercase tracking-tight">Tactical Robotics</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mb-gutter h-24 overflow-hidden">Kinetic response platforms engineered for extreme environments and high-precision field operations.</p>
+<div class="pt-gutter border-t border-outline-variant/10 flex items-center justify-between">
+<button class="font-label-mono text-label-mono text-primary flex items-center gap-2 group/btn">
+                        LAUNCH PHASE <span class="material-symbols-outlined text-sm transition-transform group-hover/btn:translate-x-1" data-icon="arrow_forward">arrow_forward</span>
+</button>
+<span class="material-symbols-outlined text-outline-variant text-xl group-hover:text-primary transition-colors" data-icon="smart_toy">smart_toy</span>
+</div>
+</div>
+<!-- Lab 04 -->
+<div class="glass-panel p-gutter rounded-xl relative overflow-hidden group hover:bg-surface-variant/20 transition-all duration-500">
+<div class="flex justify-between items-start mb-gutter">
+<span class="font-label-mono text-label-mono text-outline uppercase">LAB-04</span>
+<span class="font-label-mono text-[10px] px-2 py-1 bg-primary/10 text-primary rounded border border-primary/20">OPERATIONAL</span>
+</div>
+<h3 class="font-headline-md text-headline-md mb-unit uppercase tracking-tight">IoT Integration</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mb-gutter h-24 overflow-hidden">Global sensor mesh networks providing real-time telemetry across the entire AIR G infrastructure.</p>
+<div class="pt-gutter border-t border-outline-variant/10 flex items-center justify-between">
+<button class="font-label-mono text-label-mono text-primary flex items-center gap-2 group/btn">
+                        LAUNCH PHASE <span class="material-symbols-outlined text-sm transition-transform group-hover/btn:translate-x-1" data-icon="arrow_forward">arrow_forward</span>
+</button>
+<span class="material-symbols-outlined text-outline-variant text-xl group-hover:text-primary transition-colors" data-icon="sensors">sensors</span>
+</div>
+</div>
+<!-- Lab 05 -->
+<div class="glass-panel p-gutter rounded-xl relative overflow-hidden group hover:bg-surface-variant/20 transition-all duration-500">
+<div class="flex justify-between items-start mb-gutter">
+<span class="font-label-mono text-label-mono text-outline uppercase">LAB-05</span>
+<span class="font-label-mono text-[10px] px-2 py-1 bg-primary/10 text-primary rounded border border-primary/20">OPERATIONAL</span>
+</div>
+<h3 class="font-headline-md text-headline-md mb-unit uppercase tracking-tight">Bio-Tech Nexus</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mb-gutter h-24 overflow-hidden">Advanced molecular engineering and synthetic biological interfaces for human-system synergy.</p>
+<div class="pt-gutter border-t border-outline-variant/10 flex items-center justify-between">
+<button class="font-label-mono text-label-mono text-primary flex items-center gap-2 group/btn">
+                        LAUNCH PHASE <span class="material-symbols-outlined text-sm transition-transform group-hover/btn:translate-x-1" data-icon="arrow_forward">arrow_forward</span>
+</button>
+<span class="material-symbols-outlined text-outline-variant text-xl group-hover:text-primary transition-colors" data-icon="biotech">biotech</span>
+</div>
+</div>
+<!-- Lab 06 -->
+<div class="glass-panel p-gutter rounded-xl relative overflow-hidden group hover:bg-surface-variant/20 transition-all duration-500">
+<div class="flex justify-between items-start mb-gutter">
+<span class="font-label-mono text-label-mono text-outline uppercase">LAB-06</span>
+<span class="font-label-mono text-[10px] px-2 py-1 bg-primary/10 text-primary rounded border border-primary/20">OPERATIONAL</span>
+</div>
+<h3 class="font-headline-md text-headline-md mb-unit uppercase tracking-tight">Aerospace Dynamics</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mb-gutter h-24 overflow-hidden">Next-generation propulsion systems and aerodynamic testing for orbital-class transportation units.</p>
+<div class="pt-gutter border-t border-outline-variant/10 flex items-center justify-between">
+<button class="font-label-mono text-label-mono text-primary flex items-center gap-2 group/btn">
+                        LAUNCH PHASE <span class="material-symbols-outlined text-sm transition-transform group-hover/btn:translate-x-1" data-icon="arrow_forward">arrow_forward</span>
+</button>
+<span class="material-symbols-outlined text-outline-variant text-xl group-hover:text-primary transition-colors" data-icon="flight_takeoff">flight_takeoff</span>
+</div>
+</div>
+<!-- Image/Hero Card for Visual Impact -->
+<div class="col-span-1 md:col-span-2 lg:col-span-2 relative h-full rounded-xl overflow-hidden group min-h-[300px]">
+<img class="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" data-alt="A highly detailed cinematic shot of a futuristic data center interior with glowing blue fiber optic cables, floating holographic UI elements displaying technical telemetry, and a sleek dark metallic aesthetic. The lighting is low-key with intense blue and red accent glows, creating a sense of deep technological sophistication and power." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBvCsLH8DPTLoyL7KFARQEvId5QygpRG6L73Nnl2B0Refy1njW4eGA2B33Qz_0X_mJJ6XmouKS5AONd1HT7I81M85ryHRqN2ieRiz0cOsd0n2nn3uvaK3YMIjhLXAVGP21n8QPSIbo5GdR-hMxZDaVNEuA5BIVKNidbrDdj6SZQ4qNdVwI0iiJNrTPmknh20FCK7xX5uoEx2wl4SsF2qPDI1UkZlBZmqUu5cips_p6Om1VFwWtK7oSudhFnuXGHfIfbrWv1rEXZyDg"/>
+<div class="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent"></div>
+<div class="absolute bottom-gutter left-gutter right-gutter">
+<span class="font-label-mono text-label-mono text-primary mb-unit block">CORE ARCHITECTURE</span>
+<h3 class="font-headline-lg text-headline-lg uppercase text-white">Integrated Intelligence</h3>
+</div>
+</div>
+<!-- Additional Lab Placeholders -->
+<div class="glass-panel p-gutter rounded-xl relative overflow-hidden group hover:bg-surface-variant/20 transition-all duration-500">
+<div class="flex justify-between items-start mb-gutter">
+<span class="font-label-mono text-label-mono text-outline uppercase">LAB-07</span>
+<span class="font-label-mono text-[10px] px-2 py-1 bg-secondary/10 text-secondary rounded border border-secondary/20">SYNCING</span>
+</div>
+<h3 class="font-headline-md text-headline-md mb-unit uppercase tracking-tight">Material Science</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mb-gutter h-24 overflow-hidden">Developing carbon-lattice structures and adaptive metamaterials for structural resilience.</p>
+<div class="pt-gutter border-t border-outline-variant/10 flex items-center justify-between">
+<button class="font-label-mono text-label-mono text-primary flex items-center gap-2 group/btn">
+                        LAUNCH PHASE <span class="material-symbols-outlined text-sm transition-transform group-hover/btn:translate-x-1" data-icon="arrow_forward">arrow_forward</span>
+</button>
+<span class="material-symbols-outlined text-outline-variant text-xl group-hover:text-primary transition-colors" data-icon="science">science</span>
+</div>
+</div>
+<div class="glass-panel p-gutter rounded-xl relative overflow-hidden group hover:bg-surface-variant/20 transition-all duration-500">
+<div class="flex justify-between items-start mb-gutter">
+<span class="font-label-mono text-label-mono text-outline uppercase">LAB-08</span>
+<span class="font-label-mono text-[10px] px-2 py-1 bg-primary/10 text-primary rounded border border-primary/20">OPERATIONAL</span>
+</div>
+<h3 class="font-headline-md text-headline-md mb-unit uppercase tracking-tight">Energy Systems</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mb-gutter h-24 overflow-hidden">Solid-state fusion research and high-density energy storage arrays for long-range fleet operations.</p>
+<div class="pt-gutter border-t border-outline-variant/10 flex items-center justify-between">
+<button class="font-label-mono text-label-mono text-primary flex items-center gap-2 group/btn">
+                        LAUNCH PHASE <span class="material-symbols-outlined text-sm transition-transform group-hover/btn:translate-x-1" data-icon="arrow_forward">arrow_forward</span>
+</button>
+<span class="material-symbols-outlined text-outline-variant text-xl group-hover:text-primary transition-colors" data-icon="bolt">bolt</span>
+</div>
+</div>
+<!-- Remaining Labs simplified as cards -->
+<div class="glass-panel p-gutter rounded-xl group hover:border-primary/30 transition-all duration-500">
+<span class="font-label-mono text-[10px] text-outline mb-2 block">LAB-09 — LAB-16</span>
+<h4 class="font-headline-md text-headline-md uppercase mb-unit">Extended Network</h4>
+<p class="text-on-surface-variant font-body-md mb-gutter">Access full node registry for Logistics, Protocol, and Defensive Systems.</p>
+<button class="w-full py-3 glass-panel border-primary/20 text-primary font-label-mono text-label-mono rounded hover:bg-primary/10 transition-colors">REQUEST ACCESS</button>
+</div>
+</section>
+<!-- CTA Section -->
+<section class="mt-section-gap glass-panel p-margin-desktop rounded-xl relative overflow-hidden">
+<div class="absolute -right-20 -top-20 w-80 h-80 bg-primary/5 rounded-full blur-[100px]"></div>
+<div class="relative z-10 flex flex-col md:flex-row items-center justify-between gap-gutter">
+<div class="max-w-xl text-center md:text-left">
+<h2 class="font-headline-lg text-headline-lg uppercase mb-unit">Operational Intelligence</h2>
+<p class="text-on-surface-variant font-body-lg">Integrating 16 global nodes into a single, cohesive command architecture. The future is kinetic.</p>
+</div>
+<div class="flex gap-gutter">
+<button class="px-gutter py-4 bg-primary text-on-primary font-label-mono text-label-mono uppercase tracking-widest rounded hover:brightness-110 transition-all">Command Terminal</button>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="full-width bottom-0 relative bg-surface-container-lowest dark:bg-surface-container-lowest border-t border-outline-variant/20 bg-gradient-to-b from-surface-container-low to-surface-container-lowest py-gutter">
+<div class="flex flex-col md:flex-row justify-between items-center w-full px-margin-mobile md:px-margin-desktop py-gutter gap-unit max-w-container-max mx-auto">
+<div class="flex flex-col items-center md:items-start gap-unit">
+<h2 class="font-headline-md text-headline-md font-black text-on-surface">AIR G INTERNATIONAL</h2>
+<p class="font-label-mono text-label-mono text-secondary dark:text-secondary-fixed-dim uppercase tracking-wider">© 2024 AIR G INTERNATIONAL. PRECISION ENGINEERED FOR THE KINETIC HORIZON.</p>
+</div>
+<div class="flex flex-wrap justify-center gap-gutter mt-gutter md:mt-0">
+<a class="text-on-surface-variant font-label-mono hover:text-secondary transition-all hover:tracking-widest uppercase" href="#">SYSTEMS</a>
+<a class="text-on-surface-variant font-label-mono hover:text-secondary transition-all hover:tracking-widest uppercase" href="#">FLEET</a>
+<a class="text-on-surface-variant font-label-mono hover:text-secondary transition-all hover:tracking-widest uppercase" href="#">INTELLIGENCE</a>
+<a class="text-on-surface-variant font-label-mono hover:text-secondary transition-all hover:tracking-widest uppercase" href="#">LOGISTICS</a>
+<a class="text-on-surface-variant font-label-mono hover:text-secondary transition-all hover:tracking-widest uppercase" href="#">PROTOCOL</a>
+</div>
+</div>
+</footer>
+</body></html>

@@ -1,0 +1,37 @@
+# Exclude large PDF files
+class/
+public/class/
+public/logos/*.pdf
+
+# Exclude scratch/dev scripts
+scratch/
+*.ps1
+extract-highres.js
+extract-highres.mjs
+extract-page5-pdf.js
+fix-logo-bg.js
+read-grades.js
+parse-pdf.js
+inspect-images.js
+projected_uttarakhand.txt
+# Exclude local development API routes
+src/app/api/copy-cards/
+src/app/api/copy-certificate/
+src/app/api/copy-demo-pages/
+src/app/api/copy-founder-image/
+src/app/api/copy-libs/
+src/app/api/copy-logo/
+src/app/api/copy-pdet-image/
+src/app/api/extract-sangli-data/
+src/app/api/extract-satara-data/
+src/app/api/extract-uttarakhand/
+src/app/api/extract-world-data/
+src/app/api/extract-zips/
+src/app/api/fix-imports/
+src/app/api/geocode-satara-labs/
+src/app/api/git-commit/
+src/app/api/git-restore/
+src/app/api/npm-install/
+src/app/api/setup-assets/
+src/app/api/temp-check/
+src/app/api/temp-exec/

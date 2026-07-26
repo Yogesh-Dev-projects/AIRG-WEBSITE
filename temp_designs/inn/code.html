@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>AIR G INTERNATIONAL | The Future of Innovation</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&amp;family=Inter:wght@100..900&amp;family=JetBrains+Mono:wght@100..800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-primary": "#002e69",
+                    "on-background": "#e3e2e7",
+                    "on-error": "#690005",
+                    "primary-container": "#4b8eff",
+                    "primary-fixed": "#d8e2ff",
+                    "on-secondary": "#690003",
+                    "surface-container-high": "#292a2e",
+                    "inverse-primary": "#005bc1",
+                    "error": "#ffb4ab",
+                    "on-primary-container": "#00285c",
+                    "on-primary-fixed-variant": "#004493",
+                    "surface": "#121317",
+                    "surface-dim": "#121317",
+                    "tertiary-fixed-dim": "#ffb595",
+                    "tertiary-fixed": "#ffdbcc",
+                    "tertiary": "#ffb595",
+                    "error-container": "#93000a",
+                    "outline": "#8b90a0",
+                    "on-tertiary-container": "#4c1a00",
+                    "inverse-surface": "#e3e2e7",
+                    "on-tertiary-fixed-variant": "#7c2e00",
+                    "on-secondary-fixed": "#410001",
+                    "on-error-container": "#ffdad6",
+                    "on-secondary-fixed-variant": "#930005",
+                    "tertiary-container": "#ef6719",
+                    "secondary": "#ffb4aa",
+                    "surface-tint": "#adc6ff",
+                    "surface-container-highest": "#343539",
+                    "on-primary-fixed": "#001a41",
+                    "on-tertiary-fixed": "#351000",
+                    "primary": "#adc6ff",
+                    "surface-variant": "#343539",
+                    "on-surface": "#e3e2e7",
+                    "on-secondary-container": "#ffd2cc",
+                    "secondary-container": "#c5020b",
+                    "surface-container-low": "#1a1b1f",
+                    "outline-variant": "#414755",
+                    "surface-container-lowest": "#0d0e12",
+                    "on-surface-variant": "#c1c6d7",
+                    "primary-fixed-dim": "#adc6ff",
+                    "secondary-fixed": "#ffdad5",
+                    "on-tertiary": "#571e00",
+                    "surface-container": "#1e1f23",
+                    "inverse-on-surface": "#2f3034",
+                    "secondary-fixed-dim": "#ffb4aa",
+                    "background": "#121317",
+                    "surface-bright": "#38393d"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "margin-mobile": "20px",
+                    "container-max": "1440px",
+                    "gutter": "24px",
+                    "unit": "8px",
+                    "margin-desktop": "80px",
+                    "section-gap": "160px"
+            },
+            "fontFamily": {
+                    "headline-md": ["Geist"],
+                    "label-mono": ["JetBrains Mono"],
+                    "body-md": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "headline-lg": ["Geist"],
+                    "display-lg": ["Geist"],
+                    "display-lg-mobile": ["Geist"]
+            },
+            "fontSize": {
+                    "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "label-mono": ["12px", {"lineHeight": "16px", "letterSpacing": "0.1em", "fontWeight": "500"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "0.02em", "fontWeight": "600"}],
+                    "display-lg": ["72px", {"lineHeight": "80px", "letterSpacing": "0.05em", "fontWeight": "700"}],
+                    "display-lg-mobile": ["40px", {"lineHeight": "48px", "letterSpacing": "0.02em", "fontWeight": "700"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .glass-panel {
+            backdrop-filter: blur(20px);
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .scanning-line {
+            position: absolute;
+            width: 100%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, #adc6ff, transparent);
+            top: 0;
+            animation: scan 4s linear infinite;
+        }
+        @keyframes scan {
+            0% { top: 0%; opacity: 0; }
+            50% { opacity: 1; }
+            100% { top: 100%; opacity: 0; }
+        }
+        .light-blob-blue {
+            background: radial-gradient(circle, rgba(75, 142, 255, 0.15) 0%, transparent 70%);
+        }
+        .light-blob-red {
+            background: radial-gradient(circle, rgba(197, 2, 11, 0.1) 0%, transparent 70%);
+        }
+        .pulsing-node {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: .5; transform: scale(1.5); }
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background font-body-md overflow-x-hidden">
+<!-- Header / TopAppBar -->
+<header class="bg-transparent backdrop-blur-xl dark:bg-transparent fixed top-0 w-full z-50 border-b border-white/10">
+<nav class="flex justify-between items-center w-full px-margin-desktop py-unit max-w-container-max mx-auto h-20">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary text-3xl" data-weight="fill">rocket_launch</span>
+<span class="font-headline-md text-headline-md font-bold text-primary dark:text-primary tracking-tighter">AIR G INTERNATIONAL</span>
+</div>
+<div class="hidden md:flex items-center gap-gutter">
+<a class="font-label-mono text-label-mono uppercase tracking-widest text-primary border-b-2 border-primary pb-1" href="#">INNOVATION</a>
+<a class="font-label-mono text-label-mono uppercase tracking-widest text-on-surface-variant hover:text-primary transition-colors duration-300 hover:backdrop-brightness-125 hover:scale-105 transition-all" href="#">WORKSHOPS</a>
+<a class="font-label-mono text-label-mono uppercase tracking-widest text-on-surface-variant hover:text-primary transition-colors duration-300 hover:backdrop-brightness-125 hover:scale-105 transition-all" href="#">IMPACT</a>
+<a class="font-label-mono text-label-mono uppercase tracking-widest text-on-surface-variant hover:text-primary transition-colors duration-300 hover:backdrop-brightness-125 hover:scale-105 transition-all" href="#">PROTOCOL</a>
+</div>
+<button class="material-symbols-outlined text-primary hover:backdrop-brightness-125 hover:scale-105 transition-all">menu</button>
+</nav>
+</header>
+<main class="relative">
+<!-- Hero Section -->
+<section class="min-h-screen relative flex items-center pt-20 overflow-hidden">
+<!-- Background Elements -->
+<div class="absolute inset-0 z-0">
+<div class="absolute top-1/4 -left-20 w-[600px] h-[600px] light-blob-blue blur-[100px]"></div>
+<div class="absolute bottom-1/4 -right-20 w-[500px] h-[500px] light-blob-red blur-[100px]"></div>
+<!-- Starfield Simulation -->
+<div class="absolute inset-0 opacity-30" style="background-image: radial-gradient(circle at center, #ffffff 1px, transparent 1px); background-size: 100px 100px;"></div>
+</div>
+<div class="relative z-10 w-full max-w-container-max mx-auto px-margin-desktop grid grid-cols-12 gap-gutter items-center">
+<!-- Text Content -->
+<div class="col-span-12 lg:col-span-6 space-y-gutter">
+<div class="inline-flex items-center gap-2 px-4 py-1 glass-panel rounded-full border border-primary/20">
+<span class="w-2 h-2 rounded-full bg-primary pulsing-node"></span>
+<span class="font-label-mono text-label-mono uppercase tracking-[0.2em] text-primary">System Status: Optimal</span>
+</div>
+<h1 class="font-display-lg text-display-lg-mobile md:text-display-lg leading-tight">
+                        THE <span class="text-primary">FUTURE</span> OF <br/>
+                        INNOVATION
+                    </h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-lg">
+                        Engineering advanced digital ecosystems and physical hubs to accelerate the global transition into the next era of technological advancement.
+                    </p>
+<div class="flex flex-wrap gap-gutter pt-8">
+<button class="group relative px-10 py-5 bg-primary text-on-primary font-label-mono text-label-mono uppercase tracking-widest font-bold rounded-lg transition-all duration-300 hover:shadow-[0_0_30px_rgba(173,198,255,0.4)] overflow-hidden">
+<span class="relative z-10">Explore Labs</span>
+<div class="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
+</button>
+<button class="group px-10 py-5 glass-panel text-primary font-label-mono text-label-mono uppercase tracking-widest font-bold rounded-lg hover:border-primary transition-all duration-300 flex items-center gap-2">
+<span>Watch Protocol</span>
+<span class="material-symbols-outlined">play_circle</span>
+</button>
+</div>
+</div>
+<!-- Maharashtra Map Visual -->
+<div class="col-span-12 lg:col-span-6 relative flex justify-center items-center h-[600px]">
+<div class="absolute w-full h-full glass-panel rounded-xl overflow-hidden shadow-2xl flex items-center justify-center p-8">
+<div class="scanning-line"></div>
+<!-- Stylized Map Placeholder Image -->
+<div class="relative w-full h-full rounded-lg bg-surface-container-low/50 border border-white/5 overflow-hidden">
+<img class="w-full h-full object-cover opacity-60 mix-blend-screen" data-alt="A highly detailed holographic map of Maharashtra rendered in a futuristic blue and red tactical HUD style. The map features glowing 3D wireframe terrain with neon pulsing nodes at major urban centers like Mumbai and Pune. Moving energy trails of light connect these nodes, simulating high-speed data transfer across a dark, starry space background with cinematic depth-of-field." data-location="Maharashtra" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAlA-yvD1crKbi5EaOmrepRsxrsiSFlp4NcKTVVv-Nz6shgk82554zkuQAecSGIMqkRvBrcAe5mCz1r9BBEcgt3ocgCp8tzKzzsgsNKMfYobYF0XihcsE98hoesOAd1kFpvDZlAhLCb7Jjy7MSXaUOVRrP1FRUWsaUStfbfsGQNs-yqrIqn0ryHgYkChccFpTF0DoHc7mBr53-5xo04JBqakImVyBZjAxHxAFn6PiifGzEnyC4sxd3uOETFufjQBmlVU3C8vXGR6_E"/>
+<!-- Tactical Overlay Elements -->
+<div class="absolute top-4 left-4 font-label-mono text-label-mono text-primary/50 flex flex-col gap-1">
+<span>[COORDS] 19.7515 N, 75.7139 E</span>
+<span>[STATUS] HUB_ACTIVE</span>
+</div>
+<!-- Pulsing Nodes -->
+<div class="absolute top-[60%] left-[20%] w-4 h-4 bg-primary rounded-full blur-sm pulsing-node"></div>
+<div class="absolute top-[70%] left-[35%] w-3 h-3 bg-secondary rounded-full blur-sm pulsing-node" style="animation-delay: 0.5s"></div>
+<div class="absolute top-[40%] left-[55%] w-3 h-3 bg-primary rounded-full blur-sm pulsing-node" style="animation-delay: 1.2s"></div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Bento Grid Sections -->
+<section class="py-section-gap px-margin-desktop max-w-container-max mx-auto">
+<div class="grid grid-cols-12 gap-gutter">
+<!-- Innovation Lab Card -->
+<div class="col-span-12 md:col-span-8 h-[500px] glass-panel rounded-xl p-10 flex flex-col justify-end relative overflow-hidden group">
+<div class="absolute inset-0 z-0 overflow-hidden">
+<img class="w-full h-full object-cover opacity-30 group-hover:scale-110 transition-transform duration-700" data-alt="A sophisticated robotics laboratory interior at night with glowing blue ambient light and rows of clean, white futuristic workstations. In the foreground, a highly articulated robotic arm is performing precision movements on a circuit board, surrounded by blurred data screens displaying complex engineering schematics. The atmosphere is quiet, clinical, and technologically supreme." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBZiToB1M9HH7nHIfmtpdifto6sDY_ah82P_9UQizOo_Ox3C3loYbdlrahfxIHPiXqDzANWqtDmho2rvdqkAG1c2zm74FiYN7JI6MqbbmY8iSB_H9bX8s-4-vgVF0bqQVrT5Rk5huN7xoSbbDuCGI6f8U27Jpvy-yZRUdpVbMXfjBjejYUcAaWcjGnYRyRCDNDplQVoO5rtUaogkc0A0CFiIYSzd4YQg-HSthNDFXDzv-RpZpF1oZR-Y-LcRecVy-QRxAmoiTaqkZA"/>
+<div class="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent"></div>
+</div>
+<div class="relative z-10 space-y-4">
+<span class="font-label-mono text-label-mono text-primary tracking-[0.3em] uppercase">Deep Tech</span>
+<h3 class="font-headline-lg text-headline-lg">INNOVATION LABS</h3>
+<p class="font-body-md text-on-surface-variant max-w-md">Our research facilities are dedicated to quantum computing, autonomous systems, and advanced material science.</p>
+<a class="inline-flex items-center gap-2 text-primary font-label-mono text-label-mono group/link" href="#">
+                            LAUNCH PHASE <span class="material-symbols-outlined group-hover/link:translate-x-2 transition-transform">arrow_forward</span>
+</a>
+</div>
+<div class="scanning-line"></div>
+</div>
+<!-- Statistics Column -->
+<div class="col-span-12 md:col-span-4 h-[500px] flex flex-col gap-gutter">
+<div class="flex-1 glass-panel rounded-xl p-8 flex flex-col justify-center border-l-4 border-l-primary">
+<span class="font-display-lg text-headline-lg text-primary">120+</span>
+<span class="font-label-mono text-label-mono uppercase tracking-widest text-on-surface-variant">Patents Secured</span>
+</div>
+<div class="flex-1 glass-panel rounded-xl p-8 flex flex-col justify-center border-l-4 border-l-secondary">
+<span class="font-display-lg text-headline-lg text-secondary">15</span>
+<span class="font-label-mono text-label-mono uppercase tracking-widest text-on-surface-variant">Global Hubs</span>
+</div>
+</div>
+<!-- Impact Hub Card -->
+<div class="col-span-12 md:col-span-4 glass-panel rounded-xl p-10 h-[400px] group">
+<div class="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center mb-6">
+<span class="material-symbols-outlined text-primary text-3xl">public</span>
+</div>
+<h3 class="font-headline-md text-headline-md mb-4">IMPACT HUB</h3>
+<p class="font-body-md text-on-surface-variant">Driving sustainable transformation through data-driven environmental initiatives and humanitarian tech deployment.</p>
+</div>
+<!-- Workshops Card -->
+<div class="col-span-12 md:col-span-8 glass-panel rounded-xl p-10 h-[400px] relative overflow-hidden group">
+<div class="flex h-full items-center">
+<div class="w-1/2 space-y-4">
+<h3 class="font-headline-md text-headline-md">TECHNICAL WORKSHOPS</h3>
+<p class="font-body-md text-on-surface-variant">Collaborative sessions with industry leaders to master the tools of the next industrial revolution.</p>
+<button class="mt-4 px-6 py-3 border border-white/10 rounded font-label-mono text-label-mono hover:bg-white/5 transition-all">ENROLL NOW</button>
+</div>
+<div class="w-1/2 flex justify-center">
+<img class="w-48 h-48 object-cover rounded-full border-4 border-primary/20 p-2 group-hover:rotate-12 transition-transform duration-1000" data-alt="An extreme close-up of a high-tech microprocessor glowing with internal golden light, its intricate circuits creating a mesmerizing geometric pattern. The background is a dark, soft-focus technical workshop environment with hints of futuristic tools and screens. The image emphasizes precision, complexity, and the beauty of micro-engineering." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB3q-fs-F-hyXCxZ9V6ij7DR_AQBNwZqald70S-c5zG6unC1ikG53FlSxg43vuzdGLmzwNTgjtFIk5idvBCsV2t97FFALNCoXg7eSV57OWd1JMqLMZONbJ0FltDcH-KHZ4L-KHcZICkExZ3dY3fm7z2CGohE7jR5jwRomYGUwYLKKOfLNnveAToaSCNl-4v4362diNEgk4Y4XuM4BI4qyJ_iC7cnwlBzWJ2n6i4Q8l4u5dg8hVxqdcA8DNfdVqi_fHfxrzmsxT-xgI"/>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="w-full relative overflow-hidden bg-surface-container-lowest dark:bg-surface-container-lowest border-t border-primary/20 bg-gradient-to-b from-transparent to-primary/5">
+<div class="flex flex-col items-center justify-center py-section-gap px-margin-desktop gap-gutter w-full max-w-container-max mx-auto">
+<div class="flex flex-col items-center gap-6">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-4xl" data-weight="fill">rocket_launch</span>
+<span class="font-headline-md text-headline-md text-on-surface tracking-tighter font-bold uppercase">AIR G INTERNATIONAL</span>
+</div>
+<div class="flex flex-wrap justify-center gap-margin-mobile md:gap-gutter">
+<a class="font-label-mono text-label-mono uppercase tracking-widest text-on-surface-variant hover:text-primary hover:glow-sm transition-all hover:tracking-[0.2em] duration-700" href="#">Innovation Labs</a>
+<a class="font-label-mono text-label-mono uppercase tracking-widest text-on-surface-variant hover:text-primary hover:glow-sm transition-all hover:tracking-[0.2em] duration-700" href="#">Workshops</a>
+<a class="font-label-mono text-label-mono uppercase tracking-widest text-on-surface-variant hover:text-primary hover:glow-sm transition-all hover:tracking-[0.2em] duration-700" href="#">Impact Hub</a>
+<a class="font-label-mono text-label-mono uppercase tracking-widest text-on-surface-variant hover:text-primary hover:glow-sm transition-all hover:tracking-[0.2em] duration-700" href="#">Privacy Protocol</a>
+</div>
+</div>
+<div class="mt-8 pt-8 border-t border-white/5 w-full text-center">
+<p class="font-label-mono text-label-mono uppercase tracking-widest text-on-surface-variant/50">
+                    © 2024 AIR G INTERNATIONAL. ENGINEERED FOR THE FUTURE.
+                </p>
+</div>
+</div>
+<!-- Decorative Ambient Light for Footer -->
+<div class="absolute -bottom-40 -left-40 w-96 h-96 light-blob-blue blur-[120px] opacity-40"></div>
+<div class="absolute -bottom-40 -right-40 w-96 h-96 light-blob-red blur-[120px] opacity-20"></div>
+</footer>
+</body></html>

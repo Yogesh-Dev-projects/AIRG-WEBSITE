@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AIR G | REVOLUTION</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Syncopate:wght@400;700&family=Inter:wght@300;400;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="new-design">
+    <div id="mesh-container"></div>
+    <div class="custom-cursor"></div>
+    
+    <nav class="glass-nav">
+        <div class="nav-container">
+            <div class="brand">
+                <span class="logo-main">AIR G</span>
+                <span class="logo-sub">INTERNATIONAL</span>
+            </div>
+            <div class="menu-links">
+                <a href="#home">HOME</a>
+                <a href="#vision">VISION</a>
+                <a href="#lab">LABS</a>
+                <a href="#shop">STORE</a>
+                <a href="#contact">JOIN</a>
+            </div>
+            <div class="nav-extra">
+                <button class="btn-icon" onclick="document.getElementById('contact').scrollIntoView({behavior: 'smooth'})">
+                    <i class="fa-solid fa-bolt"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        <section id="home" class="hero-center">
+            <div class="hero-wrapper">
+                <div class="hero-top-text">THE NEXT CHAPTER IN GLOBAL EDUCATION</div>
+                <h1 class="main-title">
+                    <span class="line">AIR G</span>
+                    <span class="line outline">INTERNATIONAL</span>
+                </h1>
+                <div class="hero-bottom">
+                    <p>REBUILDING THE LEARNING EXPERIENCE FROM THE GROUND UP. INNOVATION, ROBOTICS, AND ARTIFICIAL INTELLIGENCE FOR THE NEW GENERATION.</p>
+                    <div class="cta-group">
+                        <button class="btn-premium" onclick="document.getElementById('vision').scrollIntoView({behavior: 'smooth'})">EXPLORE VISION <i class="fa-solid fa-arrow-right"></i></button>
+                        <button class="btn-outline-new" onclick="document.getElementById('lab').scrollIntoView({behavior: 'smooth'})">VIEW LABS</button>
+                    </div>
+                </div>
+            </div>
+            <div class="hero-visual-center">
+                <img src="hero_new.png" alt="Futuristic Student" class="floating-img">
+            </div>
+        </section>
+
+        <section id="vision" class="bento-section">
+            <div class="section-title">01 // OUR VISION</div>
+            <div class="bento-grid">
+                <div class="bento-item large-card">
+                    <div class="card-content">
+                        <span class="label">MISSION // 01</span>
+                        <h2>INTELLIGENT <br>ECOSYSTEMS</h2>
+                        <p>We provide the tools for students to build their own futures through AI and advanced robotics. Our curriculum is designed by industry experts for real-world impact.</p>
+                        <button class="btn-small" onclick="alert('Full curriculum demo coming soon!')">LEARN MORE</button>
+                    </div>
+                </div>
+                <div class="bento-item tall-card">
+                    <div class="card-content">
+                        <span class="label">STATS // 2026</span>
+                        <div class="stat">98%</div>
+                        <p>SUCCESS RATE IN GLOBAL PLACEMENTS</p>
+                        <div class="stat-small">+45% YEARLY GROWTH</div>
+                    </div>
+                </div>
+                <div class="bento-item small-card">
+                    <i class="fa-solid fa-microchip"></i>
+                    <h3>LAB-A</h3>
+                    <p>AI & Robotics</p>
+                </div>
+                <div class="bento-item small-card accent">
+                    <i class="fa-solid fa-flask"></i>
+                    <h3>LAB-B</h3>
+                    <p>Bio-Tech</p>
+                </div>
+                <div class="bento-item wide-card">
+                    <div class="marquee-container">
+                        <div class="marquee">
+                            <span>FUTURE IS HERE // AIR G INTERNATIONAL // JOIN THE REVOLUTION //</span>
+                            <span>FUTURE IS HERE // AIR G INTERNATIONAL // JOIN THE REVOLUTION //</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="lab" class="labs-detailed">
+            <div class="container">
+                <div class="section-title">02 // RESEARCH LABS</div>
+                <div class="labs-showcase">
+                    <div class="lab-entry">
+                        <div class="lab-img"><img src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&q=80&w=800" alt="Lab 1"></div>
+                        <div class="lab-info">
+                            <h3>Quantum Computing Wing</h3>
+                            <p>Exploring the next frontier of processing power. Our students get hands-on experience with quantum simulators and cryo-tech.</p>
+                            <button class="btn-premium" onclick="alert('Redirecting to Lab Enrollment Portal...')">ENROLL NOW</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="shop" class="store-section">
+            <div class="container">
+                <div class="section-title">03 // ELITE STORE</div>
+                <div class="product-grid">
+                    <div class="product-card">
+                        <div class="p-img"><img src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&q=80&w=400" alt="Watch"></div>
+                        <h4>AIRG TECH-WATCH</h4>
+                        <p>$299.00</p>
+                        <button class="btn-small" onclick="alert('Added to cart!')">ADD TO CART</button>
+                    </div>
+                    <div class="product-card">
+                        <div class="p-img"><img src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&q=80&w=400" alt="Headphones"></div>
+                        <h4>AIRG NEURAL PODS</h4>
+                        <p>$199.00</p>
+                        <button class="btn-small" onclick="alert('Added to cart!')">ADD TO CART</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="contact" class="contact-section">
+            <div class="container">
+                <div class="section-title">04 // JOIN THE NETWORK</div>
+                <div class="contact-flex">
+                    <div class="contact-text">
+                        <h2>Ready to <br><span class="gradient-text">REWRITE</span> history?</h2>
+                        <p>Fill out the form to receive your digital orientation packet.</p>
+                    </div>
+                    <form class="contact-form" onsubmit="event.preventDefault(); alert('Success! Your request has been sent to AIR G HQ.');">
+                        <input type="text" placeholder="FULL NAME" required>
+                        <input type="email" placeholder="EMAIL ADDRESS" required>
+                        <textarea placeholder="WHY AIR G?"></textarea>
+                        <button type="submit" class="btn-premium">SUBMIT REQUEST</button>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="minimal-footer">
+        <div class="footer-left">©2026 AIR G</div>
+        <div class="footer-right">
+            <a href="#">INSTAGRAM</a>
+            <a href="#">TWITTER</a>
+            <a href="#">DISCORD</a>
+        </div>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="main.js"></script>
+</body>
+</html>

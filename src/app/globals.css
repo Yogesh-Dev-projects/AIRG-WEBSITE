@@ -1,0 +1,488 @@
+@import "tailwindcss";
+
+@theme {
+  --color-background: #ffffff;
+  --color-surface: #f8f8fa;
+  --color-on-surface: #1a1a2e;
+  --color-primary: #EB0028;
+  --color-secondary: #FF5C6C;
+  
+  --spacing-section-gap: 120px;
+  --spacing-container-max: 1440px;
+  --spacing-margin-desktop: 80px;
+  
+  --font-headline: var(--font-outfit), sans-serif;
+  --font-body: var(--font-inter), sans-serif;
+  --font-mono: var(--font-jetbrains), monospace;
+}
+
+:root {
+  --background: #ffffff;
+  --surface: #f8f8fa;
+  --on-surface: #1a1a2e;
+  --primary: #EB0028;
+}
+
+body {
+  background-color: #ffffff;
+  color: #1a1a2e;
+  font-family: var(--font-inter), sans-serif;
+}
+
+.font-headline { font-family: var(--font-outfit), sans-serif; }
+.font-body { font-family: var(--font-inter), sans-serif; }
+.font-mono { font-family: var(--font-jetbrains), monospace; }
+
+/* ── Light-theme glass card ────────────────────────────── */
+.glass-premium {
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+
+header.glass-premium {
+  background: #ffffff !important;
+}
+
+.hero-grid {
+  background-image: radial-gradient(rgba(235, 0, 40, 0.15) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+.glow-red {
+  box-shadow: none;
+}
+
+/* ── Cube Transition System ────────────────────────────── */
+.scene {
+  width: 100vw;
+  height: 100vh;
+  perspective: 2500px;
+  overflow: hidden;
+  position: relative;
+}
+
+.cube-container {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-style: preserve-3d;
+  transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform;
+}
+
+.no-transition {
+  transition: none !important;
+}
+
+.cube-face {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background: #ffffff;
+  padding-top: 80px;
+}
+
+/* GPU optimizations during 3D rotation */
+.is-rotating .glass-premium {
+  backdrop-filter: none !important;
+  background: rgba(255, 255, 255, 0.95) !important;
+}
+
+.is-rotating .scanning-line {
+  animation-play-state: paused !important;
+}
+
+.is-rotating .india-map-state {
+  transition: none !important;
+  filter: none !important;
+}
+
+#hero-face { transform: rotateY(0deg) translateZ(50vw); }
+#labs-face { transform: rotateY(90deg) translateZ(50vw); }
+#centres-face { transform: rotateY(180deg) translateZ(50vw); }
+#workshops-face { transform: rotateY(270deg) translateZ(50vw); }
+#store-face { transform: rotateX(90deg) translateZ(50vw); }
+#learning-face { transform: rotateX(-90deg) translateZ(50vw); }
+
+.show-hero { transform: translateZ(-50vw) rotateY(0deg); }
+.show-labs { transform: translateZ(-50vw) rotateY(-90deg); }
+.show-centres { transform: translateZ(-50vw) rotateY(-180deg); }
+.show-workshops { transform: translateZ(-50vw) rotateY(-270deg); }
+.show-store { transform: translateZ(-50vw) rotateX(-90deg); }
+.show-learning { transform: translateZ(-50vw) rotateX(90deg); }
+
+.cube-face.active { z-index: 10; }
+
+.cube-3d-visual {
+  width: 200px;
+  height: 200px;
+  position: relative;
+  transform-style: preserve-3d;
+  animation: spin-slow 20s linear infinite;
+}
+
+@keyframes spin-slow {
+  from { transform: rotateX(0deg) rotateY(0deg); }
+  to { transform: rotateX(360deg) rotateY(360deg); }
+}
+
+.cube-3d-face {
+  position: absolute;
+  width: 200px;
+  height: 200px;
+  border: 2px solid #EB0028;
+  background: rgba(235, 0, 40, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: inset 0 0 30px rgba(235, 0, 40, 0.2);
+}
+
+.cube-face-front  { transform: translateZ(100px); }
+.cube-face-back   { transform: rotateY(180deg) translateZ(100px); }
+.cube-face-right  { transform: rotateY(90deg) translateZ(100px); }
+.cube-face-left   { transform: rotateY(-90deg) translateZ(100px); }
+.cube-face-top    { transform: rotateX(90deg) translateZ(100px); }
+.cube-face-bottom { transform: rotateX(-90deg) translateZ(100px); }
+
+/* 3D A-Shape Transformation */
+.a-3d-container {
+  width: 300px;
+  height: 300px;
+  position: relative;
+  transform-style: preserve-3d;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.a-3d-bar {
+  position: absolute;
+  transform-style: preserve-3d;
+  background: rgba(235, 0, 40, 0.1);
+  border: 1px solid rgba(235, 0, 40, 0.5);
+  box-shadow: 0 0 20px rgba(235, 0, 40, 0.2);
+}
+
+.a-3d-bar::before, .a-3d-bar::after {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: inherit;
+  border: inherit;
+}
+
+/* Side faces for the bars */
+.a-bar-depth-1 { transform: translateZ(15px); }
+.a-bar-depth-2 { transform: translateZ(-15px); }
+
+.a-left-leg {
+  width: 40px;
+  height: 250px;
+  transform: translateX(-45px) rotateZ(18deg);
+}
+
+.a-right-leg {
+  width: 40px;
+  height: 250px;
+  transform: translateX(45px) rotateZ(-18deg);
+}
+
+.a-crossbar {
+  width: 120px;
+  height: 40px;
+  transform: translateY(30px) translateZ(0);
+}
+
+.holographic-effect {
+  background: linear-gradient(45deg, rgba(235, 0, 40, 0.2), rgba(255, 255, 255, 0.1), rgba(235, 0, 40, 0.2));
+  background-size: 200% 200%;
+  animation: holo-shimmer 3s linear infinite;
+}
+
+@keyframes holo-shimmer {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 200% 50%; }
+}
+
+/* Hide scrollbars globally */
+::-webkit-scrollbar {
+  display: none;
+}
+
+* {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+/* Interactive India Map States */
+.india-map-state {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform, fill, stroke;
+}
+
+.india-map-state:hover {
+  filter: drop-shadow(0 0 12px rgba(235, 0, 40, 0.6));
+}
+
+/* Detail map view (e.g. Maharashtra) district/region boundaries visibility */
+.glass-premium svg path:not(.india-map-state) {
+  stroke: rgba(26, 26, 46, 0.28) !important;
+  stroke-width: 0.85px !important;
+  transition: stroke 0.2s ease, stroke-width 0.2s ease;
+}
+
+.glass-premium svg path:not(.india-map-state):hover {
+  stroke: #EB0028 !important;
+  stroke-width: 1.5px !important;
+}
+
+/* Scanning line effect for state detail view */
+.scanning-line {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #EB0028, transparent);
+  animation: scan-down 4s linear infinite;
+  opacity: 0.5;
+  z-index: 10;
+  pointer-events: none;
+}
+
+@keyframes scan-down {
+  0% { top: 0%; }
+  100% { top: 100%; }
+}
+
+/* Pulsing node animation */
+.pulsing-node {
+  animation: pulse-node 2s ease-in-out infinite;
+}
+
+@keyframes pulse-node {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(235, 0, 40, 0.4); }
+  50% { box-shadow: 0 0 0 12px rgba(235, 0, 40, 0); }
+}
+
+/* Text glow for headings */
+.text-glow-red {
+  text-shadow: none;
+}
+
+/* Flat-view mode to bypass 3D transform hit-testing issues when static */
+.flat-view {
+  transform: none !important;
+  transform-style: flat !important;
+  transition: none !important;
+}
+
+.flat-view .cube-face {
+  visibility: hidden !important;
+  pointer-events: none !important;
+  transition: none !important;
+}
+
+.flat-view .cube-face.active {
+  visibility: visible !important;
+  pointer-events: auto !important;
+  transform: none !important;
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  z-index: 10 !important;
+  transition: none !important;
+}
+
+/* ══════════════════════════════════════════════════════════
+   LIGHT THEME OVERRIDES
+   Remap dark-mode Tailwind utilities so the existing JSX
+   "just works" on a white background without touching TSX.
+   ══════════════════════════════════════════════════════════ */
+
+/* ── Text colour overrides ─────────────────────────────── */
+
+/* Headings / primary text that was "text-white" → dark */
+.cube-face .text-white,
+header .text-white {
+  color: #1a1a2e !important;
+}
+
+/* Muted text — white/XX → dark equivalents with high contrast */
+.cube-face .text-white\/5  { color: rgba(26,26,46,0.15) !important; }
+.cube-face .text-white\/10 { color: rgba(26,26,46,0.25) !important; }
+.cube-face .text-white\/15 { color: rgba(26,26,46,0.35) !important; }
+.cube-face .text-white\/20 { color: rgba(26,26,46,0.50) !important; }
+.cube-face .text-white\/30 { color: rgba(26,26,46,0.60) !important; }
+.cube-face .text-white\/40 { color: rgba(26,26,46,0.75) !important; }
+.cube-face .text-white\/50 { color: rgba(26,26,46,0.80) !important; }
+.cube-face .text-white\/60 { color: rgba(26,26,46,0.85) !important; }
+.cube-face .text-white\/70 { color: rgba(26,26,46,0.90) !important; }
+.cube-face .text-white\/80 { color: rgba(26,26,46,0.95) !important; }
+
+/* Map custom high-tech text-color opacities used in TSX to high-contrast versions */
+[class*="text-[#1a1a2e]/40"] { color: rgba(26, 26, 46, 0.75) !important; }
+[class*="text-[#1a1a2e]/30"] { color: rgba(26, 26, 46, 0.65) !important; }
+[class*="text-[#1a1a2e]/20"] { color: rgba(26, 26, 46, 0.55) !important; }
+[class*="text-[#1a1a2e]/60"] { color: rgba(26, 26, 46, 0.85) !important; }
+[class*="text-[#1a1a2e]/80"] { color: rgba(26, 26, 46, 0.95) !important; }
+
+/* ── Border overrides ──────────────────────────────────── */
+.cube-face .border-white\/5,
+header .border-white\/5    { border-color: rgba(0,0,0,0.08) !important; }
+.cube-face .border-white\/10,
+header .border-white\/10   { border-color: rgba(0,0,0,0.12) !important; }
+.cube-face .border-white\/15 { border-color: rgba(0,0,0,0.15) !important; }
+.cube-face .border-white\/20 { border-color: rgba(0,0,0,0.20) !important; }
+
+/* ── Background overrides ──────────────────────────────── */
+.cube-face .bg-white\/5   { background-color: rgba(0,0,0,0.04) !important; }
+.cube-face .bg-white\/10  { background-color: rgba(0,0,0,0.07) !important; }
+.cube-face .bg-black\/40  { background-color: rgba(255,255,255,0.85) !important; }
+
+/* Header specific */
+header .bg-black\/40       { background-color: rgba(255,255,255,0.85) !important; }
+header .border-white\/10   { border-color: rgba(0,0,0,0.08) !important; }
+header .text-white\/80     { color: rgba(26,26,46,0.95) !important; }
+header .text-white\/40     { color: rgba(26,26,46,0.70) !important; }
+header .text-white\/30     { color: rgba(26,26,46,0.60) !important; }
+header .border-white\/20   { border-color: rgba(0,0,0,0.15) !important; }
+header .bg-white\/5        { background-color: rgba(0,0,0,0.04) !important; }
+
+/* ── Logo text on light bg ─────────────────────────────── */
+header .from-white { --tw-gradient-from: #1a1a2e !important; }
+header .via-white  { --tw-gradient-via: #1a1a2e !important; }
+header .to-white\/70 { --tw-gradient-to: rgba(26,26,46,0.8) !important; }
+header .text-white\/40.font-headline { color: rgba(26,26,46,0.7) !important; }
+
+/* Nav links */
+header .text-white\/40:not(.text-primary) { color: rgba(26,26,46,0.7) !important; }
+header .hover\:text-white:hover { color: #1a1a2e !important; }
+
+/* Connect Now button text stays white on red bg */
+header .bg-primary .text-white,
+header .bg-primary.text-white,
+.bg-primary.text-white,
+.bg-primary .text-white,
+button.bg-primary,
+a.bg-primary { color: #ffffff !important; }
+
+/* Keep CTA button text white */
+.glow-red.text-white,
+.glow-red .text-white,
+button.glow-red { color: #ffffff !important; }
+
+.text-white-force {
+  color: #ffffff !important;
+}
+
+/* ── Map section dark panel — keep dark ────────────────── */
+.cube-face .glass-premium.bg-black\/40 {
+  background: rgba(255,255,255,0.85) !important;
+}
+
+/* ── Gradient text "from-white" on hero section ────────── */
+.cube-face .from-white {
+  --tw-gradient-from: #1a1a2e !important;
+}
+.cube-face .via-white {
+  --tw-gradient-via: #1a1a2e !important;
+}
+.cube-face .to-white\/70 {
+  --tw-gradient-to: rgba(26,26,46,0.8) !important;
+}
+
+/* ── Restore white text inside primary-colored elements ── */
+.bg-primary,
+.bg-primary\/10,
+[class*="bg-primary"] button,
+.bg-gradient-to-r.from-\[\#ff4d4d\],
+.glow-red {
+  color: #ffffff;
+}
+
+/* Make sure buttons with bg-primary keep white text */
+button.bg-primary.text-white,
+.bg-primary.text-white {
+  color: #ffffff !important;
+}
+
+/* White text inside red CTA tags/badges */
+.cube-face .bg-primary\/10 .text-primary {
+  color: #EB0028 !important;
+}
+
+/* ── Fix hero background gradients ─────────────────────── */
+.cube-face .bg-primary\/10 { background-color: rgba(235, 0, 40, 0.08) !important; }
+.cube-face .bg-secondary\/5 { background-color: rgba(255, 77, 77, 0.04) !important; }
+.cube-face .bg-primary\/5  { background-color: rgba(235, 0, 40, 0.04) !important; }
+
+/* ── India map container — use light grey bg ───────────── */
+.cube-face .bg-\[\#0a1628\]\/40,
+.cube-face .bg-\[rgba\(10\,22\,40\,0\.94\)\] {
+  background-color: rgba(240,240,245,0.9) !important;
+}
+
+/* ── Compact Map Heights ───────────────────────────────── */
+.cube-face .min-h-\[85vh\] {
+  min-height: 58vh !important;
+}
+
+@keyframes pulse-bar {
+  0% { height: 4px; }
+  100% { height: 26px; }
+}
+
+/* ── Interactive Hover Pointers ────────────────────────── */
+button, a, [role="button"], .cursor-pointer, .nav-link, .cube-face button {
+  cursor: pointer !important;
+}
+
+/* ── Preloader CSS Fallback Animations ─────────────────── */
+@keyframes preloader-slide-down {
+  0% { transform: translate3d(0, 0, 0); }
+  100% { transform: translate3d(0, 100%, 0); }
+}
+@keyframes preloader-fade-out {
+  0% { opacity: 1; }
+  100% { opacity: 0; pointer-events: none; visibility: hidden; }
+}
+@keyframes preloader-text-up {
+  0% { transform: translate3d(0, 105%, 0); }
+  100% { transform: translate3d(0, 0, 0); }
+}
+.preloader-wrapper {
+  will-change: opacity;
+  animation: preloader-fade-out 0.3s ease forwards;
+  animation-delay: 1.8s;
+}
+.preloader-col {
+  will-change: transform;
+  transform: translate3d(0, 0, 0);
+  animation: preloader-slide-down 0.5s ease-in-out forwards;
+}
+.preloader-text-char {
+  display: inline-block;
+  will-change: transform;
+  transform: translate3d(0, 105%, 0);
+  animation: preloader-text-up 0.3s ease-out both;
+}
+.preloader-text-container {
+  will-change: opacity, transform;
+  animation: preloader-fade-out 0.3s ease forwards;
+  animation-delay: 0.9s;
+}
+

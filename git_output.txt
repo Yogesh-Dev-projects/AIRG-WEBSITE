@@ -1,0 +1,2591 @@
+commit ac11f85f5354da78926325fab66c30dd24d4d568
+Author: Yogesh Meena <yogesh.meena.btech2022@sitpune.edu.in>
+Date:   Mon Jun 1 22:54:10 2026 +0530
+
+    Initial commit of AIRG website code
+
+diff --git a/src/components/NewDesignContent.tsx b/src/components/NewDesignContent.tsx
+new file mode 100644
+index 0000000..fc6fe1e
+--- /dev/null
++++ b/src/components/NewDesignContent.tsx
+@@ -0,0 +1,2579 @@
++"use client";
++// Force recompile: 2
++import { useState, useEffect, useRef } from "react";
++import Image from "next/image";
++import Link from "next/link";
++import { motion, useMotionValue, useSpring, AnimatePresence } from "framer-motion";
++import Preloader from "./Preloader";
++import InteractiveIndiaMap from "./InteractiveIndiaMap";
++import InteractiveWorldMap from "./InteractiveWorldMap";
++import { workshopsData } from "@/data/workshops";
++import { labsData } from "@/data/labs";
++import { useAppContext } from "@/context/AppContext";
++import AuthModal from "./AuthModal";
++import { Courses } from "./Courses";
++
++
++// Premium SVG Logo - Recreated for "AIR GURUJI International" (Vertical Centered Layout)
++const Logo = () => (
++  <div className="flex flex-col items-center justify-center text-center group cursor-pointer py-1 select-none">
++    {/* Stylized Logo Typography */}
++    <div className="flex flex-col items-center leading-none select-none">
++      {/* Brand Title: AIR GURUJI */}
++      <div className="flex items-baseline justify-center gap-1.5 leading-none">
++        <span className="font-serif text-[17px] font-black text-[#EB0028] tracking-wide">AIR</span>
++        <span className="relative font-serif text-[17px] font-black text-[#EB0028] tracking-wide flex items-center">
++          {/* Mortarboard Graduation Cap over the G */}
++          <span className="absolute -top-3 left-[-2px] pointer-events-none">
++            <svg width="15" height="10" viewBox="0 0 20 15">
++              {/* Cap Diamond */}
++              <polygon points="10,2 18,6 10,10 2,6" fill="#1a1a2e" stroke="#ffffff" strokeWidth="0.5" />
++              {/* Cap Base */}
++              <path d="M 6,7.5 L 6,11 A 4,2 0 0,0 14,11 L 14,7.5" fill="#1a1a2e" />
++              {/* Cap Tassel */}
++              <path d="M 10,6 L 16,8.5 L 16,11" fill="none" stroke="#ffeb3b" strokeWidth="0.8" />
++              <circle cx="16" cy="11" r="1.2" fill="#ffeb3b" />
++            </svg>
++          </span>
++          GURUJI
++        </span>
++      </div>
++
++      {/* Sub-Brand: Centre of Excellence */}
++      <span className="text-[6.5px] font-sans font-bold text-[#EB0028] tracking-[0.05em] mt-0.5 uppercase leading-none">
++        Centre of Excellence
++      </span>
++
++      {/* Corporate Division: INTERNATIONAL */}
++      <span className="text-[8px] font-sans font-black text-[#1a1a2e] tracking-[0.38em] mt-0.5 uppercase leading-none">
++        INTERNATIONAL
++      </span>
++    </div>
++  </div>
++);
++
++export default function NewDesignContent() {
++  const { isAuthModalOpen, setAuthModalOpen } = useAppContext();
++  const [activeFace, setActiveFace] = useState("");
++  const [previousFace, setPreviousFace] = useState("");
++  const [isInitialLoad, setIsInitialLoad] = useState(true);
++  const [isMounted, setIsMounted] = useState(false);
++  const [rotation, setRotation] = useState({ x: 0, y: 0 });
++  const [isTransitioning, setIsTransitioning] = useState(false);
++  const [activeNetwork, setActiveNetwork] = useState<"india" | "global">("global");
++  const [selectedGlobalHub, setSelectedGlobalHub] = useState<any>(null);
++  const [isMapFullscreen, setIsMapFullscreen] = useState(false);
++
++  // Cart state
++  const [cart, setCart] = useState<{ name: string; price: string; img: string; tag: string; quantity: number }[]>([]);
++  const [isCartOpen, setIsCartOpen] = useState(false);
++  const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
++  const [checkoutStep, setCheckoutStep] = useState<'details' | 'payment' | 'processing' | 'success'>('details');
++  const [shippingDetails, setShippingDetails] = useState({ name: '', email: '', address: '', phone: '' });
++  const [paymentMethod, setPaymentMethod] = useState<'upi' | 'card' | 'netbanking'>('upi');
++  const [orders, setOrders] = useState<{ id: string; date: string; items: { name: string; price: string; quantity: number }[]; total: number; status: string }[]>([]);
++  const [isOrdersOpen, setIsOrdersOpen] = useState(false);
++  const [isProfileOpen, setIsProfileOpen] = useState(false);
++  const [userProfile, setUserProfile] = useState({
++    name: "Rahul Sharma",
++    email: "rahul.sharma@airg.com",
++    role: "Elite Developer",
++    memberSince: "May 2026",
++    walletBalance: 25000,
++    node: "Satara Mesh #04"
++  });
++
++  // Competition Registration States
++  const [selectedComp, setSelectedComp] = useState<string | null>(null);
++  const [compName, setCompName] = useState("");
++  const [compEmail, setCompEmail] = useState("");
++  const [compInst, setCompInst] = useState("");
++  const [isSubmittingComp, setIsSubmittingComp] = useState(false);
++
++  const topUpWallet = (amount: number) => {
++    setUserProfile(prev => ({
++      ...prev,
++      walletBalance: prev.walletBalance + amount
++    }));
++  };
++
++  const addToCart = (product: { name: string; price: string; img: string; tag: string }) => {
++    setCart((prev) => {
++      const existing = prev.find((item) => item.name === product.name);
++      if (existing) {
++        return prev.map((item) =>
++          item.name === product.name ? { ...item, quantity: item.quantity + 1 } : item
++        );
++      }
++      return [...prev, { ...product, quantity: 1 }];
++    });
++    setIsCartOpen(true);
++  };
++
++  const removeFromCart = (name: string) => {
++    setCart((prev) => prev.filter((item) => item.name !== name));
++  };
++
++  const updateQuantity = (name: string, delta: number) => {
++    setCart((prev) =>
++      prev
++        .map((item) => {
++          if (item.name === name) {
++            const newQty = item.quantity + delta;
++            return { ...item, quantity: newQty };
++          }
++          return item;
++        })
++        .filter((item) => item.quantity > 0)
++    );
++  };
++
++  const getCartTotal = () => {
++    return cart.reduce((total, item) => {
++      const numPrice = parseInt(item.price.replace(/[^\d]/g, ""), 10);
++      return total + numPrice * item.quantity;
++    }, 0);
++  };
++
++  const x = useMotionValue(rotation.x);
++  const y = useMotionValue(rotation.y);
++  const xSpring = useSpring(x, { stiffness: 200, damping: 25, restDelta: 0.001 });
++  const ySpring = useSpring(y, { stiffness: 200, damping: 25, restDelta: 0.001 });
++
++  useEffect(() => {
++    x.set(rotation.x);
++    y.set(rotation.y);
++  }, [rotation, x, y]);
++
++  const activeFaceRef = useRef(activeFace);
++
++  useEffect(() => {
++    if (activeFace) {
++      setPreviousFace(activeFaceRef.current);
++      activeFaceRef.current = activeFace;
++      setIsTransitioning(true);
++      const timer = setTimeout(() => setIsTransitioning(false), 850);
++      return () => clearTimeout(timer);
++    }
++  }, [activeFace]);
++
++  const isDragging = useRef(false);
++  const dragStart = useRef({ x: 0, y: 0 });
++  const lastRotation = useRef({ x: 0, y: 0 });
++
++  // Combined Interaction & Idle Logic
++  useEffect(() => {
++    let animationFrame: number;
++    
++    const animate = () => {
++      if (!isDragging.current) {
++        setRotation(prev => {
++          const targetX = 0;
++          const targetY = 0;
++          
++          // Snappy spring-back to default straight phase
++          const baseLerpX = prev.x + (targetX - prev.x) * 0.08;
++          const baseLerpY = prev.y + (targetY - prev.y) * 0.08;
++          
++          // Subtle, organic float wave
++          const time = Date.now() * 0.0015;
++          const floatX = Math.sin(time * 1.2) * 3;
++          const floatY = Math.cos(time) * 3;
++          
++          return {
++            x: baseLerpX + (floatX - (baseLerpX - targetX)) * 0.1,
++            y: baseLerpY + (floatY - (baseLerpY - targetY)) * 0.1
++          };
++        });
++      }
++      animationFrame = requestAnimationFrame(animate);
++    };
++
++    const handleWindowMouseMove = (e: MouseEvent) => {
++      if (!isDragging.current) return;
++      
++      const deltaX = e.clientX - dragStart.current.x;
++      const deltaY = e.clientY - dragStart.current.y;
++
++      setRotation({
++        x: lastRotation.current.x - deltaY * 0.5,
++        y: lastRotation.current.y + deltaX * 0.5
++      });
++    };
++
++    const handleWindowMouseUp = () => {
++      if (isDragging.current) {
++        isDragging.current = false;
++        document.body.style.cursor = 'default';
++      }
++    };
++
++    window.addEventListener('mousemove', handleWindowMouseMove);
++    window.addEventListener('mouseup', handleWindowMouseUp);
++    animationFrame = requestAnimationFrame(animate);
++
++    return () => {
++      window.removeEventListener('mousemove', handleWindowMouseMove);
++      window.removeEventListener('mouseup', handleWindowMouseUp);
++      cancelAnimationFrame(animationFrame);
++    };
++  }, []);
++
++  const handleMouseDown = (e: React.MouseEvent) => {
++    isDragging.current = true;
++    dragStart.current = { x: e.clientX, y: e.clientY };
++    lastRotation.current = { ...rotation };
++    document.body.style.cursor = 'grabbing';
++  };
++
++  const navigateTo = (target: string) => {
++    setActiveFace(target);
++    if (target === "centres") {
++      setActiveNetwork("global");
++    }
++    if (typeof window !== "undefined") {
++      window.location.hash = target;
++    }
++    const faceElement = document.getElementById(`${target}-face`);
++    if (faceElement) {
++      faceElement.scrollTop = 0;
++    }
++  };
++
++  useEffect(() => {
++    const handleHashChange = () => {
++      const hash = window.location.hash.replace("#", "");
++      if (hash && ["hero", "labs", "centres", "workshops", "learning", "store"].includes(hash)) {
++        setActiveFace(hash);
++        if (hash === "centres") {
++          setActiveNetwork("global");
++        }
++      } else {
++        setActiveFace("hero");
++      }
++    };
++
++    handleHashChange();
++    setIsMounted(true);
++
++    const savedOrders = localStorage.getItem("aig_orders");
++    if (savedOrders) {
++      try {
++        setOrders(JSON.parse(savedOrders));
++      } catch (e) {
++        console.error(e);
++      }
++    }
++    
++    const timer = setTimeout(() => {
++      setIsInitialLoad(false);
++    }, 50);
++
++    window.addEventListener("hashchange", handleHashChange);
++    return () => {
++      window.removeEventListener("hashchange", handleHashChange);
++      clearTimeout(timer);
++    };
++  }, []);
++
++  const getCubeClass = () => {
++    switch (activeFace) {
++      case "hero": return "show-hero";
++      case "labs": return "show-labs";
++      case "centres": return "show-centres";
++      case "workshops": return "show-workshops";
++      case "store": return "show-store";
++      case "learning": return "show-learning";
++      default: return "show-hero";
++    }
++  };
++
++  const getFaceClass = (faceName: string) => {
++    const isActive = activeFace === faceName;
++    const isPrevious = previousFace === faceName;
++    if (isActive) return "active pointer-events-auto opacity-100 visible";
++    if (isTransitioning && isPrevious) return "pointer-events-none opacity-40 visible";
++    return "pointer-events-none opacity-0 invisible";
++  };
++
++  const labs = labsData;
++
++  const fieldRecords = workshopsData;
++
++  // Optimized 3D Brand Emblem Component
++  const ButterySmoothA = ({ isTransitioning }: { isTransitioning: boolean }) => {
++    const layers = isTransitioning ? 2 : 12;
++    
++    return (
++      <div 
++        className="relative w-[420px] h-[420px] flex items-center justify-center scale-110" 
++        style={{ 
++          transformStyle: 'preserve-3d',
++          willChange: 'transform'
++        }}
++      >
++        {/* 3D Layered Depth Stack */}
++        {[...Array(layers)].map((_, i) => {
++          const isFront = i === layers - 1;
++          const isBack = i === 0;
++          const isFace = isFront || isBack;
++          const depthZ = i * 3.5 - (layers * 1.75);
++          
++          return (
++            <div 
++              key={i} 
++              className="absolute inset-0 flex items-center justify-center pointer-events-none"
++              style={{ 
++                transform: `translateZ(${depthZ}px)`, 
++                transformStyle: 'preserve-3d',
++                opacity: isFace ? 1 : 0.6
++              }}
++            >
++              <svg viewBox="0 0 100 100" className="w-[360px] h-[360px] overflow-visible">
++                <defs>
++                  <linearGradient id={`grad-hex-${i}`} x1="0%" y1="0%" x2="100%" y2="100%">
++                    <stop offset="0%" stopColor="#FF5C6C" />
++                    <stop offset="100%" stopColor="#E11B22" />
++                  </linearGradient>
++                  <linearGradient id={`grad-a-${i}`} x1="0%" y1="0%" x2="0%" y2="100%">
++                    <stop offset="0%" stopColor="#ffffff" />
++                    <stop offset="100%" stopColor="rgba(255, 255, 255, 0.25)" />
++                  </linearGradient>
++                  {isFace && (
++                    <filter id={`neon-glow-${i}`} colorInterpolationFilters="sRGB">
++                      <feGaussianBlur stdDeviation="1.5" result="blur" />
++                      <feComposite in="SourceGraphic" in2="blur" operator="over" />
++                    </filter>
++                  )}
++                </defs>
++                
++                {/* Solid Hexagon Core */}
++                <polygon 
++                  points="50,22 75,36 75,64 50,78 25,64 25,36" 
++                  fill={isFace ? "rgba(10, 22, 40, 0.94)" : "rgba(225, 27, 34, 0.8)"}
++                  stroke={isFace ? `url(#grad-hex-${i})` : "transparent"}
++                  strokeWidth={isFace ? "2.5" : "0"}
++                  strokeLinejoin="round"
++                  style={{ filter: isFace ? `url(#neon-glow-${i})` : 'none' }}
++                  className={isFace ? "backdrop-blur-md" : ""}
++                />
++
++                {/* Stylized Geometric Letter A inside Hexagon */}
++                <path 
++                  d="M50 34 L64 60 H56 L50 48 L44 60 H36 Z" 
++                  fill={isFace ? `url(#grad-a-${i})` : "rgba(255, 255, 255, 0.25)"}
++                  opacity="0.9"
++                />
++              </svg>
++            </div>
++          );
++        })}
++      </div>
++    );
++  };
++
++  return (
++    <div className="font-body bg-white text-[#1a1a2e] overflow-hidden min-h-screen select-none relative">
++      <Preloader onComplete={() => setIsMounted(true)} />
++      <header className="fixed top-0 w-full z-[100] glass-premium border-b border-black/5">
++        <nav className="flex justify-between items-center max-w-[1440px] mx-auto px-5 h-20 md:px-20">
++          <div onClick={() => navigateTo('hero')}>
++            <Logo />
++          </div>
++          <div className="hidden lg:flex gap-10 items-center">
++            {['hero', 'learning', 'store', 'labs', 'workshops', 'centres'].map((item) => {
++              const labels: Record<string, string> = {
++                hero: 'Home',
++                learning: 'Learning',
++                store: 'Store',
++                labs: 'Innovation Labs',
++                workshops: 'Workshops',
++                centres: 'Global Centres'
++              };
++              return (
++                <button
++                  key={item}
++                  className={`nav-link font-semibold transition-colors text-xs uppercase tracking-widest ${activeFace === item ? 'text-primary' : 'text-[#1a1a2e]/40 hover:text-[#1a1a2e]'
++                    }`}
++                  onClick={() => navigateTo(item)}
++                >
++                  {labels[item] || item}
++                </button>
++              );
++            })}
++          </div>
++          <div className="flex items-center gap-3">
++            {/* Shopping Cart Button */}
++            <button 
++              onClick={() => setIsCartOpen(true)}
++              className="relative p-3 rounded-xl border border-black/10 bg-white/40 backdrop-blur-md hover:border-primary/50 transition-all duration-300 flex items-center justify-center text-[#1a1a2e]/80 hover:text-primary shadow-[0_4px_20px_rgba(0,0,0,0.08)] hover:shadow-[0_0_20px_rgba(238,44,60,0.15)] group"
++            >
++              <span className="material-symbols-outlined text-lg group-hover:scale-110 transition-transform duration-300">shopping_bag</span>
++              {cart.reduce((sum, item) => sum + item.quantity, 0) > 0 && (
++                <span className="absolute -top-1.5 -right-1.5 bg-primary text-white text-[9px] font-black w-5 h-5 rounded-full flex items-center justify-center border-2 border-white animate-pulse">
++                  {cart.reduce((sum, item) => sum + item.quantity, 0)}
++                </span>
++              )}
++            </button>
++            {/* User Profile Button */}
++            <button 
++              onClick={() => setIsProfileOpen(true)}
++              className="relative p-3 rounded-xl border border-black/10 bg-white/40 backdrop-blur-md hover:border-primary/50 transition-all duration-300 flex items-center justify-center text-[#1a1a2e]/80 hover:text-primary shadow-[0_4px_20px_rgba(0,0,0,0.08)] hover:shadow-[0_0_20px_rgba(238,44,60,0.15)] group"
++            >
++              <span className="material-symbols-outlined text-lg group-hover:scale-110 transition-transform duration-300">person</span>
++            </button>
++            <button 
++              onClick={() => setAuthModalOpen(true)}
++              className="bg-primary text-[#1a1a2e] px-8 py-3 rounded-xl font-bold text-xs uppercase tracking-widest glow-red hover:scale-105 transition-all"
++            >
++              Connect Now
++            </button>
++          </div>
++        </nav>
++      </header>
++
++      <div className={`scene pt-20 transition-opacity duration-300 ${isMounted ? 'opacity-100' : 'opacity-0'}`}>
++        <div className={`cube-container ${getCubeClass()} ${isInitialLoad ? 'no-transition' : ''} ${!isTransitioning && !isInitialLoad && activeFace ? 'flat-view' : ''} ${isTransitioning ? 'is-rotating' : ''}`}>
++          {/* FACE 1: HERO */}
++          <section className={`cube-face ${getFaceClass('hero')} flex flex-col items-center overflow-y-auto custom-scrollbar`} id="hero-face">
++            <div className="relative w-full flex flex-col pt-6 pb-20">
++              <div className="absolute inset-0 pointer-events-none overflow-hidden">
++                {/* No background glow blobs for a pure white layout */}
++              </div>
++              <div className="relative z-10 w-full max-w-[1440px] mx-auto px-5 md:px-20 grid lg:grid-cols-2 gap-12 lg:gap-16 items-center pt-12 pb-16">
++                <div className="space-y-8 relative">
++                  {/* High-Tech UI Accents */}
++                  <div className="absolute left-[-20px] top-0 h-full w-[1px] bg-black/5">
++                    <div className="absolute top-0 left-[-4px] w-2 h-2 bg-primary rounded-full animate-pulse" />
++                    <div className="absolute bottom-0 left-[-4px] w-2 h-2 bg-white/20 rounded-full" />
++                  </div>
++
++
++                  <h1 className="font-headline tracking-tighter leading-[0.9]">
++                    <div className="flex items-baseline gap-4 mb-2">
++                      <span className="text-6xl md:text-8xl font-black text-[#1a1a2e] uppercase">
++                        Center
++                      </span>
++                      <span className="text-2xl md:text-4xl font-bold text-[#1a1a2e]/30 uppercase tracking-[0.2em]">of</span>
++                    </div>
++                    <span className="block text-6xl md:text-8xl font-black text-[#EB0028] uppercase">
++                      Excellence
++                    </span>
++                    <div className="flex items-center gap-4 mt-2">
++                      <span className="h-[2px] w-12 bg-white/10"></span>
++                      <span className="text-3xl md:text-5xl font-black text-[#1a1a2e]/40 uppercase tracking-widest">
++                        Innovation
++                      </span>
++                    </div>
++                  </h1>
++                  
++                  <p className="text-base md:text-lg text-[#1a1a2e]/40 max-w-lg font-light leading-relaxed border-l-2 border-primary/20 pl-6">
++                    Building the digital backbone of Maharashtra through advanced R&D, physical innovation hubs, and strategic technological ecosystems.
++                  </p>
++
++                  <div className="flex flex-wrap gap-4 pt-4">
++                    <button className="group relative px-10 py-5 bg-primary text-[#1a1a2e] font-bold text-xs uppercase tracking-widest rounded-lg transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] glow-red" onClick={() => navigateTo('labs')}>
++                      <span className="relative z-10 flex items-center gap-3">Explore Labs <span className="material-symbols-outlined text-sm">bolt</span></span>
++                    </button>
++                    <button className="group px-10 py-5 glass-premium text-[#1a1a2e]/60 font-bold text-xs uppercase tracking-widest rounded-lg border border-black/5 hover:border-black/20 transition-all duration-300 flex items-center gap-2" onClick={() => navigateTo('workshops')}>
++                      <span>Watch Protocol</span>
++                      <span className="material-symbols-outlined text-sm">play_circle</span>
++                    </button>
++                  </div>
++
++                  <div className="flex gap-12 pt-8">
++                    <div>
++                      <div className="text-3xl font-headline font-black text-[#1a1a2e] tracking-tighter">120<span className="text-primary">+</span></div>
++                      <div className="text-[9px] text-[#1a1a2e]/20 font-bold uppercase tracking-[0.3em] mt-1">Patents</div>
++                    </div>
++                    <div>
++                      <div className="text-3xl font-headline font-black text-[#1a1a2e] tracking-tighter">{labs.length}</div>
++                      <div className="text-[9px] text-[#1a1a2e]/20 font-bold uppercase tracking-[0.3em] mt-1">Global Hubs</div>
++                    </div>
++                    <div>
++                      <div className="text-3xl font-headline font-black text-[#1a1a2e] tracking-tighter">24/7</div>
++                      <div className="text-[9px] text-[#1a1a2e]/20 font-bold uppercase tracking-[0.3em] mt-1">Monitoring</div>
++                  </div>
++                </div>
++              </div>
++
++                <div className="hidden lg:flex justify-center items-center relative h-[560px] w-full rounded-[3.5rem] overflow-hidden translate-x-12 bg-white border border-black/5 shadow-[0_4px_30px_rgba(0,0,0,0.03)]">
++                  {/* Rich layered background */}
++                  <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, #1a1a2e 1px, transparent 0)', backgroundSize: '24px 24px' }}></div>
++                  
++                  {/* No dynamic ambient glows - pure white background */}
++
++                    {/* Honeycomb Hexagonal Grid Pattern */}
++                  <div className="absolute inset-0 opacity-[0.06] pointer-events-none" style={{
++                    backgroundImage: `radial-gradient(circle, #EE2C3C 1px, transparent 1px), 
++                                      linear-gradient(to right, rgba(26,26,46,0.12) 1px, transparent 1px), 
++                                      linear-gradient(to bottom, rgba(26,26,46,0.12) 1px, transparent 1px)`,
++                    backgroundSize: '24px 24px, 48px 48px, 48px 48px'
++                  }}></div>
++
++                  {/* Corner Diagnostic Overlays (HUD readouts) */}
++                  <div className="absolute top-8 left-8 font-mono text-[8px] text-[#1a1a2e]/40 pointer-events-none space-y-1 select-none">
++                    <div>SYSTEM: AIG_GRID_V2.0</div>
++                    <div>STATUS: <span className="text-primary font-black animate-pulse">ONLINE</span></div>
++                    <div>SECURE NODE: #04_SATARA</div>
++                  </div>
++                  
++                  <div className="absolute top-8 right-8 font-mono text-[8px] text-[#1a1a2e]/40 pointer-events-none text-right select-none">
++                    <div>LATENCY: 14ms (MESH)</div>
++                    <div>FPS: 60.0 // RENDER: GPU</div>
++                    <div className="flex justify-end gap-0.5 mt-1">
++                      <span className="w-1.5 h-1 bg-primary/40 rounded-sm"></span>
++                      <span className="w-1.5 h-1 bg-primary/40 rounded-sm"></span>
++                      <span className="w-1.5 h-1 bg-primary/40 rounded-sm"></span>
++                      <span className="w-1.5 h-1 bg-primary animate-pulse rounded-sm"></span>
++                    </div>
++                  </div>
++
++                  <div className="absolute bottom-8 left-8 font-mono text-[8px] text-[#1a1a2e]/40 pointer-events-none select-none">
++                    <div>COORD: 17.6805° N, 74.0183° E</div>
++                    <div>CORE TEMP: 34.2°C // PASSIVE</div>
++                  </div>
++
++                  <div className="absolute bottom-8 right-8 font-mono text-[8px] text-[#1a1a2e]/40 pointer-events-none text-right select-none">
++                    <div>AUTHENTICATED ACCESS</div>
++                    <div>PACKETS: IN 98.4% // OUT 99.1%</div>
++                  </div>
++
++                  {/* Left HUD Vertical Index Scale */}
++                  <div className="absolute left-6 top-1/2 -translate-y-1/2 flex flex-col gap-2.5 pointer-events-none select-none opacity-30 font-mono text-[7px] text-[#1a1a2e]/60">
++                    <div>[MAX] -</div>
++                    <div>080 -</div>
++                    <div>060 -</div>
++                    <div>040 -</div>
++                    <div>020 -</div>
++                    <div>[MIN] -</div>
++                  </div>
++
++                  {/* Right HUD System Load Dial */}
++                  <div className="absolute right-6 top-1/2 -translate-y-1/2 flex flex-col items-center gap-1.5 pointer-events-none select-none opacity-30 font-mono text-[7px] text-[#1a1a2e]/60">
++                    <svg width="34" height="34" viewBox="0 0 36 36">
++                      <circle cx="18" cy="18" r="16" fill="none" stroke="#1a1a2e" strokeWidth="1.2" strokeDasharray="80 20" className="animate-spin" style={{ animationDuration: '6s' }} />
++                      <circle cx="18" cy="18" r="12" fill="none" stroke="#EE2C3C" strokeWidth="1.8" strokeDasharray="50 25" className="animate-spin" style={{ animationDuration: '3s', animationDirection: 'reverse' }} />
++                    </svg>
++                    <div className="font-bold tracking-wider">LOAD: 42%</div>
++                  </div>
++
++                  {/* Bouncing Data Stream Waveform at the bottom center */}
++                  <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-end gap-[3px] h-[26px] pointer-events-none select-none opacity-35">
++                    {[10, 22, 14, 8, 26, 12, 18, 30, 8, 16, 24, 10, 6, 20, 14, 28, 12, 6, 20].map((h, i) => (
++                      <span 
++                        key={i} 
++                        className="w-[2px] bg-primary rounded-full"
++                        style={{ 
++                          height: `${h}px`,
++                          animation: `pulse-bar 0.9s ease-in-out infinite alternate`,
++                          animationDelay: `${i * 0.05}s`
++                        }}
++                      ></span>
++                    ))}
++                  </div>
++
++                   {/* High-Tech Blueprint Vector Graphic Behind Logo */}
++                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none">
++                    <svg width="480" height="480" viewBox="0 0 500 500" className="opacity-[0.8]">
++                      {/* Grid Coordinates & Axes */}
++                      <path d="M 30,250 L 470,250 M 250,30 L 250,470" stroke="#EB0028" strokeWidth="0.8" strokeDasharray="3 6" strokeOpacity="0.4" />
++                      <path d="M 80,80 L 420,420 M 80,420 L 420,80" stroke="#1a1a2e" strokeWidth="0.5" strokeDasharray="1 7" strokeOpacity="0.3" />
++
++                      {/* Main Concentric Tech Blueprint Rings */}
++                      <circle cx="250" cy="250" r="225" fill="none" stroke="#1a1a2e" strokeWidth="0.75" strokeOpacity="0.2" />
++                      <circle cx="250" cy="250" r="215" fill="none" stroke="#EB0028" strokeWidth="1" strokeDasharray="3 4" strokeOpacity="0.6" />
++                      <circle cx="250" cy="250" r="185" fill="none" stroke="#1a1a2e" strokeWidth="0.5" strokeOpacity="0.3" />
++                      
++                      {/* Rotating Dashed Tech Hexagon Outer Ring */}
++                      <g className="animate-[spin_45s_linear_infinite_reverse] origin-center">
++                        <polygon 
++                          points="250,85 393,167 393,333 250,415 107,333 107,167" 
++                          fill="none" 
++                          stroke="#EB0028" 
++                          strokeWidth="0.8" 
++                          strokeDasharray="8 12" 
++                          strokeOpacity="0.5"
++                        />
++                      </g>
++
++                      {/* Orbiting Satellite Nodes */}
++                      <g className="animate-[spin_15s_linear_infinite] origin-center">
++                        <circle cx="250" cy="65" r="4.5" fill="#EB0028" />
++                        <circle cx="250" cy="65" r="9" fill="none" stroke="#EB0028" strokeWidth="1" className="animate-ping" opacity="0.6" />
++                        <line x1="250" y1="65" x2="250" y2="85" stroke="#EB0028" strokeWidth="0.8" strokeDasharray="2 2" strokeOpacity="0.7" />
++                      </g>
++                      <g className="animate-[spin_25s_linear_infinite_reverse] origin-center">
++                        <circle cx="107" cy="167" r="3.5" fill="#1a1a2e" />
++                        <line x1="107" y1="167" x2="140" y2="167" stroke="#1a1a2e" strokeWidth="0.8" strokeDasharray="2 2" strokeOpacity="0.5" />
++                      </g>
++
++                      <circle cx="250" cy="250" r="145" fill="none" stroke="#1a1a2e" strokeWidth="0.75" strokeDasharray="40 10 10 10" strokeOpacity="0.4" />
++                      <circle cx="250" cy="250" r="115" fill="none" stroke="#EB0028" strokeWidth="0.8" opacity="0.7" />
++                      <circle cx="250" cy="250" r="85" fill="none" stroke="#1a1a2e" strokeWidth="1.5" strokeDasharray="2 12" strokeLinecap="round" strokeOpacity="0.3" />
++
++                      {/* Spinning Outer Calibration Ticks */}
++                      <g className="animate-[spin_60s_linear_infinite] origin-center">
++                        {[...Array(36)].map((_, index) => {
++                          const angle = (index * 360) / 360 * 10;
++                          const isMajor = index % 3 === 0;
++                          return (
++                            <line
++                              key={index}
++                              x1="250"
++                              y1={isMajor ? "20" : "24"}
++                              x2="250"
++                              y2="30"
++                              stroke={isMajor ? "#EB0028" : "#1a1a2e"}
++                              strokeWidth={isMajor ? "1.5" : "0.75"}
++                              transform={`rotate(${angle} 250 250)`}
++                              strokeOpacity={isMajor ? "0.9" : "0.5"}
++                            />
++                          );
++                        })}
++                      </g>
++
++                      {/* Concentric Sweep & Radar Arch Markers */}
++                      <g className="animate-[spin_40s_linear_infinite_reverse] origin-center">
++                        <path d="M 70,250 A 180,180 0 0,1 250,70" fill="none" stroke="#EB0028" strokeWidth="2" strokeDasharray="20 40" strokeLinecap="round" strokeOpacity="0.7" />
++                        <path d="M 430,250 A 180,180 0 0,1 250,430" fill="none" stroke="#1a1a2e" strokeWidth="1" strokeDasharray="10 30" strokeLinecap="round" strokeOpacity="0.4" />
++                      </g>
++
++                      {/* Tech Angle Text / Info overlays mock */}
++                      <text x="260" y="75" fill="#EB0028" fontSize="7" fontFamily="monospace" fontWeight="bold" opacity="0.6">SYS_STATUS: ACTIVE</text>
++                      <text x="70" y="244" fill="#1a1a2e" fontSize="7" fontFamily="monospace" fontWeight="bold" opacity="0.4">NODE_04 // SATARA</text>
++                      <text x="350" y="425" fill="#EB0028" fontSize="7" fontFamily="monospace" fontWeight="bold" opacity="0.6">R&amp;D_GRID: DEPLOYED</text>
++                    </svg>
++                  </div>
++
++                  {/* Corner tech brackets */}
++                  <div className="absolute top-6 left-6 w-8 h-8 border-t-2 border-l-2 border-primary/20 rounded-tl-xl pointer-events-none"></div>
++                  <div className="absolute top-6 right-6 w-8 h-8 border-t-2 border-r-2 border-primary/20 rounded-tr-xl pointer-events-none"></div>
++                  <div className="absolute bottom-6 left-6 w-8 h-8 border-b-2 border-l-2 border-primary/20 rounded-bl-xl pointer-events-none"></div>
++                  <div className="absolute bottom-6 right-6 w-8 h-8 border-b-2 border-r-2 border-primary/20 rounded-tr-xl pointer-events-none"></div>
++
++                  {/* Floating pulsing nodes */}
++                  <div className="absolute top-12 right-16 w-2 h-2 bg-primary/25 rounded-full animate-pulse"></div>
++                  <div className="absolute bottom-16 left-12 w-1.5 h-1.5 bg-primary/30 rounded-full animate-pulse" style={{ animationDelay: '1s' }}></div>
++                  <div className="absolute top-1/3 right-8 w-1 h-1 bg-primary/20 rounded-full animate-pulse" style={{ animationDelay: '0.5s' }}></div>
++
++                  {/* Inner shadow for depth */}
++                  <div className="absolute inset-0 rounded-[3.5rem] shadow-[inset_0_2px_30px_rgba(0,0,0,0.03)] pointer-events-none"></div>
++
++                  <motion.div
++                    className="a-3d-container cursor-grab active:cursor-grabbing scale-135 relative z-10"
++                    style={{
++                      rotateX: xSpring,
++                      rotateY: ySpring,
++                      transformStyle: 'preserve-3d'
++                    }}
++                    onMouseDown={handleMouseDown}
++                  >
++                    <ButterySmoothA isTransitioning={isTransitioning} />
++                  </motion.div>
++                </div>
++              </div>
++
++              {/* HOMEPAGE SECTIONS: NAVIGATION PILOTS */}
++              <div className="w-full max-w-[1440px] mx-auto px-5 md:px-20 py-16 space-y-16 relative z-10 border-t border-black/5">
++
++                {/* PILLAR 1: INNOVATION LABS */}
++                <div className="glass-premium p-8 md:p-14 rounded-[3.5rem] border border-black/5 hover:border-primary/20 transition-all duration-500 shadow-3xl relative overflow-hidden group">
++                  <div className="absolute inset-0 bg-gradient-to-tr from-primary/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
++                  <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center relative z-10">
++                    <div className="lg:col-span-7 space-y-6 relative">
++                      {/* Visual Accent */}
++                      <div className="absolute left-[-20px] top-0 h-full w-[1px] bg-black/5">
++                        <div className="absolute top-0 left-[-4px] w-2 h-2 bg-primary rounded-full animate-pulse" />
++                      </div>
++                      
++                      <span className="font-mono text-[10px] text-primary tracking-[0.4em] uppercase font-black block">01 // Research Frontiers</span>
++                      <h2 className="font-headline text-3xl md:text-5xl font-black text-[#1a1a2e] uppercase tracking-tighter leading-none">
++                        Innovation <br />
++                        <span className="text-primary text-glow-red">Labs</span>
++                      </h2>
++                      <p className="font-body text-sm md:text-base text-[#1a1a2e]/40 leading-relaxed font-light border-l-2 border-primary/20 pl-6">
++                        A distributed network of 15 deep-tech facilities operating at the edge of physical possibility. Integrating neural architectures, advanced robotics, precision agriculture, and aerospace systems.
++                      </p>
++                      
++                      <div className="flex flex-wrap gap-2.5 pt-1">
++                        {["Robotics Hub", "Agri-Tech R&D", "Propulsion Lab", "Decentralized Networks"].map((tech) => (
++                          <span key={tech} className="px-3.5 py-1 rounded-full bg-black/5 border border-black/10 text-[#1a1a2e]/60 text-[9px] uppercase font-mono tracking-wider font-bold">
++                            {tech}
++                          </span>
++                        ))}
++                      </div>
++
++                      <div className="pt-2">
++                        <button 
++                          onClick={() => navigateTo('labs')}
++                          className="group relative px-6 py-3.5 bg-primary text-[#1a1a2e] font-bold text-xs uppercase tracking-widest rounded-xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] glow-red flex items-center gap-3"
++                        >
++                          Explore Labs 
++                          <span className="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">arrow_forward</span>
++                        </button>
++                      </div>
++                    </div>
++
++                    <div className="lg:col-span-5 grid grid-cols-2 gap-4">
++                      {[
++                        { name: "Mudhoji Lab", type: "Robotics", icon: "precision_manufacturing" },
++                        { name: "Sakharwadi Lab", type: "AgriTech", icon: "agriculture" },
++                        { name: "Sant Tukaram", type: "Decentralized", icon: "hub" },
++                        { name: "Swami Ramanand", type: "Bio-Signals", icon: "biotech" }
++                      ].map((item, i) => (
++                        <div 
++                          key={i} 
++                          onClick={() => navigateTo('labs')}
++                          className="p-5 glass-premium rounded-2xl border border-black/5 hover:border-primary/30 transition-all cursor-pointer group/item space-y-3"
++                        >
++                          <span className="material-symbols-outlined text-primary text-xl group-hover/item:scale-110 transition-transform">{item.icon}</span>
++                          <div>
++                            <div className="text-[#1a1a2e] font-headline font-bold text-xs uppercase tracking-tight">{item.name}</div>
++                            <div className="text-[#1a1a2e]/30 text-[8px] font-mono uppercase tracking-widest mt-1">{item.type}</div>
++                          </div>
++                        </div>
++                      ))}
++                    </div>
++                  </div>
++                </div>
++
++                {/* PILLAR 2: OFFLINE CENTRES */}
++                <div className="glass-premium p-8 md:p-14 rounded-[3.5rem] border border-black/5 hover:border-primary/20 transition-all duration-500 shadow-3xl relative overflow-hidden group">
++                  <div className="absolute inset-0 bg-gradient-to-tr from-primary/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
++                  <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center relative z-10">
++                    <div className="lg:col-span-5 relative group rounded-3xl overflow-hidden border border-white/10 bg-[#070d19] p-2 shadow-2xl order-2 lg:order-1">
++                      <div className="absolute inset-0 bg-gradient-to-tr from-primary/15 to-transparent pointer-events-none z-10"></div>
++                      <div className="scanning-line group-hover:translate-y-[260px] transition-transform duration-[4000ms] ease-linear"></div>
++                      <div className="relative aspect-[4/3] w-full rounded-2xl overflow-hidden bg-slate-50 flex items-center justify-center p-4 select-none [&_svg]:max-h-[90%] [&_svg]:w-auto [&_svg]:mx-auto">
++                        <InteractiveIndiaMap />
++                      </div>
++                      <div className="relative z-10 text-center space-y-3 mt-4">
++                        <div className="text-xl font-headline font-black text-white uppercase tracking-tighter">India Deployment Grid</div>
++                        <div className="text-primary font-mono text-[8px] uppercase tracking-widest px-2.5 py-1 bg-primary/10 rounded border border-primary/20 inline-block">Active Node Synced</div>
++                      </div>
++                    </div>
++
++                    <div className="lg:col-span-7 space-y-6 relative order-1 lg:order-2 lg:pl-8">
++                      {/* Visual Accent */}
++                      <div className="absolute left-[-20px] top-0 h-full w-[1px] bg-black/5">
++                        <div className="absolute top-0 left-[-4px] w-2 h-2 bg-primary rounded-full animate-pulse" />
++                      </div>
++                      
++                      <span className="font-mono text-[10px] text-primary tracking-[0.4em] uppercase font-black block">02 // Physical Infrastructure</span>
++                      <h2 className="font-headline text-3xl md:text-5xl font-black text-[#1a1a2e] uppercase tracking-tighter leading-none">
++                        Offline <br />
++                        <span className="text-primary text-glow-red">Centres</span>
++                      </h2>
++                      <p className="font-body text-sm md:text-base text-[#1a1a2e]/40 leading-relaxed font-light border-l-2 border-primary/20 pl-6">
++                        Explore our regional footprint on the India Network Map. Drill down into active zones like Maharashtra's technology frontiers or the detailed 38-district deployment across Bihar.
++                      </p>
++                      
++                      <div className="grid grid-cols-2 gap-4">
++                        <div className="space-y-0.5">
++                          <div className="text-[#1a1a2e] font-headline font-black text-base">38 Districts Mapped</div>
++                          <div className="text-[#1a1a2e]/30 text-[8px] font-mono uppercase tracking-widest">State-wide boundary precision</div>
++                        </div>
++                        <div className="space-y-0.5">
++                          <div className="text-primary font-headline font-black text-base">Interactive Zoom</div>
++                          <div className="text-[#1a1a2e]/30 text-[8px] font-mono uppercase tracking-widest">Tactical regional audits</div>
++                        </div>
++                      </div>
++
++                      <div className="pt-2">
++                        <button 
++                          onClick={() => navigateTo('centres')}
++                          className="group relative px-6 py-3.5 bg-primary text-[#1a1a2e] font-bold text-xs uppercase tracking-widest rounded-xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] glow-red flex items-center gap-3"
++                        >
++                          Open Network Map 
++                          <span className="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">arrow_forward</span>
++                        </button>
++                      </div>
++                    </div>
++                  </div>
++                </div>
++
++                {/* PILLAR 3: WORKSHOPS */}
++                <div className="glass-premium p-8 md:p-14 rounded-[3.5rem] border border-black/5 hover:border-primary/20 transition-all duration-500 shadow-3xl relative overflow-hidden group">
++                  <div className="absolute inset-0 bg-gradient-to-tr from-primary/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
++                  <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center relative z-10">
++                    <div className="lg:col-span-7 space-y-6 relative">
++                      {/* Visual Accent */}
++                      <div className="absolute left-[-20px] top-0 h-full w-[1px] bg-black/5">
++                        <div className="absolute top-0 left-[-4px] w-2 h-2 bg-primary rounded-full animate-pulse" />
++                      </div>
++                      
++                      <span className="font-mono text-[10px] text-primary tracking-[0.4em] uppercase font-black block">03 // Operational Training</span>
++                      <h2 className="font-headline text-3xl md:text-5xl font-black text-[#1a1a2e] uppercase tracking-tighter leading-none">
++                        Workshops & <br />
++                        <span className="text-primary text-glow-red">Briefings</span>
++                      </h2>
++                      <p className="font-body text-sm md:text-base text-[#1a1a2e]/40 leading-relaxed font-light border-l-2 border-primary/20 pl-6">
++                        A visual audit log of our industrial-grade training sessions, technical exhibitions, and tactical bootcamps. Sync with local coordinators or request custom institutional showcases.
++                      </p>
++                      
++                      <div className="grid grid-cols-1 md:grid-cols-3 gap-3 font-mono text-[8px] uppercase tracking-widest text-[#1a1a2e]/50">
++                        <div className="flex items-center gap-2">
++                          <span className="material-symbols-outlined text-primary text-base">precision_manufacturing</span>
++                          <span>Industrial Expos</span>
++                        </div>
++                        <div className="flex items-center gap-2">
++                          <span className="material-symbols-outlined text-primary text-base">psychology</span>
++                          <span>Tech Briefings</span>
++                        </div>
++                        <div className="flex items-center gap-2">
++                          <span className="material-symbols-outlined text-primary text-base">diversity_3</span>
++                          <span>Bootcamps</span>
++                        </div>
++                      </div>
++
++                      <div className="pt-2">
++                        <button 
++                          onClick={() => navigateTo('workshops')}
++                          className="group relative px-6 py-3.5 bg-primary text-[#1a1a2e] font-bold text-xs uppercase tracking-widest rounded-xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] glow-red flex items-center gap-3"
++                        >
++                          Audit Workshops 
++                          <span className="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">arrow_forward</span>
++                        </button>
++                      </div>
++                    </div>
++
++                    <div className="lg:col-span-5 space-y-3.5">
++                      {fieldRecords.slice(0, 2).map((record, i) => (
++                        <div 
++                          key={i}
++                          onClick={() => navigateTo('workshops')}
++                          className="glass-premium p-5 rounded-2xl border border-black/5 hover:border-primary/25 transition-all cursor-pointer flex gap-4 items-center group/item"
++                        >
++                          <div className="relative w-14 h-14 rounded-xl overflow-hidden shrink-0 border border-black/5">
++                            <Image src={record.url} alt={record.title} fill className="object-cover group-hover/item:scale-105 transition-transform duration-500" sizes="56px" />
++                          </div>
++                          <div className="space-y-0.5">
++                            <span className="px-2 py-0.5 bg-primary/10 border border-primary/20 rounded text-[7px] font-mono text-primary uppercase font-bold tracking-wider">{record.category}</span>
++                            <div className="text-[#1a1a2e] font-headline font-bold text-xs uppercase tracking-tight line-clamp-1 mt-1">{record.title}</div>
++                          </div>
++                        </div>
++                      ))}
++                    </div>
++                  </div>
++                </div>
++
++                {/* PILLAR 4: ELITE STORE */}
++                <div className="glass-premium p-8 md:p-14 rounded-[3.5rem] border border-black/5 hover:border-primary/20 transition-all duration-500 shadow-3xl relative overflow-hidden group">
++                  <div className="absolute inset-0 bg-gradient-to-tr from-primary/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
++                  <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center relative z-10">
++                    <div className="lg:col-span-5 grid grid-cols-2 gap-4 order-2 lg:order-1">
++                      {[
++                        { name: "Robotics Core Kit", price: "â‚¹12,499", icon: "memory" },
++                        { name: "Interface Hoodie", price: "â‚¹2,499", icon: "apparel" }
++                      ].map((item, i) => (
++                        <div 
++                          key={i}
++                          onClick={() => navigateTo('store')}
++                          className="p-5 glass-premium rounded-2xl border border-black/5 hover:border-primary/30 transition-all cursor-pointer group/item text-center space-y-3"
++                        >
++                          <div className="w-10 h-10 bg-black/5 rounded-lg flex items-center justify-center mx-auto text-primary text-lg"><span className="material-symbols-outlined">{item.icon}</span></div>
++                          <div>
++                            <div className="text-[#1a1a2e] font-headline font-bold text-[11px] uppercase tracking-tight">{item.name}</div>
++                            <div className="text-primary font-mono text-[8px] font-bold mt-1">{item.price}</div>
++                          </div>
++                        </div>
++                      ))}
++                    </div>
++
++                    <div className="lg:col-span-7 space-y-6 relative order-1 lg:order-2 lg:pl-8">
++                      {/* Visual Accent */}
++                      <div className="absolute left-[-20px] top-0 h-full w-[1px] bg-black/5">
++                        <div className="absolute top-0 left-[-4px] w-2 h-2 bg-primary rounded-full animate-pulse" />
++                      </div>
++                      
++                      <span className="font-mono text-[10px] text-primary tracking-[0.4em] uppercase font-black block">04 // Logistics & Provisioning</span>
++                      <h2 className="font-headline text-3xl md:text-5xl font-black text-[#1a1a2e] uppercase tracking-tighter leading-none">
++                        Elite <br />
++                        <span className="text-primary text-glow-red">Store</span>
++                      </h2>
++                      <p className="font-body text-sm md:text-base text-[#1a1a2e]/40 leading-relaxed font-light border-l-2 border-primary/20 pl-6">
++                        Official technology kits, high-performance apparel, and deep-learning textbooks designed for engineers and institutional training programs.
++                      </p>
++                      
++                      <div className="pt-1 text-[#1a1a2e]/40 font-light text-[10px]">
++                        * Supports bulk procurement and volume licensing for academic institutions across India.
++                      </div>
++
++                      <div className="pt-2">
++                        <button 
++                          onClick={() => navigateTo('store')}
++                          className="group relative px-6 py-3.5 bg-primary text-[#1a1a2e] font-bold text-xs uppercase tracking-widest rounded-xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] glow-red flex items-center gap-3"
++                        >
++                          Enter Elite Store 
++                          <span className="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">arrow_forward</span>
++                        </button>
++                      </div>
++                    </div>
++                  </div>
++                </div>
++
++              </div>
++
++              {/* FOOTER */}
++              <footer className="w-full border-t border-black/5 pt-16 pb-12 relative z-10">
++                <div className="max-w-[1440px] mx-auto px-5 md:px-20">
++                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-12 gap-8 mb-12">
++                    <div className="space-y-4 sm:col-span-2 md:col-span-3 pr-0 md:pr-4">
++                      <Logo />
++                      <p className="text-[#1a1a2e]/40 text-xs font-light leading-relaxed max-w-xs font-body">
++                        Building the digital and physical infrastructure layer for decentralized intelligence hubs and autonomous ecosystems.
++                      </p>
++                    </div>
++                    <div className="md:col-span-2">
++                      <h4 className="font-sans font-bold text-[#1a1a2e] mb-4 uppercase tracking-wider text-[11px]">Company</h4>
++                      <ul className="space-y-2 text-xs text-[#1a1a2e]/50 font-sans font-medium">
++                        <li><a href="/about" className="hover:text-primary transition-colors">About Us</a></li>
++                        <li><a href="/careers" className="hover:text-primary transition-colors">Careers</a></li>
++                        <li><a href="/blog" className="hover:text-primary transition-colors">Blog</a></li>
++                        <li><a href="/press" className="hover:text-primary transition-colors">Press</a></li>
++                      </ul>
++                    </div>
++                    <div className="md:col-span-3">
++                      <h4 className="font-sans font-bold text-[#1a1a2e] mb-4 uppercase tracking-wider text-[11px]">Community</h4>
++                      <ul className="space-y-2 text-xs text-[#1a1a2e]/50 font-sans font-medium">
++                        <li><a href="/instructor" className="hover:text-primary transition-colors">Become an Instructor</a></li>
++                        <li><a href="/affiliate" className="hover:text-primary transition-colors">Affiliate Program</a></li>
++                        <li><a href="/stories" className="hover:text-primary transition-colors">Student Stories</a></li>
++                      </ul>
++                    </div>
++                    <div className="md:col-span-2">
++                      <h4 className="font-sans font-bold text-[#1a1a2e] mb-4 uppercase tracking-wider text-[11px]">Support</h4>
++                      <ul className="space-y-2 text-xs text-[#1a1a2e]/50 font-sans font-medium">
++                        <li><a href="/help" className="hover:text-primary transition-colors">Help Center</a></li>
++                        <li><a href="/contact" className="hover:text-primary transition-colors">Contact Us</a></li>
++                        <li><a href="/privacy" className="hover:text-primary transition-colors">Privacy Policy</a></li>
++                        <li><a href="/terms" className="hover:text-primary transition-colors">Terms of Service</a></li>
++                      </ul>
++                    </div>
++                    <div className="md:col-span-2">
++                      <h4 className="font-sans font-bold text-[#1a1a2e] mb-4 uppercase tracking-wider text-[11px]">Mobile App</h4>
++                      <div className="flex flex-col gap-2">
++                        {/* App Store button */}
++                        <a href="#" className="flex items-center gap-2.5 bg-black hover:bg-black/90 text-white px-3.5 py-2 rounded-lg transition-all duration-300 border border-white/10 w-[150px] hover:scale-[1.02]">
++                          <svg viewBox="0 0 170 170" className="w-[18px] h-[18px] fill-white">
++                            <path d="M150.37 130.25c-2.45 5.66-5.35 10.87-8.71 15.66-4.58 6.53-8.33 11.05-11.22 13.56-4.48 4.12-9.28 6.23-14.42 6.35-3.69 0-8.14-1.05-13.32-3.18-5.19-2.12-9.97-3.17-14.34-3.17-4.58 0-9.49 1.05-14.75 3.17-5.26 2.13-9.5 3.24-12.74 3.35-4.37.13-9.13-1.9-14.3-6.08-3.57-2.9-7.22-7.44-10.95-13.62C13.43 115.17 6.1 90.7 6.1 65.86c0-15.16 3.73-27.42 11.2-36.78 7.46-9.36 16.56-14.13 27.27-14.3 5.37-.08 10.95 1.5 16.74 4.74 5.8 3.23 9.87 4.79 12.21 4.79 1.83 0 5.61-1.46 11.37-4.4 5.75-2.92 11.16-4.33 16.24-4.22 17.58.33 30.65 6.78 39.22 19.38-15.7 9.53-23.33 22.33-22.92 38.4.33 12.92 5.3 23.46 14.92 31.62 9.62 8.16 20.87 12.5 33.74 13.04.42-3.4 1.25-7.04 2.5-10.88zM119.22 26.24c0-7.72 2.76-14.88 8.29-21.49.92-1.09 1.83-2.01 2.75-2.75 1-.92 1.67-1.42 2-1.5.25-.08.5-.12.75-.12.58 0 1 .29 1.25.87.5.92.75 2.21.75 3.87 0 7.42-2.75 14.54-8.25 21.34-.83.92-1.75 1.88-2.75 2.88-1 .92-1.71 1.46-2.12 1.62-.34.17-.67.25-1 .25-.67 0-1.13-.37-1.38-1.12-.37-1.13-.54-2.46-.54-3.98z" />
++                          </svg>
++                          <div className="flex flex-col items-start leading-none text-left">
++                            <span className="text-[6.5px] uppercase tracking-wider text-white/55">Download on the</span>
++                            <span className="text-[10.5px] font-semibold text-white mt-0.5 font-sans">App Store</span>
++                          </div>
++                        </a>
++                        {/* Google Play button */}
++                        <a href="#" className="flex items-center gap-2.5 bg-black hover:bg-black/90 text-white px-3.5 py-2 rounded-lg transition-all duration-300 border border-white/10 w-[150px] hover:scale-[1.02]">
++                          <svg viewBox="0 0 512 512" className="w-[18px] h-[18px] fill-white">
++                            <path d="M325.3 234.3L104.6 13l280.8 161.2-60.1 60.1zM47 0C34 6.8 25.3 19.2 25.3 35.3v441.3c0 16.1 8.7 28.5 21.7 35.3l256.6-256L47 0zm425.2 225.6l-58 33.3 60.1 60.1c11.9-19.1 11.9-42.5-2.1-53.4zM104.6 499l220.7-126.7-60.1-60.1-160.6 186.8z" />
++                          </svg>
++                          <div className="flex flex-col items-start leading-none text-left">
++                            <span className="text-[6.5px] uppercase tracking-wider text-white/55">GET IT ON</span>
++                            <span className="text-[10.5px] font-semibold text-white mt-0.5 font-sans">Google Play</span>
++                          </div>
++                        </a>
++                      </div>
++                    </div>
++                  </div>
++                  
++                  <div className="pt-8 border-t border-black/5 flex flex-col md:flex-row justify-between items-center gap-6 font-mono text-[9px] text-[#1a1a2e]/30 tracking-widest uppercase">
++                    <div>© 2026 AIR G INTERNATIONAL. ALL RIGHTS RESERVED.</div>
++                    <div className="flex gap-6">
++                      <a href="#" className="hover:text-primary transition-colors">Security Protocols</a>
++                      <span>/</span>
++                      <a href="#" className="hover:text-primary transition-colors">Compliance Audits</a>
++                    </div>
++                  </div>
++                </div>
++              </footer>
++            </div>
++          </section>
++
++          {/* FACE 2: LABS (NEXUS NODES) */}
++          <section className={`cube-face ${getFaceClass('labs')} pt-16 pb-20 overflow-y-auto custom-scrollbar`} id="labs-face">
++            <div className="max-w-[1440px] mx-auto px-5 md:px-20">
++              <div className="mb-10 relative">
++                <div className="absolute left-[-20px] top-0 h-full w-[1px] bg-black/5">
++                  <div className="absolute top-0 left-[-4px] w-2 h-2 bg-primary rounded-full animate-pulse" />
++                </div>
++                <span className="text-primary font-black tracking-[0.4em] uppercase text-[10px] mb-4 block font-mono">Strategic Infrastructure</span>
++                <h2 className="font-headline tracking-tighter leading-[0.9]">
++                  <span className="block text-4xl md:text-6xl font-black text-[#1a1a2e] uppercase">
++                    Innovation
++                  </span>
++                  <span className="block text-4xl md:text-6xl font-black bg-gradient-to-r from-[#EE2C3C] via-[#FF5C6C] to-[#BD1A29] bg-clip-text text-transparent uppercase drop-shadow-[0_2px_8px_rgba(238,44,60,0.15)]">
++                    Labs
++                  </span>
++                </h2>
++                <p className="text-[#1a1a2e]/40 mt-4 max-w-2xl text-base font-light leading-relaxed font-body border-l-2 border-primary/20 pl-6">
++                  A distributed network of deep-tech facilities operating at the edge of physical possibility. Precision engineered for the kinetic horizon.
++                </p>
++              </div>
++
++              <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-20">
++                {[
++                  { label: "Verified Hubs", val: `${labs.length} Active Labs`, icon: "domain", pulse: true },
++                  { label: "Coverage Area", val: "3 Active States", icon: "map" },
++                  { label: "Focus Domains", val: "Deep Tech & AI", icon: "precision_manufacturing" },
++                  { label: "Mission Scale", val: "State-Wide Impact", icon: "hub" }
++                ].map((item) => (
++                  <div key={item.label} className="p-6 glass-premium rounded-2xl border border-black/5 border-t-2 border-t-primary flex flex-col gap-2 group hover:border-primary/50 transition-all shadow-sm">
++                    <div className="flex items-center gap-2">
++                      {item.pulse ? <span className="w-2 h-2 bg-primary rounded-full animate-pulse shadow-[0_0_10px_#EE2C3C]"></span> : <span className="material-symbols-outlined text-xs text-primary">{item.icon}</span>}
++                      <span className="text-[10px] font-bold text-[#1a1a2e]/40 uppercase tracking-widest font-mono">{item.label}</span>
++                    </div>
++                    <div className="text-sm text-[#1a1a2e] font-black font-headline uppercase tracking-tight">{item.val}</div>
++                  </div>
++                ))}
++              </div>
++
++              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
++                {labs.map((lab, i) => (
++                  <div key={i} className="glass-premium p-6 rounded-3xl border border-black/5 border-t-4 border-t-primary group hover:border-primary/50 transition-all duration-500 relative overflow-hidden shadow-sm flex flex-col justify-between h-full">
++                    <div className="scanning-line group-hover:translate-y-[380px] transition-transform duration-[3000ms] ease-linear"></div>
++                    <div>
++                      <div className="flex justify-between items-start mb-6">
++                        <span className="font-mono text-[10px] text-[#1a1a2e]/20 uppercase tracking-widest">LAB-{String(i + 1).padStart(2, '0')}</span>
++                        <span className="font-mono text-[8px] px-2 py-1 bg-primary/10 text-primary rounded border border-primary/20 uppercase tracking-widest">Operational</span>
++                      </div>
++
++                      {/* Lab Centre Photo */}
++                      <div className="relative aspect-[16/10] w-full rounded-2xl overflow-hidden mb-6 border border-black/5 bg-slate-100 shrink-0">
++                        <Image 
++                          src={lab.img} 
++                          alt={lab.name} 
++                          fill 
++                          className="object-cover group-hover:scale-105 transition-transform duration-500"
++                          sizes="(max-width: 768px) 100vw, 300px"
++                        />
++                      </div>
++
++                      <div className="w-12 h-12 bg-primary/5 rounded-2xl flex items-center justify-center text-primary/80 mb-6 group-hover:bg-primary group-hover:text-white transition-all duration-300">
++                        <span className="material-symbols-outlined text-2xl">{lab.icon}</span>
++                      </div>
++                      <h4 className="text-xl font-headline font-bold mb-3 text-[#1a1a2e] uppercase tracking-tight group-hover:text-primary transition-colors">{lab.name}</h4>
++                      <p className="text-xs text-[#1a1a2e]/40 leading-relaxed mb-8 h-16 overflow-hidden line-clamp-3 font-body">{lab.desc}</p>
++                    </div>
++                    <div className="pt-6 border-t border-black/5 flex items-center justify-between font-mono mt-auto">
++                      <Link 
++                        href={`/labs/${lab.slug}`}
++                        className="text-[10px] font-bold text-primary flex items-center gap-2 group/btn uppercase tracking-widest font-mono hover:text-[#EE2C3C] transition-colors"
++                      >
++                        Launch Phase <span className="material-symbols-outlined text-xs transition-transform group-hover/btn:translate-x-1">arrow_forward</span>
++                      </Link>
++                      <span className="material-symbols-outlined text-[#1a1a2e]/10 text-lg group-hover:text-primary/50 transition-colors">{lab.sIcon}</span>
++                    </div>
++                  </div>
++                ))}
++              </div>
++            </div>
++          </section>
++
++          {/* FACE 3: CENTRES (TACTICAL ZOOM MAP) */}
++          <section className={`cube-face ${getFaceClass('centres')} pt-24 pb-10 overflow-y-auto custom-scrollbar`} id="centres-face">
++            <div className="max-w-[1440px] mx-auto px-5 md:px-12">
++              
++              {/* Network Toggle Switch */}
++              <div className="flex justify-center mb-8">
++                <div className="bg-slate-100 p-1.5 rounded-2xl border border-black/5 flex gap-2 z-20">
++                  <button
++                    onClick={() => {
++                      setActiveNetwork("india");
++                      setSelectedGlobalHub(null);
++                    }}
++                    className={`px-6 py-2.5 rounded-xl font-bold text-xs uppercase tracking-widest transition-all cursor-pointer ${
++                      activeNetwork === "india"
++                        ? "bg-[#EE2C3C] text-white shadow-md"
++                        : "text-[#1a1a2e]/60 hover:text-[#1a1a2e]"
++                    }`}
++                  >
++                    India Network
++                  </button>
++                  <button
++                    onClick={() => setActiveNetwork("global")}
++                    className={`px-6 py-2.5 rounded-xl font-bold text-xs uppercase tracking-widest transition-all cursor-pointer ${
++                      activeNetwork === "global"
++                        ? "bg-[#EE2C3C] text-white shadow-md"
++                        : "text-[#1a1a2e]/60 hover:text-[#1a1a2e]"
++                    }`}
++                  >
++                    Global Network
++                  </button>
++                </div>
++              </div>
++
++              <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
++                
++                {/* Left Side: Info & Controls */}
++                <div className="lg:col-span-4 space-y-6 relative">
++                  <div className="absolute left-[-20px] top-0 h-full w-[1px] bg-black/5">
++                    <div className="absolute top-0 left-[-4px] w-2 h-2 bg-primary rounded-full animate-pulse" />
++                  </div>
++                  
++                  {activeNetwork === "india" ? (
++                    <>
++                      <span className="text-primary font-bold tracking-[0.4em] uppercase text-[9px] block font-mono">National Infrastructure</span>
++                      <h2 className="font-headline tracking-tighter leading-[0.9]">
++                        <span className="block text-4xl md:text-5xl font-black text-[#1a1a2e] uppercase">
++                          India
++                        </span>
++                        <span className="block text-4xl md:text-5xl font-black text-primary uppercase text-glow-red">
++                          Network
++                        </span>
++                      </h2>
++                      <p className="text-[#1a1a2e]/60 text-xs font-light leading-relaxed font-body border-l-2 border-primary/20 pl-4">
++                        Advanced Tactical Interface. Use controls to zoom and drag to pan across the verified deployment registry. Click highlighted states to explore.
++                      </p>
++
++                      <div className="space-y-4 pt-4">
++                        <div className="glass-premium p-5 rounded-2xl border border-black/5 flex items-center gap-4 bg-gradient-to-r from-primary/5 to-transparent">
++                          <span className="material-symbols-outlined text-primary text-2xl">map</span>
++                          <div>
++                            <h3 className="text-xs font-headline font-bold text-[#1a1a2e] uppercase tracking-tighter">Interactive <span className="text-primary">States</span></h3>
++                            <p className="text-[#1a1a2e]/40 text-[9px] leading-relaxed mt-0.5">Click highlighted states to drill into regional views.</p>
++                          </div>
++                        </div>
++                        
++                        <div className="glass-premium p-5 rounded-2xl border border-black/5 flex flex-col justify-center gap-2">
++                          <div className="flex justify-between text-[9px] font-black text-[#1a1a2e]/40 uppercase tracking-widest">
++                            <span>Coverage Status</span>
++                            <span className="text-primary font-bold">Expanding</span>
++                          </div>
++                          <div className="w-full h-1 bg-black/5 rounded-full overflow-hidden">
++                            <div className="h-full bg-primary w-[35%] transition-all duration-500"></div>
++                          </div>
++                        </div>
++
++                        <button className="w-full py-3.5 bg-primary/10 border border-primary/30 text-[#1a1a2e] font-black text-[10px] uppercase tracking-widest rounded-xl hover:bg-primary transition-all">
++                          Download Full Asset
++                        </button>
++                      </div>
++                    </>
++                  ) : (
++                    <>
++                      <span className="text-primary font-bold tracking-[0.4em] uppercase text-[9px] block font-mono">International Presence</span>
++                      <h2 className="font-headline tracking-tighter leading-[0.9]">
++                        <span className="block text-4xl md:text-5xl font-black text-[#1a1a2e] uppercase">
++                          Global
++                        </span>
++                        <span className="block text-4xl md:text-5xl font-black text-primary uppercase text-glow-red">
++                          Outreach
++                        </span>
++                      </h2>
++                      
++                      {selectedGlobalHub ? (
++                        <div className="space-y-6 pt-2">
++                          <div className="border-l-2 border-primary/35 pl-4">
++                            <h3 className="text-lg font-bold text-[#1a1a2e] uppercase tracking-tight font-sans">{selectedGlobalHub.name}</h3>
++                            <span className="text-[10px] font-mono text-primary font-bold block mt-1">{selectedGlobalHub.location}</span>
++                          </div>
++                          <p className="text-xs text-[#1a1a2e]/60 leading-relaxed font-body">
++                            {selectedGlobalHub.description}
++                          </p>
++                          <div className="space-y-3.5">
++                            {selectedGlobalHub.stats.map((stat: any, idx: number) => (
++                              <div key={idx} className="flex justify-between items-center text-[10px] border-b border-black/5 pb-2 font-mono">
++                                <span className="text-[#1a1a2e]/40">{stat.label.toUpperCase()}</span>
++                                <span className="text-[#1a1a2e] font-black">{stat.value}</span>
++                              </div>
++                            ))}
++                          </div>
++                        </div>
++                      ) : (
++                        <>
++                          <p className="text-[#1a1a2e]/60 text-xs font-light leading-relaxed font-body border-l-2 border-primary/20 pl-4">
++                            Partnering with international schools and universities to align digital literacy pathways with global certification frameworks.
++                          </p>
++
++                          <div className="space-y-4 pt-4">
++                            <div className="glass-premium p-5 rounded-2xl border border-black/5 flex items-center gap-4 bg-gradient-to-r from-primary/5 to-transparent">
++                              <span className="material-symbols-outlined text-primary text-2xl">globe</span>
++                              <div>
++                                <h3 className="text-xs font-headline font-bold text-[#1a1a2e] uppercase tracking-tighter">Interactive <span className="text-primary">Hubs</span></h3>
++                                <p className="text-[#1a1a2e]/40 text-[9px] leading-relaxed mt-0.5">Click highlighted hubs on the map to inspect academic profiles.</p>
++                              </div>
++                            </div>
++
++                            <div className="glass-premium p-5 rounded-2xl border border-black/5 flex flex-col justify-center gap-1 font-mono text-[9px] text-[#1a1a2e]/40">
++                              <div className="flex justify-between border-b border-black/5 pb-1">
++                                <span>ACTIVE REGIONS</span>
++                                <span>7 GLOBAL CENTRES</span>
++                              </div>
++                              <div className="flex justify-between pt-1">
++                                <span>CERTIFICATIONS</span>
++                                <span>UK & ASEAN ACCREDITED</span>
++                              </div>
++                            </div>
++                          </div>
++                        </>
++                      )}
++                    </>
++                  )}
++                </div>
++
++                {/* Right Side: Map Container */}
++                <div className="lg:col-span-8 relative group">
++                  {/* Premium red glow behind the map container */}
++                  <div className="absolute -inset-3 bg-gradient-to-tr from-[#EE2C3C]/10 to-[#FF5C6C]/5 rounded-[3.5rem] opacity-80 blur-2xl group-hover:opacity-100 transition-all duration-700 pointer-events-none"></div>
++                  
++                  <div className="relative glass-premium rounded-[3rem] overflow-hidden border border-[#EE2C3C]/15 bg-white/70 backdrop-blur-md p-5 flex items-center justify-center shadow-[0_15px_40px_rgba(238,44,60,0.05)] hover:shadow-[0_20px_50px_rgba(238,44,60,0.12)] hover:border-[#EE2C3C]/30 transition-all duration-500">
++                    {/* Fullscreen Button */}
++                    <button 
++                      onClick={() => setIsMapFullscreen(true)}
++                      className="absolute top-6 right-6 z-40 bg-white/80 backdrop-blur-md text-[#1a1a2e] hover:bg-[#EB0028] hover:text-white transition-all duration-300 w-10 h-10 rounded-full flex items-center justify-center shadow-lg group"
++                      title="View Fullscreen"
++                    >
++                      <span className="material-symbols-outlined text-xl group-hover:scale-110 transition-transform">fullscreen</span>
++                    </button>
++                    {activeNetwork === "india" ? (
++                      <InteractiveIndiaMap />
++                    ) : (
++                      <InteractiveWorldMap onSelectHub={(hub) => setSelectedGlobalHub(hub)} />
++                    )}
++                  </div>
++                </div>
++
++              </div>
++            </div>
++          </section>
++
++          {/* FACE 4: WORKSHOPS */}
++          <section className={`cube-face ${getFaceClass('workshops')} pt-16 pb-20 overflow-y-auto custom-scrollbar`} id="workshops-face">
++            <div className="max-w-[1440px] mx-auto px-5 md:px-20">
++              <div className="mb-10 relative">
++                <div className="absolute left-[-20px] top-0 h-full w-[1px] bg-black/5">
++                  <div className="absolute top-0 left-[-4px] w-2 h-2 bg-primary rounded-full animate-pulse" />
++                </div>
++                <span className="text-primary font-bold uppercase tracking-[0.5em] text-[10px] mb-4 block font-mono">Operational Training</span>
++                <h2 className="font-headline tracking-tighter leading-[0.9]">
++                  <span className="block text-4xl md:text-6xl font-black text-[#1a1a2e] uppercase">
++                    Field
++                  </span>
++                  <span className="block text-4xl md:text-6xl font-black bg-gradient-to-r from-[#EE2C3C] via-[#FF5C6C] to-[#BD1A29] bg-clip-text text-transparent uppercase drop-shadow-[0_2px_8px_rgba(238,44,60,0.15)]">
++                    Records
++                  </span>
++                </h2>
++                <p className="text-[#1a1a2e]/40 mt-4 max-w-2xl text-base font-light leading-relaxed border-l-2 border-primary/20 pl-6">
++                  A visual audit of industrial-grade training sessions, tactical bootcamps, and high-level strategic exhibitions.
++                </p>
++              </div>
++
++              {/* Portfolio Showcase Gallery - Horizontal Layout */}
++              <div className="space-y-10 mb-32">
++                {fieldRecords.map((record, i) => (
++                  <Link href={`/workshops/${record.slug}`} key={i} className="group grid lg:grid-cols-5 gap-10 items-center glass-premium p-6 rounded-[2.5rem] border border-black/5 hover:border-primary/20 transition-all duration-500 overflow-hidden relative cursor-pointer w-full">
++                    {/* Image Column */}
++                    <div className="lg:col-span-2 relative aspect-[16/10] rounded-[1.5rem] overflow-hidden border border-black/5">
++                      <Image 
++                        src={record.url} 
++                        alt={record.title} 
++                        fill 
++                        className="object-cover group-hover:scale-105 transition-transform duration-700"
++                        sizes="(max-width: 768px) 100vw, 500px"
++                      />
++                      <div className="absolute inset-0 bg-gradient-to-tr from-primary/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
++                    </div>
++
++                    {/* Info Column */}
++                    <div className="lg:col-span-3 space-y-4 pr-6">
++                      <div className="flex items-center gap-3">
++                        <span className="px-3 py-1 bg-primary/10 border border-primary/20 rounded-full text-[8px] font-black font-mono text-primary uppercase tracking-widest">{record.category}</span>
++                        <span className="text-[10px] text-[#1a1a2e]/20 font-mono">/ MISSION DATA</span>
++                      </div>
++                      
++                      <h4 className="text-3xl md:text-4xl font-headline font-black text-[#1a1a2e] uppercase tracking-tighter leading-none">{record.title}</h4>
++                      
++                      <p className="text-[#1a1a2e]/40 text-sm md:text-base font-light leading-relaxed max-w-xl">
++                        {record.desc}
++                      </p>
++
++                      <div className="pt-4 flex items-center gap-6">
++                        <div className="flex items-center gap-2 text-[#1a1a2e]/60">
++                          <span className="material-symbols-outlined text-sm text-primary">verified</span>
++                          <span className="text-[10px] font-bold uppercase tracking-widest font-mono">Authenticated</span>
++                        </div>
++                        <div className="w-full h-[1px] bg-black/5"></div>
++                      </div>
++                    </div>
++
++                    {/* Background UI Element */}
++                    <div className="absolute top-[-20%] right-[-10%] opacity-5 group-hover:opacity-10 transition-opacity pointer-events-none">
++                       <span className="text-[120px] font-black text-[#1a1a2e] leading-none font-headline">0{i+1}</span>
++                    </div>
++                  </Link>
++                ))}
++              </div>
++
++              {/* Engagement Pillars (Replacing Course Catalog) */}
++              <div className="grid lg:grid-cols-3 gap-12">
++                <div className="p-12 glass-premium rounded-[3rem] border border-black/5 space-y-8">
++                  <div className="w-16 h-16 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center">
++                    <span className="material-symbols-outlined text-primary text-3xl">precision_manufacturing</span>
++                  </div>
++                  <div>
++                    <h3 className="text-2xl font-headline font-black text-[#1a1a2e] uppercase tracking-tight mb-4">Industrial <span className="text-primary">Expos</span></h3>
++                    <p className="text-[#1a1a2e]/40 leading-relaxed font-light text-sm">
++                      Showcasing state-of-the-art industrial robotics and automation systems to global stakeholders and engineering communities.
++                    </p>
++                  </div>
++                </div>
++
++                <div className="p-12 glass-premium rounded-[3rem] border border-black/5 space-y-8">
++                  <div className="w-16 h-16 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center">
++                    <span className="material-symbols-outlined text-primary text-3xl">psychology</span>
++                  </div>
++                  <div>
++                    <h3 className="text-2xl font-headline font-black text-[#1a1a2e] uppercase tracking-tight mb-4">Strategic <span className="text-primary">Briefings</span></h3>
++                    <p className="text-[#1a1a2e]/40 leading-relaxed font-light text-sm">
++                      High-level presentations and immersive demonstrations of AI-driven ecosystems and future-tech roadmaps.
++                    </p>
++                  </div>
++                </div>
++
++                <div className="p-12 glass-premium rounded-[3rem] border border-black/5 space-y-8">
++                  <div className="w-16 h-16 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center">
++                    <span className="material-symbols-outlined text-primary text-3xl">diversity_3</span>
++                  </div>
++                  <div>
++                    <h3 className="text-2xl font-headline font-black text-[#1a1a2e] uppercase tracking-tight mb-4">Tactical <span className="text-primary">Exhibitions</span></h3>
++                    <p className="text-[#1a1a2e]/40 leading-relaxed font-light text-sm">
++                      Public engagements designed to inspire and educate the next generation through hands-on technology interaction.
++                    </p>
++                  </div>
++                </div>
++              </div>
++
++              <div className="mt-20 p-12 glass-premium rounded-[3rem] border border-primary/20 flex flex-col md:flex-row items-center justify-between gap-10">
++                <div className="max-w-xl">
++                  <h3 className="text-3xl font-headline text-[#1a1a2e] mb-4 uppercase tracking-tighter">Request a <span className="text-primary">Custom Showcase</span></h3>
++                  <p className="text-[#1a1a2e]/40 text-sm font-light">Bring AIR G's tactical technology and innovation labs to your institution or corporate event.</p>
++                </div>
++                <button className="bg-primary text-[#1a1a2e] px-12 py-6 rounded-2xl font-bold uppercase tracking-widest glow-red whitespace-nowrap hover:scale-105 transition-all">Inquire for Collaboration</button>
++              </div>
++            </div>
++          </section>
++
++          {/* FACE 5: ELITE STORE */}
++          <section className={`cube-face ${getFaceClass('store')} pt-16 pb-20`} id="store-face">
++            <div className="max-w-[1440px] mx-auto px-5 md:px-20">
++              <div className="mb-10 relative">
++                <div className="absolute left-[-20px] top-0 h-full w-[1px] bg-black/5">
++                  <div className="absolute top-0 left-[-4px] w-2 h-2 bg-primary rounded-full animate-pulse" />
++                </div>
++                <span className="text-primary font-bold tracking-[0.5em] uppercase text-[10px] mb-4 block font-mono">Official Merchandise</span>
++                <h2 className="font-headline tracking-tighter leading-[0.9]">
++                  <span className="block text-4xl md:text-6xl font-black text-[#1a1a2e] uppercase">
++                    AIR G
++                  </span>
++                  <span className="block text-4xl md:text-6xl font-black bg-gradient-to-r from-[#EE2C3C] via-[#FF5C6C] to-[#BD1A29] bg-clip-text text-transparent uppercase drop-shadow-[0_2px_8px_rgba(238,44,60,0.15)]">
++                    Store
++                  </span>
++                </h2>
++                <p className="text-[#1a1a2e]/40 mt-4 max-w-2xl text-base font-light border-l-2 border-primary/20 pl-6">Exclusive high-performance gear and academic resources for the next generation of engineers.</p>
++              </div>
++
++              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
++                {[
++                  { name: "Neural Interface Hoodie", price: "₹2,499", img: "https://images.unsplash.com/photo-1556821840-3a63f95609a7?auto=format&fit=crop&q=80&w=400", tag: "Apparel" },
++                  { name: "AIG Industrial Pack", price: "₹4,999", img: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&q=80&w=400", tag: "Gear" },
++                  { name: "Robotics Core Kit", price: "₹12,499", img: "https://images.unsplash.com/photo-1581092160562-40aa08e78837?auto=format&fit=crop&q=80&w=400", tag: "Hardware" },
++                  { name: "AI Strategy Handbook", price: "₹899", img: "https://images.unsplash.com/photo-1589998059171-988d887df646?auto=format&fit=crop&q=80&w=400", tag: "Books" }
++                ].map((product, i) => (
++                  <div key={i} className="glass-premium rounded-[2rem] overflow-hidden border border-black/5 group hover:border-primary/50 transition-all flex flex-col h-full">
++                    <div className="relative h-64 overflow-hidden">
++                      <img src={product.img} alt={product.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
++                      <div className="absolute top-4 right-4 px-3 py-1 bg-black/60 backdrop-blur-md rounded-full text-[10px] font-bold text-[#1a1a2e] uppercase tracking-widest">{product.tag}</div>
++                    </div>
++                    <div className="p-8 flex flex-col flex-grow">
++                      <h4 className="text-lg font-headline font-bold text-[#1a1a2e] mb-2 uppercase tracking-tight">{product.name}</h4>
++                      <div className="flex justify-between items-center font-mono mt-auto pt-4">
++                        <span className="text-primary font-bold">{product.price}</span>
++                        <button 
++                          onClick={() => addToCart(product)}
++                          className="text-[10px] font-bold text-[#1a1a2e] uppercase tracking-widest px-4 py-2 bg-black/5 rounded-lg hover:bg-primary transition-all font-mono"
++                        >
++                          Add to Bag
++                        </button>
++                      </div>
++                    </div>
++                  </div>
++                ))}
++              </div>
++
++              <div className="mt-20 p-12 glass-premium rounded-[3rem] border border-primary/20 flex flex-col md:flex-row items-center justify-between gap-10">
++                <div className="max-w-xl">
++                  <h3 className="text-3xl font-headline text-[#1a1a2e] mb-4">Bulk Institutional Orders</h3>
++                  <p className="text-[#1a1a2e]/40 text-sm">We provide specialized hardware kits and curricula for schools and colleges across Maharashtra. Connect with our procurement team for volume licensing.</p>
++                </div>
++                <button className="bg-primary text-[#1a1a2e] px-10 py-5 rounded-2xl font-bold uppercase tracking-widest glow-red whitespace-nowrap">Contact Sales</button>
++              </div>
++
++              <footer className="mt-40 pt-20 border-t border-black/5 grid grid-cols-1 md:grid-cols-5 gap-12 pb-10">
++                <div className="space-y-6 md:col-span-2">
++                  <Logo />
++                  <p className="text-[10px] text-[#1a1a2e]/20 uppercase tracking-[0.2em]">© 2026 AIR G INTERNATIONAL. ALL RIGHTS RESERVED.</p>
++                  <div className="flex gap-4">
++                    <div className="w-10 h-10 rounded-xl bg-black/5 border border-black/10 flex items-center justify-center text-[#1a1a2e] hover:bg-primary transition-all cursor-pointer group shadow-lg"><span className="material-symbols-outlined text-sm">mail</span></div>
++                    <div className="w-10 h-10 rounded-xl bg-black/5 border border-black/10 flex items-center justify-center text-[#1a1a2e] hover:bg-primary transition-all cursor-pointer group shadow-lg"><span className="material-symbols-outlined text-sm">hub</span></div>
++                  </div>
++                </div>
++                <div>
++                  <h4 className="font-bold text-[#1a1a2e] mb-6 uppercase tracking-widest text-[10px]">Company</h4>
++                  <ul className="space-y-3 text-xs text-[#1a1a2e]/40 uppercase tracking-widest">
++                    <li><a href="/about" className="hover:text-primary transition-colors text-left block">About Us</a></li>
++                    <li><a href="/careers" className="hover:text-primary transition-colors text-left block">Careers</a></li>
++                    <li><a href="/blog" className="hover:text-primary transition-colors text-left block">Blog</a></li>
++                    <li><a href="/press" className="hover:text-primary transition-colors text-left block">Press</a></li>
++                  </ul>
++                </div>
++                <div>
++                  <h4 className="font-bold text-[#1a1a2e] mb-6 uppercase tracking-widest text-[10px]">Community</h4>
++                  <ul className="space-y-3 text-xs text-[#1a1a2e]/40 uppercase tracking-widest">
++                    <li><a href="/instructor" className="hover:text-primary transition-colors text-left block">Become an Instructor</a></li>
++                    <li><a href="/affiliate" className="hover:text-primary transition-colors text-left block">Affiliate Program</a></li>
++                    <li><a href="/stories" className="hover:text-primary transition-colors text-left block">Student Stories</a></li>
++                  </ul>
++                </div>
++                <div>
++                  <h4 className="font-bold text-[#1a1a2e] mb-6 uppercase tracking-widest text-[10px]">Support</h4>
++                  <ul className="space-y-3 text-xs text-[#1a1a2e]/40 uppercase tracking-widest">
++                    <li><a href="/help" className="hover:text-primary transition-colors text-left block">Help Center</a></li>
++                    <li><a href="/contact" className="hover:text-primary transition-colors text-left block">Contact Us</a></li>
++                    <li><a href="/privacy" className="hover:text-primary transition-colors text-left block">Privacy Policy</a></li>
++                    <li><a href="/terms" className="hover:text-primary transition-colors text-left block">Terms of Service</a></li>
++                  </ul>
++                </div>
++              </footer>
++            </div>
++          </section>
++
++          {/* FACE 6: LEARNING */}
++          <section className={`cube-face ${getFaceClass('learning')} pt-16 pb-20 overflow-y-auto custom-scrollbar`} id="learning-face">
++            <div className="max-w-[1440px] mx-auto px-5 md:px-20">
++              <div className="mb-12 relative">
++                <div className="absolute left-[-20px] top-0 h-full w-[1px] bg-black/5">
++                  <div className="absolute top-0 left-[-4px] w-2 h-2 bg-primary rounded-full animate-pulse" />
++                </div>
++                <span className="text-primary font-bold tracking-[0.5em] uppercase text-[10px] mb-4 block font-mono">Academic & Innovation Portal</span>
++                <h2 className="font-headline tracking-tighter leading-[0.9]">
++                  <span className="block text-4xl md:text-6xl font-black text-[#1a1a2e] uppercase">
++                    Learning &
++                  </span>
++                  <span className="block text-4xl md:text-6xl font-black bg-gradient-to-r from-[#EE2C3C] to-[#BD1A29] bg-clip-text text-transparent uppercase drop-shadow-[0_2px_8px_rgba(238,44,60,0.15)]">
++                    Competition Hub
++                  </span>
++                </h2>
++                <p className="text-[#1a1a2e]/40 mt-4 max-w-2xl text-base font-light border-l-2 border-primary/20 pl-6">
++                  Register for state-level engineering challenges, track active student nodes, and synchronize your curriculums via the official AIR G Learning App.
++                </p>
++                 {/* Free Training Courses Section (Full Width, 4 columns) */}
++              <div className="space-y-6 mb-16 pt-6">
++                <h3 className="text-xl font-headline font-black text-[#1a1a2e] uppercase tracking-tight flex items-center gap-2">
++                  <span className="material-symbols-outlined text-primary text-xl">menu_book</span>
++                  Free E-Learning & Certifications
++                </h3>
++                
++                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
++                  {[
++                    {
++                      title: "Introduction to Autonomous Drones",
++                      duration: "6 Weeks",
++                      level: "Beginner",
++                      icon: "flight_takeoff",
++                      desc: "Learn automated flight telemetry, ArduPilot configuration, and payload control using Python scripting.",
++                      students: "1,450+ Enrolled"
++                    },
++                    {
++                      title: "Edge AI & ROS2 Industrial Robotics",
++                      duration: "8 Weeks",
++                      level: "Intermediate",
++                      icon: "precision_manufacturing",
++                      desc: "Develop neural-network controllers for microcontrollers and design simulation workspaces using ROS2.",
++                      students: "980+ Enrolled"
++                    },
++                    {
++                      title: "IoT Wireless Sensor Mesh Networks",
++                      duration: "4 Weeks",
++                      level: "Beginner",
++                      icon: "sensors",
++                      desc: "Deploy smart agricultural telemetry mesh networks using ESP32 nodes and custom cloud dashboards.",
++                      students: "2,100+ Enrolled"
++                    },
++                    {
++                      title: "Embedded Systems & Firmware Dev",
++                      duration: "5 Weeks",
++                      level: "Advanced",
++                      icon: "memory",
++                      desc: "Master low-level C programming, real-time operating systems (RTOS), and hardware debugging interfaces.",
++                      students: "850+ Enrolled"
++                    }
++                  ].map((course, idx) => (
++                    <div key={idx} className="glass-premium p-6 rounded-[2rem] border border-black/5 hover:border-primary/25 transition-all duration-300 relative overflow-hidden group shadow-sm flex flex-col justify-between h-full">
++                      <div className="absolute top-0 right-0 w-16 h-16 bg-gradient-to-bl from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
++                      <div className="space-y-4">
++                        <div className="flex justify-between items-center">
++                          <span className="px-2.5 py-0.5 bg-green-500/10 border border-green-500/20 rounded-full text-[9px] font-black font-mono text-green-600 uppercase tracking-widest">Free Course</span>
++                          <div className="flex items-center gap-1 text-[9px] font-mono text-[#1a1a2e]/30 uppercase tracking-wider">
++                            <span className="material-symbols-outlined text-[11px] text-primary">group</span>
++                            <span>{course.students}</span>
++                          </div>
++                        </div>
++                        
++                        <div className="flex items-center gap-3">
++                          <div className="w-10 h-10 rounded-xl bg-primary/5 border border-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all duration-300 shrink-0">
++                            <span className="material-symbols-outlined text-xl">{course.icon}</span>
++                          </div>
++                          <div>
++                            <h4 className="text-sm font-headline font-bold text-[#1a1a2e] uppercase tracking-tight line-clamp-2 leading-snug">{course.title}</h4>
++                            <div className="flex gap-2 font-mono text-[8px] text-[#1a1a2e]/40 uppercase tracking-wider mt-0.5">
++                              <span>{course.duration}</span>
++                              <span>•</span>
++                              <span>{course.level}</span>
++                            </div>
++                          </div>
++                        </div>
++                        
++                        <p className="text-xs text-[#1a1a2e]/50 leading-relaxed font-light font-body pt-1">{course.desc}</p>
++                      </div>
++                      
++                      <div className="pt-4 mt-6 border-t border-black/5 flex justify-between items-center">
++                        <span className="text-[9px] font-mono text-[#1a1a2e]/30 uppercase tracking-wider">Self-Paced / Online</span>
++                        <button className="text-[10px] font-bold text-primary flex items-center gap-1 hover:text-primary/80 transition-colors uppercase tracking-widest font-mono">
++                          Start Learning
++                          <span className="material-symbols-outlined text-[11px]">arrow_forward</span>
++                        </button>
++                      </div>
++                    </div>
++                  ))}
++                </div>
++              </div>
++
++              <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
++                {/* COLUMN 1: COMPETITIONS REGISTRATION (Left, 7 spans) */}
++                <div className="lg:col-span-7 space-y-6">
++                  <h3 className="text-xl font-headline font-black text-[#1a1a2e] uppercase tracking-tight flex items-center gap-2">
++                    <span className="material-symbols-outlined text-primary text-xl">emoji_events</span>
++                    Active Engineering Competitions
++                  </h3>
++                  
++                  <div className="space-y-6">
++                    {[
++                      {
++                        id: "drone",
++                        title: "Maharashtra Autonomous Drone Challenge",
++                        desc: "Program automated flight navigation protocols, obstacle avoidance systems, and precision crop-monitoring payloads for low-altitude drones.",
++                        date: "Oct 12, 2026",
++                        location: "Sakharwadi Agri-Tech Hub",
++                        prize: "₹1,50,000 Cash Prize + Incubation"
++                      },
++                      {
++                        id: "robotics",
++                        title: "Satara Robotics Championship",
++                        desc: "Design and implement neural-network based mechanical controllers for heavy industrial pick-and-place robots.",
++                        date: "Nov 05, 2026",
++                        location: "Mudhoji Lab Center",
++                        prize: "₹2,50,000 Cash Prize + R&D Grant"
++                      },
++                      {
++                        id: "space",
++                        title: "Space Tech & Cubesat Exhibition",
++                        desc: "Develop and test ground station antennas, transceiver modules, and communication boards for micro-satellite nodes.",
++                        date: "Dec 18, 2026",
++                        location: "Rajendra Aerospace Division",
++                        prize: "Elite Internship at ISRO Partners"
++                      }
++                    ].map((comp) => (
++                      <div key={comp.id} className="glass-premium p-8 rounded-[2.5rem] border border-black/5 hover:border-primary/25 transition-all duration-300 relative overflow-hidden group shadow-sm">
++                        <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
++                        <div className="flex flex-col md:flex-row md:items-start justify-between gap-6 relative z-10">
++                          <div className="space-y-3">
++                            <span className="px-3 py-1 bg-primary/10 border border-primary/20 rounded-full text-[8px] font-black font-mono text-primary uppercase tracking-widest">Registration Open</span>
++                            <h4 className="text-xl font-headline font-bold text-[#1a1a2e] uppercase tracking-tight">{comp.title}</h4>
++                            <p className="text-xs text-[#1a1a2e]/50 leading-relaxed font-light font-body max-w-lg">{comp.desc}</p>
++                            
++                            <div className="flex flex-wrap gap-4 pt-2 font-mono text-[9px] text-[#1a1a2e]/40 uppercase tracking-wider">
++                              <div className="flex items-center gap-1">
++                                <span className="material-symbols-outlined text-xs text-primary">calendar_today</span>
++                                <span>{comp.date}</span>
++                              </div>
++                              <div className="flex items-center gap-1">
++                                <span className="material-symbols-outlined text-xs text-primary">location_on</span>
++                                <span>{comp.location}</span>
++                              </div>
++                              <div className="flex items-center gap-1 font-bold text-primary">
++                                <span className="material-symbols-outlined text-xs">payments</span>
++                                <span>{comp.prize}</span>
++                              </div>
++                            </div>
++                          </div>
++                          <button 
++                            onClick={() => setSelectedComp(comp.title)}
++                            className="bg-[#EB0028] text-white hover:bg-[#EB0028]/90 hover:scale-[1.03] transition-all px-6 py-4.5 rounded-xl text-[10px] font-bold uppercase tracking-widest shrink-0 self-end md:self-start flex items-center gap-2"
++                          >
++                            <span>Register Hub</span>
++                            <span className="material-symbols-outlined text-xs">arrow_forward</span>
++                          </button>
++                        </div>
++                      </div>
++                    ))}
++                  </div>
++                </div>
++
++                {/* COLUMN 2: AIR G APP SHOWCASE (Right, 5 spans) */}
++                <div className="lg:col-span-5 space-y-6 lg:pl-4">
++                  <h3 className="text-xl font-headline font-black text-[#1a1a2e] uppercase tracking-tight flex items-center gap-2">
++                    <span className="material-symbols-outlined text-primary text-xl">smartphone</span>
++                    AIR G Learning App
++                  </h3>
++
++                  <div className="glass-premium p-8 rounded-[3rem] border border-black/5 flex flex-col items-center gap-8 shadow-sm">
++                    {/* Device Mockup */}
++                    <div className="relative w-64 aspect-[9/18] bg-black rounded-[2.5rem] p-3 shadow-2xl border-4 border-black/10 select-none overflow-hidden group">
++                      {/* Notch */}
++                      <div className="absolute top-4 left-1/2 -translate-x-1/2 w-28 h-5 bg-black rounded-b-xl z-20 flex items-center justify-center">
++                        <span className="w-2.5 h-2.5 bg-primary/45 rounded-full animate-pulse"></span>
++                      </div>
++                      
++                      {/* Screen Content - EXACT DEMO APP INTERFACE */}
++                      <div className="relative w-full h-full bg-[#f8fafc] rounded-[2rem] overflow-hidden p-3 flex flex-col">
++                        {/* Status bar */}
++                        <div className="flex justify-between items-center text-[7px] font-bold text-[#1a1a2e]/50 font-mono pt-1 pb-1 px-1 border-b border-black/5 bg-[#f8fafc] shrink-0">
++                          <span>09:41 AM</span>
++                          <div className="flex items-center gap-1">
++                            <span className="material-symbols-outlined text-[8px] text-green-600">wifi</span>
++                            <span>AIG_MESH_04</span>
++                          </div>
++                        </div>
++
++                        {/* App Header (Sticky) */}
++                        <div className="flex justify-between items-center py-2 px-1 bg-white border-b border-black/5 shrink-0">
++                          <div className="flex items-center gap-0.5 text-[9px] font-black font-headline tracking-tighter">
++                            <span className="text-[#1a1a2e]">AIR G</span>
++                            <span className="text-primary font-black uppercase">INTERNATIONAL</span>
++                          </div>
++                          <span className="material-symbols-outlined text-[10px] text-amber-500 font-bold">emoji_events</span>
++                        </div>
++
++                        {/* Scrollable Content */}
++                        <div className="flex-grow overflow-y-auto custom-scrollbar p-1.5 space-y-4">
++                          
++                          {/* Hero Section */}
++                          <div className="text-center py-3 px-1 space-y-2 bg-white rounded-xl border border-black/5 shadow-[0_2px_8px_rgba(0,0,0,0.02)]">
++                            <div className="inline-flex items-center gap-1 px-2 py-0.5 bg-white border border-primary/10 rounded-full shadow-sm mx-auto">
++                              <span className="material-symbols-outlined text-[7px] text-primary">auto_awesome</span>
++                              <span className="text-[6.5px] font-bold text-[#1a1a2e]/80 uppercase tracking-widest font-mono">The Challenge Zone</span>
++                            </div>
++                            
++                            <h4 className="text-[12px] font-black leading-tight text-[#1e293b] uppercase font-headline">
++                              Prove Your <span className="text-primary italic font-serif lowercase">skills</span>
++                            </h4>
++                            
++                            <p className="text-[7px] text-slate-500 max-w-[150px] mx-auto leading-relaxed">
++                              Level up by completing quizzes and practicing your code! 🏆
++                            </p>
++                          </div>
++
++                          {/* Choose Your Path Header */}
++                          <div className="flex items-center gap-1.5 px-0.5">
++                            <span className="material-symbols-outlined text-[10px] text-primary">psychology</span>
++                            <span className="text-[8px] font-black text-[#1e293b] uppercase tracking-wider font-headline">Choose Your Path</span>
++                          </div>
++
++                          {/* Challenge Cards Grid */}
++                          <div className="grid grid-cols-2 gap-2">
++                            {[
++                              { title: "AI Super Quiz", stats: "15 Questions", color: "bg-blue-500/10 text-blue-500", icon: "psychology" },
++                              { title: "Coding Quest", stats: "Select Lang", color: "bg-amber-500/10 text-amber-500", icon: "bolt" },
++                              { title: "Daily Problem", stats: "Daily Problem", color: "bg-emerald-500/10 text-emerald-500", icon: "calendar_today" },
++                              { title: "1v1 Battles", stats: "Live Match", color: "bg-rose-500/10 text-rose-500", icon: "swords" },
++                              { title: "Timed Tests", stats: "12 Questions", color: "bg-orange-500/10 text-orange-500", icon: "timer" },
++                              { title: "Tournaments", stats: "Coding Champ", color: "bg-violet-500/10 text-violet-500", icon: "emoji_events" }
++                            ].map((item, idx) => (
++                              <div key={idx} className="bg-white p-2 rounded-lg border border-black/5 flex flex-col justify-between h-[68px] hover:border-primary/20 transition-all shadow-[0_2px_6px_rgba(0,0,0,0.01)]">
++                                <div className="flex items-start justify-between">
++                                  <div className={`p-1 rounded-md ${item.color} flex items-center justify-center shrink-0`}>
++                                    <span className="material-symbols-outlined text-[9px] font-bold">{item.icon}</span>
++                                  </div>
++                                </div>
++                                <div className="mt-1.5">
++                                  <div className="text-[7.5px] font-black text-[#1e293b] uppercase tracking-tight truncate">{item.title}</div>
++                                  <div className="flex justify-between items-center text-[5.5px] text-slate-400 font-mono mt-1">
++                                    <span>{item.stats}</span>
++                                    <span className="text-primary font-bold flex items-center gap-0.5">Start<span className="material-symbols-outlined text-[5px]">chevron_right</span></span>
++                                  </div>
++                                </div>
++                              </div>
++                            ))}
++                          </div>
++
++                          {/* Code Playground Section Header */}
++                          <div className="flex items-center gap-1.5 px-0.5 pt-1">
++                            <span className="material-symbols-outlined text-[10px] text-primary">code</span>
++                            <span className="text-[8px] font-black text-[#1e293b] uppercase tracking-wider font-headline">Code Playground</span>
++                          </div>
++
++                          {/* Code Playground Card */}
++                          <div className="bg-[#0f172a] rounded-xl overflow-hidden border border-black/10 shadow-[0_4px_12px_rgba(0,0,0,0.08)] flex flex-col">
++                            {/* IDE Header */}
++                            <div className="bg-[#1e293b] px-2.5 py-1.5 flex justify-between items-center border-b border-white/5">
++                              <div className="flex items-center gap-1">
++                                <span className="material-symbols-outlined text-[8px] text-blue-400">code</span>
++                                <span className="text-[6px] font-mono text-white/70">magic_playground.py</span>
++                              </div>
++                              <div className="bg-emerald-500 px-1.5 py-0.5 rounded flex items-center gap-0.5 shadow-sm">
++                                <span className="material-symbols-outlined text-[6px] text-white">play_arrow</span>
++                                <span className="text-[5px] text-white font-bold uppercase tracking-wider">Run</span>
++                              </div>
++                            </div>
++                            {/* IDE Body */}
++                            <div className="p-2 space-y-1.5 font-mono text-[5.5px] leading-tight text-white/90">
++                              <div>
++                                <span className="text-blue-400">print</span>
++                                <span className="text-white">(</span>
++                                <span className="text-amber-300">"Hello World!"</span>
++                                <span className="text-white">)</span>
++                              </div>
++                              <div className="text-white/30 font-mono text-[5.5px]"># Type your code here...</div>
++                              <div className="border-t border-white/5 pt-1.5 mt-1 text-white/40 font-mono text-[5px]">
++                                // Result will output here
++                              </div>
++                            </div>
++                          </div>
++                        </div>
++                      </div>
++                    </div>
++                  </div>
++
++                  {/* App Description & Download Redirect */}
++                    <div className="space-y-4 text-center">
++                      <p className="text-xs text-[#1a1a2e]/50 leading-relaxed font-light max-w-xs">
++                        The AIR G Learning app provides high-fidelity simulated test beds, live lab telemetry sensors, and automated enrollment sync for institutional courses.
++                      </p>
++                      
++                      <a 
++                        href="https://gurujiair.com/app"
++                        target="_blank"
++                        rel="noopener noreferrer"
++                        className="w-full bg-primary text-white py-4 px-8 rounded-2xl font-bold uppercase tracking-widest glow-red text-xs hover:scale-[1.03] transition-all flex items-center justify-center gap-3 shadow-lg"
++                      >
++                        <span>Download AIR G App</span>
++                        <span className="material-symbols-outlined text-sm">download</span>
++                      </a>
++                    </div>
++                  </div>
++                </div>
++              </div>
++            </div>
++
++            {/* COMPETITION REGISTRATION MODAL */}
++            <AnimatePresence>
++              {selectedComp && (
++                <>
++                  <motion.div
++                    initial={{ opacity: 0 }}
++                    animate={{ opacity: 1 }}
++                    exit={{ opacity: 0 }}
++                    onClick={() => setSelectedComp(null)}
++                    className="fixed inset-0 bg-black/60 backdrop-blur-md z-[130]"
++                  />
++                  <div className="fixed inset-0 overflow-y-auto z-[140] flex items-center justify-center p-4">
++                    <motion.div
++                      initial={{ opacity: 0, scale: 0.9, y: 20 }}
++                      animate={{ opacity: 1, scale: 1, y: 0 }}
++                      exit={{ opacity: 0, scale: 0.9, y: 20 }}
++                      className="w-full max-w-lg bg-white rounded-[2.5rem] border border-black/5 overflow-hidden shadow-2xl flex flex-col relative"
++                    >
++                      {/* Header */}
++                      <div className="p-8 border-b border-black/5 flex items-center justify-between">
++                        <div>
++                          <h3 className="font-headline text-2xl font-black uppercase text-[#1a1a2e]">Competition Entry</h3>
++                          <p className="text-xs text-primary font-mono uppercase mt-1 tracking-wider">Register student node</p>
++                        </div>
++                        <button 
++                          onClick={() => setSelectedComp(null)}
++                          className="w-10 h-10 rounded-xl bg-black/5 flex items-center justify-center text-[#1a1a2e]/60 hover:text-[#1a1a2e] hover:bg-black/10 transition-all"
++                        >
++                          <span className="material-symbols-outlined text-lg">close</span>
++                        </button>
++                      </div>
++
++                      {/* Content */}
++                      <div className="p-8 space-y-6">
++                        <div className="p-4 rounded-xl bg-primary/5 border border-primary/20 text-xs font-bold text-primary font-mono uppercase tracking-wider">
++                          Event: {selectedComp}
++                        </div>
++
++                        {isSubmittingComp ? (
++                          <div className="py-12 flex flex-col items-center justify-center text-center space-y-6">
++                            <div className="relative w-16 h-16 flex items-center justify-center">
++                              <div className="absolute inset-0 rounded-full border-4 border-black/5" />
++                              <div className="absolute inset-0 rounded-full border-4 border-t-primary border-r-transparent border-b-transparent border-l-transparent animate-spin" />
++                            </div>
++                            <h4 className="font-headline text-sm font-bold uppercase text-[#1a1a2e] tracking-widest animate-pulse">Syncing Lab Credentials...</h4>
++                          </div>
++                        ) : (
++                          <div className="space-y-4">
++                            <div>
++                              <label className="text-[9px] uppercase font-bold tracking-widest text-[#1a1a2e]/50 block mb-1">Full Name</label>
++                              <input 
++                                type="text" 
++                                value={compName}
++                                onChange={(e) => setCompName(e.target.value)}
++                                className="w-full px-4 py-3 rounded-xl border border-black/10 focus:outline-none focus:border-primary text-sm transition-all" 
++                                placeholder="e.g. Rahul Sharma" 
++                              />
++                            </div>
++                            <div>
++                              <label className="text-[9px] uppercase font-bold tracking-widest text-[#1a1a2e]/50 block mb-1">Email Address</label>
++                              <input 
++                                type="email" 
++                                value={compEmail}
++                                onChange={(e) => setCompEmail(e.target.value)}
++                                className="w-full px-4 py-3 rounded-xl border border-black/10 focus:outline-none focus:border-primary text-sm transition-all" 
++                                placeholder="e.g. rahul@airg.com" 
++                              />
++                            </div>
++                            <div>
++                              <label className="text-[9px] uppercase font-bold tracking-widest text-[#1a1a2e]/50 block mb-1">Institution / Research Lab</label>
++                              <input 
++                                type="text" 
++                                value={compInst}
++                                onChange={(e) => setCompInst(e.target.value)}
++                                className="w-full px-4 py-3 rounded-xl border border-black/10 focus:outline-none focus:border-primary text-sm transition-all" 
++                                placeholder="e.g. Satara Mesh Node Hub #04" 
++                              />
++                            </div>
++
++                            <button 
++                              onClick={() => {
++                                if (!compName || !compEmail || !compInst) {
++                                  alert("Please fill in all entry credentials to register.");
++                                  return;
++                                }
++                                setIsSubmittingComp(true);
++                                setTimeout(() => {
++                                  setIsSubmittingComp(false);
++                                  setSelectedComp(null);
++                                  
++                                  // Clear states
++                                  setCompName("");
++                                  setCompEmail("");
++                                  setCompInst("");
++                                  
++                                  // Success notify
++                                  if (typeof window !== "undefined") {
++                                    alert("Registration successful! Your node has been synced with the event registry.");
++                                  }
++                                }, 2500);
++                              }}
++                              className="w-full bg-[#1a1a2e] text-white py-4 rounded-xl font-bold uppercase tracking-widest text-xs hover:bg-primary transition-all flex items-center justify-center gap-2 mt-6 shadow-md"
++                            >
++                              <span>Submit Registration Entry</span>
++                              <span className="material-symbols-outlined text-xs">arrow_forward</span>
++                            </button>
++                          </div>
++                        )}
++                      </div>
++                    </motion.div>
++                  </div>
++                </>
++              )}
++            </AnimatePresence>
++          </section>
++        </div>
++      </div>
++      <AuthModal isOpen={isAuthModalOpen} onClose={() => setAuthModalOpen(false)} />
++
++      {/* CART DRAWER */}
++      <AnimatePresence>
++        {isCartOpen && (
++          <>
++            {/* Backdrop */}
++            <motion.div
++              initial={{ opacity: 0 }}
++              animate={{ opacity: 1 }}
++              exit={{ opacity: 0 }}
++              onClick={() => setIsCartOpen(false)}
++              className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[110]"
++            />
++            {/* Drawer */}
++            <motion.div
++              initial={{ x: "100%" }}
++              animate={{ x: 0 }}
++              exit={{ x: "100%" }}
++              transition={{ type: "spring", damping: 25, stiffness: 200 }}
++              className="fixed right-0 top-0 bottom-0 w-full max-w-md bg-white border-l border-black/5 shadow-2xl z-[120] flex flex-col"
++            >
++              {/* Header */}
++              <div className="p-6 border-b border-black/5 flex items-center justify-between">
++                <div className="flex items-center gap-3">
++                  <span className="material-symbols-outlined text-primary text-2xl">shopping_bag</span>
++                  <h3 className="font-headline text-xl font-bold uppercase tracking-tight text-[#1a1a2e]">Your Bag</h3>
++                </div>
++                <button 
++                  onClick={() => setIsCartOpen(false)}
++                  className="w-10 h-10 rounded-xl bg-black/5 flex items-center justify-center text-[#1a1a2e]/60 hover:text-[#1a1a2e] hover:bg-black/10 transition-all"
++                >
++                  <span className="material-symbols-outlined text-lg">close</span>
++                </button>
++              </div>
++
++              {/* Items List */}
++              <div className="flex-grow overflow-y-auto p-6 space-y-6 custom-scrollbar">
++                {cart.length === 0 ? (
++                  <div className="h-full flex flex-col items-center justify-center text-center space-y-4">
++                    <span className="material-symbols-outlined text-[#1a1a2e]/10 text-6xl">shopping_bag</span>
++                    <p className="text-[#1a1a2e]/40 font-light text-sm">Your bag is empty.</p>
++                    <button 
++                      onClick={() => setIsCartOpen(false)}
++                      className="px-6 py-2 border border-primary text-primary text-xs uppercase tracking-widest font-bold rounded-xl hover:bg-primary hover:text-white transition-all"
++                    >
++                      Browse Store
++                    </button>
++                  </div>
++                ) : (
++                  cart.map((item) => (
++                    <div key={item.name} className="flex gap-4 p-4 rounded-2xl bg-black/5 border border-black/5 relative group">
++                      <div className="w-20 h-20 rounded-xl overflow-hidden bg-black/10 flex-shrink-0">
++                        <img src={item.img} alt={item.name} className="w-full h-full object-cover" />
++                      </div>
++                      <div className="flex-grow flex flex-col justify-between">
++                        <div>
++                          <h4 className="font-headline text-sm font-bold uppercase text-[#1a1a2e] line-clamp-1">{item.name}</h4>
++                          <span className="text-[10px] uppercase font-bold text-[#1a1a2e]/40 tracking-wider font-mono">{item.tag}</span>
++                        </div>
++                        <div className="flex justify-between items-center mt-2">
++                          <span className="text-primary font-bold text-sm font-mono">{item.price}</span>
++                          <div className="flex items-center gap-2 border border-black/10 rounded-lg p-1 bg-white">
++                            <button 
++                              onClick={() => updateQuantity(item.name, -1)}
++                              className="w-6 h-6 flex items-center justify-center text-[#1a1a2e]/60 hover:text-primary transition-colors"
++                            >
++                              <span className="material-symbols-outlined text-xs">remove</span>
++                            </button>
++                            <span className="text-xs font-mono font-bold w-4 text-center">{item.quantity}</span>
++                            <button 
++                              onClick={() => updateQuantity(item.name, 1)}
++                              className="w-6 h-6 flex items-center justify-center text-[#1a1a2e]/60 hover:text-primary transition-colors"
++                            >
++                              <span className="material-symbols-outlined text-xs">add</span>
++                            </button>
++                          </div>
++                        </div>
++                      </div>
++                      <button 
++                        onClick={() => removeFromCart(item.name)}
++                        className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity text-[#1a1a2e]/30 hover:text-primary w-6 h-6 flex items-center justify-center"
++                      >
++                        <span className="material-symbols-outlined text-sm">delete</span>
++                      </button>
++                    </div>
++                  ))
++                )}
++              </div>
++
++              {/* Footer / Summary */}
++              {cart.length > 0 && (
++                <div className="p-6 border-t border-black/5 bg-black/5 space-y-4">
++                  <div className="flex justify-between items-center">
++                    <span className="text-xs uppercase tracking-widest text-[#1a1a2e]/60 font-bold">Total Amount</span>
++                    <span className="text-xl font-black text-primary font-mono">₹{getCartTotal().toLocaleString('en-IN')}</span>
++                  </div>
++                  <button 
++                    onClick={() => {
++                      setIsCartOpen(false);
++                      setIsCheckoutOpen(true);
++                      setCheckoutStep('details');
++                    }}
++                    className="w-full bg-primary text-white py-4 rounded-2xl font-bold uppercase tracking-widest glow-red text-xs hover:scale-[1.02] transition-transform flex items-center justify-center gap-2"
++                  >
++                    <span>Proceed to Checkout</span>
++                    <span className="material-symbols-outlined text-sm">arrow_forward</span>
++                  </button>
++                </div>
++              )}
++            </motion.div>
++          </>
++        )}
++      </AnimatePresence>
++
++      {/* CHECKOUT MODAL */}
++      <AnimatePresence>
++        {isCheckoutOpen && (
++          <>
++            {/* Backdrop */}
++            <motion.div
++              initial={{ opacity: 0 }}
++              animate={{ opacity: 1 }}
++              exit={{ opacity: 0 }}
++              onClick={() => {
++                if (checkoutStep !== 'processing' && checkoutStep !== 'success') {
++                  setIsCheckoutOpen(false);
++                }
++              }}
++              className="fixed inset-0 bg-black/60 backdrop-blur-md z-[130]"
++            />
++            {/* Modal Container */}
++            <div className="fixed inset-0 overflow-y-auto z-[140] flex items-center justify-center p-4">
++              <motion.div
++                initial={{ opacity: 0, scale: 0.9, y: 20 }}
++                animate={{ opacity: 1, scale: 1, y: 0 }}
++                exit={{ opacity: 0, scale: 0.9, y: 20 }}
++                className="w-full max-w-lg bg-white rounded-[2.5rem] border border-black/5 overflow-hidden shadow-2xl flex flex-col relative"
++              >
++                {/* Header */}
++                <div className="p-8 border-b border-black/5 flex items-center justify-between">
++                  <div>
++                    <h3 className="font-headline text-2xl font-black uppercase text-[#1a1a2e]">Checkout</h3>
++                    <p className="text-xs text-[#1a1a2e]/40 font-mono uppercase mt-1 tracking-wider">Secure Payment Gateway</p>
++                  </div>
++                  {checkoutStep !== 'processing' && checkoutStep !== 'success' && (
++                    <button 
++                      onClick={() => setIsCheckoutOpen(false)}
++                      className="w-10 h-10 rounded-xl bg-black/5 flex items-center justify-center text-[#1a1a2e]/60 hover:text-[#1a1a2e] hover:bg-black/10 transition-all"
++                    >
++                      <span className="material-symbols-outlined text-lg">close</span>
++                    </button>
++                  )}
++                </div>
++
++                {/* Content */}
++                <div className="p-8 flex-grow">
++                  {checkoutStep === 'details' && (
++                    <div className="space-y-6">
++                      <h4 className="font-headline text-sm font-bold uppercase text-[#1a1a2e]/80 tracking-wider">1. Shipping & Contact Details</h4>
++                      <div className="space-y-4">
++                        <div>
++                          <label className="text-[10px] uppercase font-bold tracking-widest text-[#1a1a2e]/50 block mb-1">Full Name</label>
++                          <input 
++                            type="text" 
++                            value={shippingDetails.name}
++                            onChange={(e) => setShippingDetails({ ...shippingDetails, name: e.target.value })}
++                            className="w-full px-4 py-3 rounded-xl border border-black/10 focus:outline-none focus:border-primary text-sm transition-all" 
++                            placeholder="e.g. Rahul Sharma" 
++                          />
++                        </div>
++                        <div>
++                          <label className="text-[10px] uppercase font-bold tracking-widest text-[#1a1a2e]/50 block mb-1">Email Address</label>
++                          <input 
++                            type="email" 
++                            value={shippingDetails.email}
++                            onChange={(e) => setShippingDetails({ ...shippingDetails, email: e.target.value })}
++                            className="w-full px-4 py-3 rounded-xl border border-black/10 focus:outline-none focus:border-primary text-sm transition-all" 
++                            placeholder="e.g. rahul@example.com" 
++                          />
++                        </div>
++                        <div>
++                          <label className="text-[10px] uppercase font-bold tracking-widest text-[#1a1a2e]/50 block mb-1">Shipping Address</label>
++                          <textarea 
++                            value={shippingDetails.address}
++                            onChange={(e) => setShippingDetails({ ...shippingDetails, address: e.target.value })}
++                            rows={3}
++                            className="w-full px-4 py-3 rounded-xl border border-black/10 focus:outline-none focus:border-primary text-sm transition-all resize-none" 
++                            placeholder="Full address, PIN code, State" 
++                          />
++                        </div>
++                        <div>
++                          <label className="text-[10px] uppercase font-bold tracking-widest text-[#1a1a2e]/50 block mb-1">Phone Number</label>
++                          <input 
++                            type="text" 
++                            value={shippingDetails.phone}
++                            onChange={(e) => setShippingDetails({ ...shippingDetails, phone: e.target.value })}
++                            className="w-full px-4 py-3 rounded-xl border border-black/10 focus:outline-none focus:border-primary text-sm transition-all" 
++                            placeholder="e.g. 9876543210" 
++                          />
++                        </div>
++                      </div>
++
++                      <button 
++                        onClick={() => {
++                          if (shippingDetails.name && shippingDetails.email && shippingDetails.address && shippingDetails.phone) {
++                            setCheckoutStep('payment');
++                          } else {
++                            alert("Please fill in all details to proceed.");
++                          }
++                        }}
++                        className="w-full bg-[#1a1a2e] text-white py-4 rounded-xl font-bold uppercase tracking-widest text-xs hover:bg-[#1a1a2e]/90 transition-all flex items-center justify-center gap-2 mt-6"
++                      >
++                        <span>Continue to Payment</span>
++                        <span className="material-symbols-outlined text-sm">arrow_forward</span>
++                      </button>
++                    </div>
++                  )}
++
++                  {checkoutStep === 'payment' && (
++                    <div className="space-y-6">
++                      <div className="flex justify-between items-center">
++                        <h4 className="font-headline text-sm font-bold uppercase text-[#1a1a2e]/80 tracking-wider">2. Payment Method</h4>
++                        <button onClick={() => setCheckoutStep('details')} className="text-xs text-primary font-bold hover:underline">Edit Details</button>
++                      </div>
++
++                      {/* Payment Method Selector */}
++                      <div className="grid grid-cols-3 gap-3">
++                        {[
++                          { id: 'upi', name: 'UPI / QR', icon: 'qr_code_scanner' },
++                          { id: 'card', name: 'Card', icon: 'credit_card' },
++                          { id: 'netbanking', name: 'Net Banking', icon: 'account_balance' },
++                        ].map((method) => (
++                          <button
++                            key={method.id}
++                            onClick={() => setPaymentMethod(method.id as any)}
++                            className={`p-4 rounded-2xl border flex flex-col items-center justify-center gap-2 transition-all ${
++                              paymentMethod === method.id 
++                                ? 'border-primary bg-primary/5 text-primary' 
++                                : 'border-black/5 hover:border-black/20 text-[#1a1a2e]/60'
++                            }`}
++                          >
++                            <span className="material-symbols-outlined text-xl">{method.icon}</span>
++                            <span className="text-[10px] font-bold uppercase tracking-wider">{method.name}</span>
++                          </button>
++                        ))}
++                      </div>
++
++                      {/* Dynamic Payment Details */}
++                      <div className="p-6 rounded-2xl bg-black/5 border border-black/5 min-h-[160px] flex flex-col justify-center">
++                        {paymentMethod === 'upi' && (
++                          <div className="flex flex-col items-center text-center space-y-4">
++                            <div className="w-32 h-32 bg-white p-2 rounded-xl border border-black/10 flex items-center justify-center relative group">
++                              {/* QR Mock */}
++                              <div className="absolute inset-0 bg-[#1a1a2e]/5 backdrop-blur-[1px] flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
++                                <span className="text-[9px] font-black uppercase text-[#1a1a2e] font-mono">Real Dynamic QR</span>
++                              </div>
++                              <img 
++                                src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=upi://pay?pa=airg@ybl%26pn=AIR%20G%20Ecosystem%26am=${getCartTotal()}%26cu=INR`}
++                                alt="Payment QR" 
++                                className="w-full h-full object-contain"
++                              />
++                            </div>
++                            <div className="space-y-1">
++                              <p className="text-xs font-bold text-[#1a1a2e]">Scan to pay using any UPI App</p>
++                              <p className="text-[10px] text-[#1a1a2e]/40 font-mono">airg@ybl • Amount: ₹{getCartTotal().toLocaleString('en-IN')}</p>
++                            </div>
++                          </div>
++                        )}
++
++                        {paymentMethod === 'card' && (
++                          <div className="space-y-4">
++                            <div>
++                              <label className="text-[9px] uppercase font-bold tracking-widest text-[#1a1a2e]/50 block mb-1">Card Number</label>
++                              <input 
++                                type="text" 
++                                className="w-full px-4 py-2.5 rounded-lg border border-black/10 text-sm focus:outline-none focus:border-primary font-mono" 
++                                placeholder="4111 2222 3333 4444" 
++                              />
++                            </div>
++                            <div className="grid grid-cols-2 gap-4">
++                              <div>
++                                <label className="text-[9px] uppercase font-bold tracking-widest text-[#1a1a2e]/50 block mb-1">Expiry Date</label>
++                                <input 
++                                  type="text" 
++                                  className="w-full px-4 py-2.5 rounded-lg border border-black/10 text-sm focus:outline-none focus:border-primary font-mono" 
++                                  placeholder="MM/YY" 
++                                />
++                              </div>
++                              <div>
++                                <label className="text-[9px] uppercase font-bold tracking-widest text-[#1a1a2e]/50 block mb-1">CVV</label>
++                                <input 
++                                  type="password" 
++                                  className="w-full px-4 py-2.5 rounded-lg border border-black/10 text-sm focus:outline-none focus:border-primary font-mono" 
++                                  placeholder="***" 
++                                />
++                              </div>
++                            </div>
++                          </div>
++                        )}
++
++                        {paymentMethod === 'netbanking' && (
++                          <div className="space-y-3">
++                            <label className="text-[9px] uppercase font-bold tracking-widest text-[#1a1a2e]/50 block">Select Popular Bank</label>
++                            <select className="w-full px-4 py-2.5 rounded-lg border border-black/10 text-sm bg-white focus:outline-none focus:border-primary">
++                              <option>State Bank of India</option>
++                              <option>HDFC Bank</option>
++                              <option>ICICI Bank</option>
++                              <option>Axis Bank</option>
++                              <option>Kotak Mahindra Bank</option>
++                            </select>
++                          </div>
++                        )}
++                      </div>
++
++                      {/* Pay Button */}
++                      <button 
++                        onClick={() => {
++                          const orderTotal = getCartTotal();
++                          if (userProfile.walletBalance < orderTotal) {
++                            alert(`Insufficient mock wallet balance. Total is ₹${orderTotal.toLocaleString('en-IN')}, but your wallet only has ₹${userProfile.walletBalance.toLocaleString('en-IN')}. Please open your Profile (person icon in header) to top up mock funds!`);
++                            return;
++                          }
++                          setCheckoutStep('processing');
++                          const orderId = `AIG-${Math.floor(100000 + Math.random() * 900000)}`;
++                          const newOrder = {
++                            id: orderId,
++                            date: new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }),
++                            items: cart.map(item => ({ name: item.name, price: item.price, quantity: item.quantity })),
++                            total: orderTotal,
++                            status: 'Shipped via AIG Logistics'
++                          };
++                          setTimeout(() => {
++                            setOrders(prev => {
++                              const updated = [newOrder, ...prev];
++                              localStorage.setItem('aig_orders', JSON.stringify(updated));
++                              return updated;
++                            });
++                            setUserProfile(prev => ({
++                              ...prev,
++                              walletBalance: prev.walletBalance - orderTotal
++                            }));
++                            setCheckoutStep('success');
++                            setCart([]); // clear cart
++                          }, 3000);
++                        }}
++                        className="w-full bg-[#EE2C3C] text-white py-4 rounded-xl font-bold uppercase tracking-widest text-xs glow-red hover:scale-[1.02] transition-transform flex items-center justify-center gap-2 mt-6"
++                      >
++                        <span>Authorize Payment • ₹{getCartTotal().toLocaleString('en-IN')}</span>
++                      </button>
++                    </div>
++                  )}
++
++                  {checkoutStep === 'processing' && (
++                    <div className="py-12 flex flex-col items-center justify-center text-center space-y-6">
++                      <div className="relative w-20 h-20 flex items-center justify-center">
++                        <div className="absolute inset-0 rounded-full border-4 border-black/5" />
++                        <div className="absolute inset-0 rounded-full border-4 border-t-primary border-r-transparent border-b-transparent border-l-transparent animate-spin" />
++                        <span className="material-symbols-outlined text-primary text-3xl">shield</span>
++                      </div>
++                      <div className="space-y-2">
++                        <h4 className="font-headline text-lg font-bold uppercase text-[#1a1a2e]">Processing Secure Transaction</h4>
++                        <p className="text-xs text-[#1a1a2e]/40 max-w-xs font-light">Please do not refresh the page or click back. We are communicating with your bank's secure host...</p>
++                      </div>
++                    </div>
++                  )}
++
++                  {checkoutStep === 'success' && (
++                    <div className="py-8 flex flex-col items-center justify-center text-center space-y-6">
++                      <div className="w-20 h-20 rounded-full bg-green-500/10 border border-green-500/20 flex items-center justify-center text-green-500 animate-bounce">
++                        <span className="material-symbols-outlined text-4xl">check_circle</span>
++                      </div>
++                      <div className="space-y-2">
++                        <h4 className="font-headline text-2xl font-black uppercase text-[#1a1a2e]">Order Confirmed!</h4>
++                        <p className="text-xs text-green-600 font-bold uppercase tracking-wider font-mono">Thank you for your purchase, {shippingDetails.name}!</p>
++                        <p className="text-[10px] text-[#1a1a2e]/40 font-mono mt-1">Transaction ID: TXN-{Math.floor(100000 + Math.random() * 900000)}</p>
++                      </div>
++
++                      <div className="w-full p-6 rounded-2xl bg-black/5 border border-black/5 text-left space-y-3">
++                        <div className="flex justify-between items-center text-xs">
++                          <span className="text-[#1a1a2e]/50 font-bold uppercase">Customer</span>
++                          <span className="font-bold text-[#1a1a2e]">{shippingDetails.name}</span>
++                        </div>
++                        <div className="flex justify-between items-center text-xs">
++                          <span className="text-[#1a1a2e]/50 font-bold uppercase">Delivery Destination</span>
++                          <span className="font-bold text-[#1a1a2e] line-clamp-1 max-w-[200px] text-right">{shippingDetails.address}</span>
++                        </div>
++                        <div className="flex justify-between items-center text-xs">
++                          <span className="text-[#1a1a2e]/50 font-bold uppercase">Status</span>
++                          <span className="font-bold text-green-600 uppercase">Shipped via AIG Logistics</span>
++                        </div>
++                      </div>
++
++                      <button 
++                        onClick={() => setIsCheckoutOpen(false)}
++                        className="w-full bg-[#1a1a2e] text-white py-4 rounded-xl font-bold uppercase tracking-widest text-xs hover:bg-[#1a1a2e]/90 transition-all"
++                      >
++                        Return to Store
++                      </button>
++                    </div>
++                  )}
++                </div>
++              </motion.div>
++            </div>
++          </>
++        )}
++      </AnimatePresence>
++
++      {/* ORDER HISTORY / TRACK ORDERS MODAL */}
++      <AnimatePresence>
++        {isOrdersOpen && (
++          <>
++            {/* Backdrop */}
++            <motion.div
++              initial={{ opacity: 0 }}
++              animate={{ opacity: 1 }}
++              exit={{ opacity: 0 }}
++              onClick={() => setIsOrdersOpen(false)}
++              className="fixed inset-0 bg-black/60 backdrop-blur-md z-[130]"
++            />
++            {/* Modal Container */}
++            <div className="fixed inset-0 overflow-y-auto z-[140] flex items-center justify-center p-4">
++              <motion.div
++                initial={{ opacity: 0, scale: 0.9, y: 20 }}
++                animate={{ opacity: 1, scale: 1, y: 0 }}
++                exit={{ opacity: 0, scale: 0.9, y: 20 }}
++                className="w-full max-w-2xl bg-white rounded-[2.5rem] border border-black/5 overflow-hidden shadow-2xl flex flex-col relative max-h-[85vh]"
++              >
++                {/* Header */}
++                <div className="p-8 border-b border-black/5 flex items-center justify-between flex-shrink-0">
++                  <div>
++                    <h3 className="font-headline text-2xl font-black uppercase text-[#1a1a2e]">Order History</h3>
++                    <p className="text-xs text-[#1a1a2e]/40 font-mono uppercase mt-1 tracking-wider">Track your tactical shipments</p>
++                  </div>
++                  <button 
++                    onClick={() => setIsOrdersOpen(false)}
++                    className="w-10 h-10 rounded-xl bg-black/5 flex items-center justify-center text-[#1a1a2e]/60 hover:text-[#1a1a2e] hover:bg-black/10 transition-all"
++                  >
++                    <span className="material-symbols-outlined text-lg">close</span>
++                  </button>
++                </div>
++
++                {/* Content */}
++                <div className="p-8 overflow-y-auto flex-grow custom-scrollbar space-y-6">
++                  {orders.length === 0 ? (
++                    <div className="py-20 flex flex-col items-center justify-center text-center space-y-4">
++                      <span className="material-symbols-outlined text-[#1a1a2e]/10 text-6xl">receipt_long</span>
++                      <h4 className="font-headline text-base font-bold uppercase text-[#1a1a2e]/60">No Orders Found</h4>
++                      <p className="text-xs text-[#1a1a2e]/40 max-w-xs font-light">You haven't placed any orders yet. Head to the Store section to purchase official merchandise.</p>
++                      <button
++                        onClick={() => {
++                          setIsOrdersOpen(false);
++                          navigateTo('store');
++                        }}
++                        className="px-6 py-2 bg-primary text-white text-xs uppercase tracking-widest font-bold rounded-xl hover:bg-primary/95 transition-all"
++                      >
++                        Visit Store
++                      </button>
++                    </div>
++                  ) : (
++                    <div className="space-y-6">
++                      {orders.map((order) => (
++                        <div key={order.id} className="p-6 rounded-[2rem] bg-black/5 border border-black/5 space-y-4">
++                          <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-black/5 pb-4 gap-2">
++                            <div>
++                              <span className="text-[10px] uppercase font-bold text-[#1a1a2e]/40 font-mono block">Order ID</span>
++                              <span className="text-sm font-bold text-[#1a1a2e] font-mono">{order.id}</span>
++                            </div>
++                            <div>
++                              <span className="text-[10px] uppercase font-bold text-[#1a1a2e]/40 font-mono block">Date Placed</span>
++                              <span className="text-xs text-[#1a1a2e]/70 font-mono">{order.date}</span>
++                            </div>
++                            <div>
++                              <span className="text-[10px] uppercase font-bold text-[#1a1a2e]/40 font-mono block">Total Amount</span>
++                              <span className="text-sm font-bold text-primary font-mono">₹{order.total.toLocaleString('en-IN')}</span>
++                            </div>
++                            <div>
++                              <span className="text-[10px] uppercase font-bold text-[#1a1a2e]/40 font-mono block">Status</span>
++                              <span className="px-3 py-1 bg-green-500/10 border border-green-500/20 text-green-700 text-[9px] font-black uppercase tracking-widest rounded-full">{order.status}</span>
++                            </div>
++                          </div>
++
++                          <div className="space-y-2">
++                            <span className="text-[10px] uppercase font-bold text-[#1a1a2e]/40 tracking-wider">Purchased Items</span>
++                            <div className="grid gap-2">
++                              {order.items.map((item, idx) => (
++                                <div key={idx} className="flex justify-between items-center text-xs p-2.5 rounded-xl bg-white border border-black/5 font-mono">
++                                  <span className="text-[#1a1a2e] font-bold uppercase">{item.name} <span className="text-primary font-normal">x{item.quantity}</span></span>
++                                  <span className="text-[#1a1a2e]/60">{item.price}</span>
++                                </div>
++                              ))}
++                            </div>
++                          </div>
++                        </div>
++                      ))}
++                    </div>
++                  )}
++                </div>
++              </motion.div>
++            </div>
++          </>
++        )}
++      </AnimatePresence>
++
++      {/* USER PROFILE MODAL */}
++      <AnimatePresence>
++        {isProfileOpen && (
++          <>
++            {/* Backdrop */}
++            <motion.div
++              initial={{ opacity: 0 }}
++              animate={{ opacity: 1 }}
++              exit={{ opacity: 0 }}
++              onClick={() => setIsProfileOpen(false)}
++              className="fixed inset-0 bg-black/60 backdrop-blur-md z-[130]"
++            />
++            {/* Modal Container */}
++            <div className="fixed inset-0 overflow-y-auto z-[140] flex items-center justify-center p-4">
++              <motion.div
++                initial={{ opacity: 0, scale: 0.9, y: 20 }}
++                animate={{ opacity: 1, scale: 1, y: 0 }}
++                exit={{ opacity: 0, scale: 0.9, y: 20 }}
++                className="w-full max-w-xl bg-white rounded-[2.5rem] border border-black/5 overflow-hidden shadow-2xl flex flex-col relative max-h-[85vh]"
++              >
++                {/* Header */}
++                <div className="p-8 border-b border-black/5 flex items-center justify-between flex-shrink-0">
++                  <div>
++                    <h3 className="font-headline text-2xl font-black uppercase text-[#1a1a2e]">Developer Profile</h3>
++                    <p className="text-xs text-[#1a1a2e]/40 font-mono uppercase mt-1 tracking-wider">AIR G Grid Node Management</p>
++                  </div>
++                  <button 
++                    onClick={() => setIsProfileOpen(false)}
++                    className="w-10 h-10 rounded-xl bg-black/5 flex items-center justify-center text-[#1a1a2e]/60 hover:text-[#1a1a2e] hover:bg-black/10 transition-all"
++                  >
++                    <span className="material-symbols-outlined text-lg">close</span>
++                  </button>
++                </div>
++
++                {/* Content */}
++                <div className="p-8 overflow-y-auto flex-grow custom-scrollbar space-y-8">
++                  {/* User Profile Info Card */}
++                  <div className="flex flex-col sm:flex-row items-center gap-6 p-6 rounded-3xl bg-black/5 border border-black/5">
++                    <div className="w-20 h-20 rounded-2xl bg-primary flex items-center justify-center text-white text-3xl font-black shadow-lg relative group overflow-hidden">
++                      <div className="absolute inset-0 bg-gradient-to-tr from-black/20 via-transparent to-white/20 animate-pulse"></div>
++                      <span>RS</span>
++                    </div>
++                    <div className="text-center sm:text-left space-y-1">
++                      <div className="flex flex-wrap justify-center sm:justify-start items-center gap-2">
++                        <h4 className="font-headline text-lg font-bold text-[#1a1a2e] uppercase">{userProfile.name}</h4>
++                        <span className="px-2.5 py-0.5 rounded-full border border-primary/20 bg-primary/5 text-[8px] font-black text-primary uppercase tracking-widest">{userProfile.role}</span>
++                      </div>
++                      <p className="text-xs text-[#1a1a2e]/60 font-mono">{userProfile.email}</p>
++                      <p className="text-[10px] text-[#1a1a2e]/40 font-mono uppercase tracking-wider">Member Since: {userProfile.memberSince} • Node: {userProfile.node}</p>
++                    </div>
++                  </div>
++
++                  {/* Wallet Balance Card */}
++                  <div className="p-6 rounded-[2rem] bg-[#1a1a2e] text-white relative overflow-hidden shadow-xl">
++                    <div className="absolute top-[-20%] right-[-10%] w-[50%] h-[150%] bg-primary/10 rounded-full blur-[80px] pointer-events-none"></div>
++                    <div className="relative z-10 flex flex-col sm:flex-row justify-between sm:items-center gap-6">
++                      <div className="space-y-1">
++                        <span className="text-[10px] uppercase font-bold tracking-widest text-white/50 block font-mono">Mock Wallet Balance</span>
++                        <span className="text-3xl font-black text-primary font-mono tracking-tight">₹{userProfile.walletBalance.toLocaleString('en-IN')}</span>
++                        <span className="text-[9px] block text-white/40 font-mono uppercase tracking-wide">Ready for store transactions</span>
++                      </div>
++                      <div className="flex flex-col gap-2">
++                        <span className="text-[9px] uppercase font-bold tracking-widest text-white/50 block font-mono text-center sm:text-left">Add Mock Funds</span>
++                        <div className="flex gap-2">
++                          {[1000, 5000, 10000].map((amt) => (
++                            <button
++                              key={amt}
++                              onClick={() => topUpWallet(amt)}
++                              className="px-3 py-2 bg-white/10 hover:bg-primary hover:text-[#1a1a2e] border border-white/5 hover:border-primary rounded-xl text-[10px] font-black font-mono transition-all"
++                            >
++                              +₹{amt.toLocaleString('en-IN')}
++                            </button>
++                          ))}
++                        </div>
++                      </div>
++                    </div>
++                  </div>
++
++                  {/* Dedicated App Download Link */}
++                  <div className="p-6 rounded-3xl bg-black/5 border border-black/5 flex items-center justify-between gap-4">
++                    <div className="flex items-center gap-4">
++                      <div className="w-12 h-12 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary">
++                        <span className="material-symbols-outlined text-2xl">rocket_launch</span>
++                      </div>
++                      <div>
++                        <h5 className="font-headline text-xs font-bold text-[#1a1a2e] uppercase tracking-wider">AIR G App (v2.0)</h5>
++                        <p className="text-[10px] text-[#1a1a2e]/40 font-mono">Download the official client terminal</p>
++                      </div>
++                    </div>
++                    <a 
++                      href="https://gurujiair.com/app"
++                      target="_blank"
++                      rel="noopener noreferrer"
++                      className="px-4 py-2 border border-black/10 hover:border-primary/50 text-[10px] uppercase tracking-widest font-black rounded-xl hover:bg-primary hover:text-white transition-all flex items-center gap-2"
++                    >
++                      <span>Download</span>
++                      <span className="material-symbols-outlined text-[10px]">arrow_forward</span>
++                    </a>
++                  </div>
++
++                  {/* Recent Orders inside Profile */}
++                  <div className="space-y-4">
++                    <div className="flex justify-between items-center">
++                      <h4 className="font-headline text-sm font-bold uppercase text-[#1a1a2e]/80 tracking-wider">My Recent Orders ({orders.length})</h4>
++                      {orders.length > 0 && (
++                        <button 
++                          onClick={() => {
++                            setIsProfileOpen(false);
++                            setIsOrdersOpen(true);
++                          }}
++                          className="text-xs text-primary font-bold hover:underline"
++                        >
++                          View Full History
++                        </button>
++                      )}
++                    </div>
++                    {orders.length === 0 ? (
++                      <div className="p-8 text-center rounded-2xl border border-dashed border-black/10 text-[#1a1a2e]/40 text-xs">
++                        No orders recorded on this node.
++                      </div>
++                    ) : (
++                      <div className="space-y-3 max-h-[220px] overflow-y-auto custom-scrollbar pr-2">
++                        {orders.slice(0, 3).map((order) => (
++                          <div key={order.id} className="p-4 rounded-2xl bg-black/5 border border-black/5 flex justify-between items-center text-xs">
++                            <div className="space-y-1">
++                              <span className="font-mono font-bold text-[#1a1a2e]">{order.id}</span>
++                              <span className="text-[9px] text-[#1a1a2e]/40 block">{order.date}</span>
++                            </div>
++                            <div className="text-right space-y-1">
++                              <span className="font-mono font-bold text-primary block">₹{order.total.toLocaleString('en-IN')}</span>
++                              <span className="text-[8px] bg-green-500/10 text-green-700 font-bold uppercase px-2 py-0.5 rounded-full">{order.status}</span>
++                            </div>
++                          </div>
++                        ))}
++                      </div>
++                    )}
++                  </div>
++                </div>
++              </motion.div>
++            </div>
++          </>
++        )}
++      </AnimatePresence>
++
++      {/* FULLSCREEN MAP MODAL */}
++      <AnimatePresence>
++        {isMapFullscreen && (
++          <div className="fixed inset-0 z-[150] bg-black/95 backdrop-blur-md flex flex-col justify-center items-center p-6">
++            <motion.div 
++              initial={{ opacity: 0 }}
++              animate={{ opacity: 1 }}
++              exit={{ opacity: 0 }}
++              className="absolute inset-0 bg-transparent"
++              onClick={() => setIsMapFullscreen(false)}
++            />
++            <motion.div 
++              initial={{ scale: 0.95, opacity: 0 }}
++              animate={{ scale: 1, opacity: 1 }}
++              exit={{ scale: 0.95, opacity: 0 }}
++              className="relative w-full max-w-[90vw] aspect-[2/1] bg-white rounded-[3rem] border border-black/5 p-6 flex items-center justify-center shadow-[0_25px_60px_rgba(0,0,0,0.15)] z-10"
++            >
++              {/* Close Button */}
++              <button 
++                onClick={() => setIsMapFullscreen(false)}
++                className="absolute top-6 right-6 z-50 bg-[#1a1a2e] text-white hover:bg-[#EB0028] hover:text-white transition-colors duration-300 w-12 h-12 rounded-full flex items-center justify-center shadow-xl"
++                title="Close Fullscreen"
++              >
++                <span className="material-symbols-outlined text-2xl">close</span>
++              </button>
++              
++              {activeNetwork === "india" ? (
++                <div className="w-full h-full flex items-center justify-center [&_svg]:max-h-[80vh] [&_svg]:w-auto [&_svg]:mx-auto select-none">
++                  <InteractiveIndiaMap />
++                </div>
++              ) : (
++                <div className="w-full h-full flex items-center justify-center [&_svg]:max-h-[80vh] [&_svg]:w-auto [&_svg]:mx-auto select-none">
++                  <InteractiveWorldMap onSelectHub={(hub) => {
++                    setSelectedGlobalHub(hub);
++                    setIsMapFullscreen(false); // Close fullscreen to show details panel
++                  }} />
++                </div>
++              )}
++            </motion.div>
++          </div>
++        )}
++      </AnimatePresence>
++    </div>
++  );
++}

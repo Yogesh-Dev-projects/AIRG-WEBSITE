@@ -1,0 +1,127 @@
+11:04:33.149 Type error: Cannot find module '@radix-ui/react-accordion' or its corresponding type declarations.
+11:04:33.149   2 |
+11:04:33.149   3 | import * as React from 'react'
+11:04:33.149 > 4 | import * as AccordionPrimitive from '@radix-ui/react-accordion'
+11:04:33.149     |                                     ^
+11:04:33.150   5 | import { ChevronDownIcon } from 'lucide-react'
+11:04:33.150   6 |
+11:04:33.150   7 | import { cn } from '@/lib/utils'
+11:04:33.278 Error: Command "npm run build" exited with 111:04:33.149 Type error: Cannot find module '@radix-ui/react-accordion' or its corresponding type declarations.
+11:04:33.149   2 |
+11:04:33.149   3 | import * as React from 'react'
+11:04:33.149 > 4 | import * as AccordionPrimitive from '@radix-ui/react-accordion'
+11:04:33.149     |                                     ^
+11:04:33.150   5 | import { ChevronDownIcon } from 'lucide-react'
+11:04:33.150   6 |
+11:04:33.150   7 | import { cn } from '@/lib/utils'
+11:04:33.278 Error: Command "npm run build" exited with 1<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+<head>
+    <title>Design and Development Revisions Walkthrough</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333333;
+            margin: 40px;
+        }
+        h1 {
+            color: #EB0028;
+            border-bottom: 2px solid #EB0028;
+            padding-bottom: 10px;
+            font-size: 24pt;
+        }
+        h2 {
+            color: #1a1a2e;
+            font-size: 16pt;
+            margin-top: 30px;
+            border-bottom: 1px solid #e0e0e0;
+            padding-bottom: 5px;
+        }
+        h3 {
+            color: #555555;
+            font-size: 13pt;
+        }
+        ul {
+            margin-left: 20px;
+        }
+        li {
+            margin-bottom: 8px;
+        }
+        .code {
+            font-family: 'Consolas', monospace;
+            background-color: #f4f4f4;
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-size: 10pt;
+        }
+        .screenshot-container {
+            margin: 20px 0;
+            text-align: center;
+            border: 1px solid #dddddd;
+            padding: 10px;
+            background-color: #fafafa;
+            border-radius: 8px;
+        }
+        .screenshot {
+            max-width: 100%;
+            height: auto;
+            border-radius: 4px;
+        }
+        .footer {
+            margin-top: 50px;
+            font-size: 9pt;
+            color: #777777;
+            text-align: center;
+            border-top: 1px solid #e0e0e0;
+            padding-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Development & Design Revisions Walkthrough</h1>
+    <p><strong>Date:</strong> 2026-06-01 &nbsp;|&nbsp; <strong>Project:</strong> AIR G INTERNATIONAL Portfolio</p>
+
+    <h2>1. Brand Preloader & Motion Identity</h2>
+    <p>We successfully designed and integrated a custom opening preloader screen to replace the previous intro with the new corporate identity:</p>
+    <ul>
+        <li><strong>Dual-Line Design:</strong> Renders "AIRG" in ultra-bold Outfit font and "INTERNATIONAL" in spaced-out tracking to match high-end corporate motion designs.</li>
+        <li><strong>Brand Color:</strong> Preloader columns utilize the official brand red (<span class="code">#EB0028</span>) with white text.</li>
+        <li><strong>Pure CSS Engine:</strong> Replaced GSAP with hardware GPU-accelerated CSS translation keyframes, resolving hydration locks and lagging.</li>
+        <li><strong>Zero-Delay mounting:</strong> Enabled immediate background rendering so the page is fully loaded and visible the second the preloader columns slide down.</li>
+    </ul>
+
+    <div class="screenshot-container">
+        <h3>Figure 1: Custom Staggered Preloader Animation Screen</h3>
+        <img class="screenshot" src="file:///C:/Users/DELL/.gemini/antigravity-ide/brain/05b87c68-796c-4172-b39c-19f7e2e74c54/media__1780315176175.png" alt="Preloader Screen" />
+    </div>
+
+    <h2>2. Map Revisions & High-Contrast Tooltips</h2>
+    <ul>
+        <li><strong>Cleaned Hub Registry:</strong> Trimmed the global centres map down to display only the 7 official locations (India, US, UK, Singapore, UAE, Cambodia, Kenya) and removed the pulsing dot overlays for a cleaner interface.</li>
+        <li><strong>Contrast Upgrades:</strong> Changed both India and World map tooltips from transparent-white to solid white boxes with dark navy text. This ensures place names (e.g. "BIHAR", "PUNJAB", "UNITED STATES") are fully legible whether the map is in standard mode or white fullscreen view.</li>
+        <li><strong>Global Section Highlight:</strong> Framed the Global Centres map panel with a radial backdrop blur glow and soft red shadows to draw focus.</li>
+    </ul>
+
+    <div class="screenshot-container">
+        <h3>Figure 2: Cleaned High-Contrast India Map Tooltip (Normal/Fullscreen)</h3>
+        <img class="screenshot" src="file:///C:/Users/DELL/.gemini/antigravity-ide/brain/05b87c68-796c-4172-b39c-19f7e2e74c54/media__1780315514344.png" alt="India Map Screen" />
+    </div>
+
+    <h2>3. Live Interactive Map Embedding</h2>
+    <ul>
+        <li>Replaced the static placeholder map icon inside the "Offline Centres" hero grid section with the actual live-interactive vector <span class="code">&lt;InteractiveIndiaMap /&gt;</span> component, allowing users to interact with the national infrastructure straight from the landing hero page.</li>
+    </ul>
+
+    <h2>4. Core Code Audits</h2>
+    <ul>
+        <li><strong>InteractiveIndiaMap.tsx:</strong> Repaired a syntax mismatch (missing closing path tag) which resolved compilation blocks.</li>
+        <li><strong>NewDesignContent.tsx:</strong> Restored imports for context feeders, data packages, maps, and modals.</li>
+    </ul>
+
+    <div class="footer">
+        AIR G INTERNATIONAL &copy; 2026. Generated by Antigravity IDE.
+    </div>
+
+</body>
+</html>
