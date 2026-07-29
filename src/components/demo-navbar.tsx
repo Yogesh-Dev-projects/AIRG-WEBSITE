@@ -29,7 +29,7 @@ export function Navbar() {
         { name: "Grampanchayat AI Lab", href: "/learning/grampanchayat-ai-lab" },
         { name: "AI Infrastructure", href: "/learning/ai-infrastructures" },
         { name: "Courses", href: "/#learning" },
-        { name: "Workshops", href: "/#workshops" }
+        { name: "Workshops", href: "/workshops" }
       ]
     },
     { name: "Store", href: "/#store" },

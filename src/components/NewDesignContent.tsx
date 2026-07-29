@@ -956,7 +956,7 @@ export default function NewDesignContent() {
     
     const handleHashChange = () => {
       const hash = window.location.hash.replace("#", "");
-      if (hash && ["hero", "labs", "centres", "workshops", "learning", "store", "ai-infrastructures"].includes(hash)) {
+      if (hash && ["hero", "labs", "centres", "learning", "store", "ai-infrastructures"].includes(hash)) {
         setActiveFace(hash);
         if (hash === "centres") {
           setActiveNetwork("india");
@@ -1084,7 +1084,7 @@ export default function NewDesignContent() {
                       </button>
                       <button
                         onClick={() => {
-                          navigateTo('workshops');
+                          router.push('/workshops');
                         }}
                         className="px-5 py-4 text-xs font-semibold uppercase tracking-widest text-[#1a1a2e]/60 hover:text-primary hover:bg-black/5 transition-colors whitespace-nowrap text-left block w-full"
                       >
@@ -1270,7 +1270,7 @@ export default function NewDesignContent() {
                           </button>
                           <button
                             onClick={() => {
-                              navigateTo('workshops');
+                              router.push('/workshops');
                               setIsMobileMenuOpen(false);
                             }}
                             className="text-left py-2 text-xs font-bold uppercase tracking-widest text-[#1a1a2e]/50 hover:text-[#1a1a2e] w-full"
@@ -1420,7 +1420,7 @@ export default function NewDesignContent() {
                     >
                       <span className="relative z-10 flex items-center gap-3">Visit Airg Labs <span className="material-symbols-outlined text-sm">arrow_forward</span></span>
                     </button>
-                    <button className="group px-6 py-4 sm:px-10 sm:py-5 glass-premium text-[#1a1a2e]/60 font-bold text-xs uppercase tracking-widest rounded-lg border border-black/5 hover:border-black/20 transition-all duration-300 flex items-center gap-2" onClick={() => navigateTo('workshops')}>
+                    <button className="group px-6 py-4 sm:px-10 sm:py-5 glass-premium text-[#1a1a2e]/60 font-bold text-xs uppercase tracking-widest rounded-lg border border-black/5 hover:border-black/20 transition-all duration-300 flex items-center gap-2" onClick={() => router.push('/workshops')}>
                       <span>View Workshops</span>
                       <span className="material-symbols-outlined text-sm">play_circle</span>
                     </button>
@@ -2686,10 +2686,10 @@ export default function NewDesignContent() {
 
                       <div className="pt-2">
                         <button 
-                          onClick={() => navigateTo('workshops')}
+                          onClick={() => router.push('/workshops')}
                           className="group relative px-6 py-3.5 bg-primary text-[#1a1a2e] font-bold text-xs uppercase tracking-widest rounded-xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] glow-red flex items-center gap-3"
                         >
-                          Audit Workshops 
+                          Book a Workshop 
                           <span className="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">arrow_forward</span>
                         </button>
                       </div>
@@ -2699,7 +2699,7 @@ export default function NewDesignContent() {
                       {fieldRecords.slice(0, 6).map((record, i) => (
                         <div 
                           key={i}
-                          onClick={() => navigateTo('workshops')}
+                          onClick={() => router.push('/workshops')}
                           className="glass-premium p-3.5 rounded-[2rem] border border-black/5 hover:border-primary/25 hover:shadow-lg transition-all duration-300 cursor-pointer flex flex-col justify-center group/item h-auto relative overflow-hidden"
                         >
                           <div className="relative w-full aspect-[4/3] rounded-2xl overflow-hidden border border-black/5 bg-slate-100 shrink-0">
@@ -2913,8 +2913,8 @@ export default function NewDesignContent() {
                       key={i}
                       x1="50"
                       y1="50"
-                      x2={50 + 42 * Math.cos((angle * Math.PI) / 180)}
-                      y2={50 + 42 * Math.sin((angle * Math.PI) / 180)}
+                      x2={Number((50 + 42 * Math.cos((angle * Math.PI) / 180)).toFixed(4))}
+                      y2={Number((50 + 42 * Math.sin((angle * Math.PI) / 180)).toFixed(4))}
                       stroke="currentColor"
                       strokeWidth="0.8"
                     />
