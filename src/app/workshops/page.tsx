@@ -786,60 +786,186 @@ export default function WorkshopsPage() {
         <WorkshopSection key={section.id} section={section} index={index} />
       ))}
 
-      {/* Experts Section — Placeholder */}
-      <section className="py-24 bg-[#1a1a2e] relative overflow-hidden">
+      {/* Experts Section */}
+      <section className="py-24 bg-white border-t border-black/6 relative overflow-hidden">
         <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-primary/10 rounded-full blur-[180px]" />
-          <div
-            className="absolute inset-0 opacity-[0.04]"
-            style={{
-              backgroundImage: "radial-gradient(rgba(255,255,255,0.4) 1px, transparent 1px)",
-              backgroundSize: "40px 40px",
-            }}
-          />
+          <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-primary/4 rounded-full blur-[150px] opacity-60" />
+          <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-red-50 rounded-full blur-[130px] opacity-50" />
         </div>
 
         <div className="max-w-[1440px] mx-auto px-6 md:px-20 relative z-10">
-          <div className="text-center mb-16">
-            <span className="px-4 py-2 bg-white/5 border border-white/10 rounded-full text-[10px] font-black font-mono text-primary uppercase tracking-widest mb-6 inline-block">
-              ✦ Our Expert Trainers
-            </span>
-            <h2 className="font-headline text-4xl md:text-6xl font-black text-white uppercase tracking-tighter leading-none mb-5">
-              Meet Our <span className="text-[#EE2C3C]">Experts</span>
+          {/* Section Header — matches Advisory Board style */}
+          <div className="flex items-center gap-3 mb-12">
+            <div className="w-8 h-8 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0">
+              <span className="material-symbols-outlined text-sm text-primary">groups</span>
+            </div>
+            <h2 className="font-headline text-xl md:text-2xl font-black text-[#1a1a2e] uppercase tracking-widest">
+              Advisory Board &amp; Industry Experts
             </h2>
-            <p className="text-white/40 text-lg font-light max-w-2xl mx-auto">
-              Our certified trainers and industry professionals bring real-world experience to every workshop — inspiring the next generation of innovators.
-            </p>
           </div>
 
-          {/* Placeholder cards — photos/names to be added */}
-          <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {[1, 2, 3, 4].map((i) => (
+          {/* Horizontal expert cards — 3 per row */}
+          <div className="grid md:grid-cols-3 gap-x-8 gap-y-6">
+            {[
+              {
+                name: "Mr. Saptparishi Ghosh",
+                title: "CEO, Symbiosis TBI",
+                desc: "Incubation and startup ecosystem expert leading Symbiosis Technology Business Incubator.",
+                photo: "/team/sapptarishi.png",
+              },
+              {
+                name: "Mr. Aashish Banka",
+                title: "CEO, Goosebumps.biz",
+                desc: "Digital transformation leader driving experiential marketing and technology solutions.",
+                photo: "/team/aashish.png",
+              },
+              {
+                name: "Mr. Tushar Agarwal",
+                title: "MD, Edelweiss Mutual",
+                desc: "Financial services leader with deep expertise in fund management and strategic investments.",
+                photo: "/team/tushar_a.png",
+              },
+              {
+                name: "Mr. Tushar Suryawanshi",
+                title: "Ex. COO, Microficial",
+                desc: "Operations specialist with experience scaling technology hardware production and operations.",
+                photo: "/team/tushar_s.png",
+              },
+              {
+                name: "Mr. Vijay Trimbake",
+                title: "CFO, Air G International",
+                desc: "Overseeing financial strategy, budgeting, and fiscal operations across all AIRG global hubs.",
+                photo: "/team/vijay.png",
+              },
+              {
+                name: "Mr. Chakravarti Gupta",
+                title: "Chief Technology Advisor",
+                desc: "Senior technology strategist advising on AI infrastructure architecture and enterprise systems.",
+                photo: "/team/chakravarti.png",
+              },
+              {
+                name: "Mr. Suyash Patil",
+                title: "",
+                desc: "",
+                photo: "/team/suyash.jpeg",
+              },
+              {
+                name: "Mr. Prasad Shelke",
+                title: "",
+                desc: "",
+                photo: "/team/prasad.jpeg",
+              },
+            ].map((expert, i) => (
               <div
                 key={i}
-                className="group bg-white/5 border border-white/8 rounded-3xl p-6 text-center hover:bg-white/8 hover:border-white/15 transition-all duration-300 hover:-translate-y-1"
+                className="group flex items-start gap-4 bg-white border border-black/6 rounded-2xl p-5 hover:border-primary/20 hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5"
               >
-                <div className="w-24 h-24 rounded-2xl bg-white/10 border border-white/10 flex items-center justify-center mx-auto mb-5">
-                  <span className="material-symbols-outlined text-4xl text-white/20">person</span>
+                {/* Rectangular photo — left side */}
+                <div className="w-[90px] h-[100px] rounded-xl overflow-hidden shrink-0 border border-black/6 group-hover:border-primary/20 transition-all duration-300">
+                  <img
+                    src={expert.photo}
+                    alt={expert.name}
+                    className="w-full h-full object-cover object-top"
+                  />
                 </div>
-                <div className="h-4 bg-white/10 rounded-full w-32 mx-auto mb-2" />
-                <div className="h-3 bg-white/6 rounded-full w-20 mx-auto" />
-                <div className="mt-4 px-4 py-2 bg-primary/10 border border-primary/20 rounded-full inline-block">
-                  <span className="text-[9px] font-mono font-bold text-primary uppercase tracking-widest">
-                    Expert Trainer
-                  </span>
+                {/* Text — right side */}
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-headline font-black text-[#1a1a2e] text-[13px] uppercase tracking-tight leading-tight mb-1">
+                    {expert.name}
+                  </h3>
+                  <p className="text-[#EE2C3C] text-[10px] font-bold font-mono uppercase tracking-widest mb-2">
+                    {expert.title}
+                  </p>
+                  <p className="text-[#1a1a2e]/50 text-xs leading-relaxed">
+                    {expert.desc}
+                  </p>
                 </div>
               </div>
             ))}
           </div>
+        </div>
+      </section>
 
-          <p className="text-center text-white/20 text-sm font-mono mt-8">
-            Expert trainer profiles coming soon — photos and names will be updated shortly.
+      {/* Our Clients Section */}
+      <section className="py-20 bg-[#f8f8fa] border-t border-black/6 relative overflow-hidden">
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute top-0 left-0 w-[400px] h-[400px] bg-primary/3 rounded-full blur-[150px] opacity-50" />
+          <div className="absolute bottom-0 right-0 w-[350px] h-[350px] bg-red-50 rounded-full blur-[130px] opacity-60" />
+        </div>
+
+        <div className="max-w-[1440px] mx-auto px-6 md:px-20 relative z-10">
+          {/* Section Header */}
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-8 h-8 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0">
+              <span className="material-symbols-outlined text-sm text-primary">school</span>
+            </div>
+            <h2 className="font-headline text-xl md:text-2xl font-black text-[#1a1a2e] uppercase tracking-widest">
+              Our Clients
+            </h2>
+          </div>
+          <p className="text-[#1a1a2e]/40 text-sm mb-12 ml-11">
+            Trusted by leading universities, colleges and institutions across India.
           </p>
+
+          {/* College cards grid */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-5">
+            {[
+              {
+                name: "DY Patil University",
+                logo: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTajnVPMPuKfXYtIyMl1a_DK8b1WLUpoutpOnHgHRQSog&s=10",
+              },
+              {
+                name: "Symbiosis Institute of Digital & Telecom Management",
+                logo: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTgSUotJpSSgR6u5Bx6_rNj-obsY0FuAHYKKLuEtCRFhg&s=10",
+              },
+              {
+                name: "Shivnagar Vidya Prasarak Manda College",
+                logo: "https://pharmacy.svpm.org.in/uploads/1751358429.png",
+              },
+              {
+                name: "Government Polytechnic Pune",
+                logo: "https://gppune.ac.in/images/gpnewlogo.png",
+              },
+              {
+                name: "Symbiosis Centre for Entrepreneurship & Innovation",
+                logo: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT4-W6fKFKLrOOu9nXfCzXPGxPvtVrfAn_-M0dW3VzWog&s=10",
+              },
+              {
+                name: "Indira College of Engineering & Management, Pune",
+                logo: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTlyOgfkrZHicoHyasNcEFk57DqssLm9wEnu5EHn_gWKw&s",
+              },
+              {
+                name: "COEP Technological University",
+                logo: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRI2tvDsfTZuEF_mE2GXD9Jb8pPDO_dfYjMXB2BSzGJJg&s=10",
+              },
+            ].map((client, i) => (
+              <div
+                key={i}
+                className="group bg-white border border-black/6 rounded-2xl p-5 flex flex-col items-center text-center gap-4 hover:border-primary/20 hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5"
+              >
+                {/* Logo */}
+                <div className="w-16 h-16 flex items-center justify-center">
+                  <img
+                    src={client.logo}
+                    alt={client.name}
+                    className="max-w-full max-h-full object-contain"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).style.display = "none";
+                    }}
+                  />
+                </div>
+                {/* Name */}
+                <p className="text-[#1a1a2e] text-[11px] font-bold uppercase tracking-wide leading-tight">
+                  {client.name}
+                </p>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
       {/* Footer CTA */}
+
       <section className="py-20 bg-white border-t border-black/6">
         <div className="max-w-[1440px] mx-auto px-6 md:px-20">
           <div className="bg-gradient-to-r from-primary/5 via-transparent to-primary/5 border border-primary/15 rounded-3xl p-10 md:p-16 flex flex-col md:flex-row items-center justify-between gap-8">
