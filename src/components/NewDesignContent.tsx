@@ -109,7 +109,7 @@ const CountUpNumber = ({ value, suffix = "" }: { value: number; suffix?: string 
 
 const row1 = [
   { name: "Aditya Birla", logo: "/logos/extracted_p5_img2.png", scaleVal: 1.1 },
-  { name: "Symbiosis", logo: "/logos/symbiosis.png", scaleVal: 1.2 },
+  { name: "Symbiosis", logo: "/logos/scei_new.png", scaleVal: 1.8 },
   { name: "Sharjah Research Park", logo: "/logos/sharjah.png" },
   { name: "UNESCO", logo: "/logos/unesco.png" },
   { name: "MIT-ADT", logo: "/logos/mitadt.png", scaleVal: 1.05 },
@@ -118,7 +118,7 @@ const row1 = [
 ];
 
 const row2 = [
-  { name: "DYP", logo: "/logos/dyp.png", scaleVal: 1.3 },
+  { name: "DYP", logo: "/logos/dyp_new.jpg", scaleVal: 2.2 },
   { name: "Western University", logo: "/logos/western.png" },
   { name: "Maha60", logo: "/logos/maha60.png", scaleVal: 1.6 },
   { name: "Institution's Innovation Council", logo: "/logos/left_7.png", scaleVal: 1.5 },

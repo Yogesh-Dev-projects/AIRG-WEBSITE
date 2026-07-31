@@ -845,14 +845,14 @@ export default function WorkshopsPage() {
               },
               {
                 name: "Mr. Suyash Patil",
-                title: "",
-                desc: "",
+                title: "Manager",
+                desc: "Manager at AIR G International",
                 photo: "/team/suyash.jpeg",
               },
               {
                 name: "Mr. Prasad Shelke",
-                title: "",
-                desc: "",
+                title: "Associate Manager",
+                desc: "Associate Manager at AIR G International",
                 photo: "/team/prasad.jpeg",
               },
             ].map((expert, i) => (
@@ -912,7 +912,8 @@ export default function WorkshopsPage() {
             {[
               {
                 name: "DY Patil University",
-                logo: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTajnVPMPuKfXYtIyMl1a_DK8b1WLUpoutpOnHgHRQSog&s=10",
+                logo: "/logos/dyp_new.jpg",
+                scaleVal: 1.6,
               },
               {
                 name: "Symbiosis Institute of Digital & Telecom Management",
@@ -928,11 +929,12 @@ export default function WorkshopsPage() {
               },
               {
                 name: "Symbiosis Centre for Entrepreneurship & Innovation",
-                logo: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT4-W6fKFKLrOOu9nXfCzXPGxPvtVrfAn_-M0dW3VzWog&s=10",
+                logo: "/logos/scei_new.png",
               },
               {
                 name: "Indira College of Engineering & Management, Pune",
                 logo: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTlyOgfkrZHicoHyasNcEFk57DqssLm9wEnu5EHn_gWKw&s",
+                scaleVal: 1.5,
               },
               {
                 name: "COEP Technological University",
@@ -944,11 +946,12 @@ export default function WorkshopsPage() {
                 className="group bg-white border border-black/6 rounded-2xl p-5 flex flex-col items-center text-center gap-4 hover:border-primary/20 hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5"
               >
                 {/* Logo */}
-                <div className="w-16 h-16 flex items-center justify-center">
+                <div className="w-full h-20 sm:h-24 flex items-center justify-center p-2 overflow-visible">
                   <img
                     src={client.logo}
                     alt={client.name}
-                    className="max-w-full max-h-full object-contain"
+                    style={client.scaleVal ? { transform: `scale(${client.scaleVal})` } : {}}
+                    className="max-w-full max-h-full object-contain mix-blend-multiply"
                     onError={(e) => {
                       (e.target as HTMLImageElement).style.display = "none";
                     }}
