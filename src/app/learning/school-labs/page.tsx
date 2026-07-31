@@ -132,15 +132,13 @@ export default function SchoolLabsPage() {
   ];
 
   const labImages = [
-    "/pratham/PHOTO-2026-07-14-20-49-29.jpg",
-    "/pratham/PHOTO-2026-07-14-20-49-29 (1).jpg",
-    "/pratham/PHOTO-2026-07-14-20-49-30.jpg",
-    "/pratham/PHOTO-2026-07-14-20-49-30 (1).jpg",
-    "/pratham/PHOTO-2026-07-14-20-49-30 (2).jpg",
-    "/pratham/PHOTO-2026-07-14-20-49-31.jpg",
-    "/pratham/PHOTO-2026-07-14-20-49-32.jpg",
-    "/pratham/PHOTO-2026-07-14-20-50-11.jpg",
-    "/pratham/PHOTO-2026-07-14-20-50-11 (1).jpg"
+    "https://lab.airginternational.com/_next/image?url=%2Fextracted-images%2Feon%2Feon_4.jpeg&w=1920&q=75",
+    "https://lab.airginternational.com/_next/image?url=%2Fcentres%2Frajendra%2FPHOTO-2026-07-14-21-26-47(1).jpg&w=1920&q=75",
+    "https://lab.airginternational.com/_next/image?url=%2Fcentres%2Fss-nikam%2FPHOTO-2026-07-14-21-47-38.jpg&w=1920&q=75",
+    "https://lab.airginternational.com/_next/image?url=%2Fcentres%2Fkoteshwar%2FPHOTO-2026-07-14-21-47-00.jpg&w=1920&q=75",
+    "https://lab.airginternational.com/_next/image?url=%2Fextracted-hi%2Fe6ae9a91-8e6f-4f86-934e-95601aef7e25.jpeg&w=1920&q=75",
+    "https://lab.airginternational.com/_next/image?url=%2Fcentres%2Fsakharwadi%2FPHOTO-2026-07-14-21-16-56(1).jpg&w=1920&q=75",
+    "https://lab.airginternational.com/_next/image?url=%2Fcentres%2Fsakharwadi%2FPHOTO-2026-07-14-21-16-55.jpg&w=1920&q=75"
   ];
 
   useEffect(() => {
