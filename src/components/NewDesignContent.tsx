@@ -384,6 +384,18 @@ export default function NewDesignContent() {
   const { isAuthModalOpen, setAuthModalOpen, addNotification } = useAppContext();
   const { user, logout, loading } = useAuth();
   const router = useRouter();
+
+  useEffect(() => {
+    if (typeof window !== "undefined" && window.location.hash) {
+      const id = window.location.hash.substring(1);
+      setTimeout(() => {
+        const el = document.getElementById(id);
+        if (el) {
+          el.scrollIntoView({ behavior: "smooth" });
+        }
+      }, 500); // Small delay to ensure render is complete
+    }
+  }, []);
   
   const getLabUrl = (slug: string) => {
     if (slug === "rajendra-khandala-lab") return "/labs/rajendra-khandala";
