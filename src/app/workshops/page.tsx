@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { Navbar } from "@/components/demo-navbar";
 import Link from "next/link";
 
@@ -207,6 +208,11 @@ function WorkshopSection({ section, index }: { section: (typeof sections)[0]; in
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState("");
   const [formVisible, setFormVisible] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
@@ -250,452 +256,236 @@ function WorkshopSection({ section, index }: { section: (typeof sections)[0]; in
     }
   };
 
-  const isEven = index % 2 === 0;
-
   return (
-    <section
-      id={section.id}
-      className="py-20 md:py-28 relative overflow-hidden"
-      style={{
-        background: isEven
-          ? "#ffffff"
-          : "linear-gradient(135deg, #f8f8fa 0%, #ffffff 100%)",
-        borderTop: "1px solid rgba(0,0,0,0.06)",
-      }}
-    >
-      {/* Background accent blob */}
+    <>
       <div
-        className="absolute pointer-events-none"
-        style={{
-          width: "500px",
-          height: "500px",
-          borderRadius: "50%",
-          background: section.accentLight,
-          filter: "blur(120px)",
-          top: "-100px",
-          right: isEven ? "-150px" : "auto",
-          left: isEven ? "auto" : "-150px",
-          opacity: 0.7,
-        }}
-      />
+        id={section.id}
+        className="group relative bg-white border border-black/10 rounded-[2rem] p-6 md:p-8 flex flex-col hover:border-black/20 hover:shadow-2xl transition-all duration-300"
+      >
+        {/* Badge */}
+        <span
+          className={`self-start inline-flex items-center gap-2 px-3 py-1.5 rounded-md border text-[10px] font-black font-mono uppercase tracking-widest mb-6 ${section.badgeColor}`}
+        >
+          {section.badge}
+        </span>
+        
+        {/* Title & Description */}
+        <h2 className="font-headline text-3xl font-black text-[#1a1a2e] uppercase tracking-tighter leading-tight mb-2">
+          {section.title}
+        </h2>
+        <p className="text-sm font-bold mb-4" style={{ color: section.accentColor }}>
+          {section.subtitle}
+        </p>
+        <p className="text-[#1a1a2e]/60 text-sm font-light leading-relaxed mb-8 border-l-2 pl-4" style={{ borderColor: section.accentColor }}>
+          {section.description}
+        </p>
 
-      <div className="max-w-[1440px] mx-auto px-6 md:px-20 relative z-10">
-        {/* Section Header */}
-        <div className="mb-14">
-          <span
-            className={`inline-flex items-center gap-2 px-4 py-2 rounded-full border text-[11px] font-black font-mono uppercase tracking-widest mb-6 ${section.badgeColor}`}
-          >
-            {section.badge}
-          </span>
-          <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
-            <div>
-              <h2
-                className="font-headline text-4xl md:text-6xl font-black text-[#1a1a2e] uppercase tracking-tighter leading-none mb-3"
-                style={{ color: "#1a1a2e" }}
-              >
-                {section.title}
-              </h2>
-              <p className="text-lg font-semibold" style={{ color: section.accentColor }}>
-                {section.subtitle}
-              </p>
-            </div>
-          </div>
-          <p className="text-[#1a1a2e]/60 text-base md:text-lg font-light leading-relaxed max-w-3xl mt-5 border-l-2 pl-5" style={{ borderColor: section.accentColor }}>
-            {section.description}
-          </p>
-        </div>
-
-        {/* Offerings Grid */}
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5 mb-16">
+        {/* Offerings List */}
+        <div className="flex-1 space-y-4 mb-10">
           {section.offerings.map((item, i) => (
-            <div
-              key={i}
-              className="group bg-white border border-black/6 rounded-2xl p-6 hover:border-black/15 hover:shadow-lg transition-all duration-300 hover:-translate-y-1"
-            >
-              <div
-                className="w-11 h-11 rounded-xl flex items-center justify-center mb-4 transition-colors duration-300"
-                style={{ background: section.accentLight }}
-              >
-                <span
-                  className="material-symbols-outlined text-xl"
-                  style={{ color: section.accentColor }}
-                >
+            <div key={i} className="flex gap-4 items-start group/item">
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 mt-0.5 transition-colors" style={{ background: section.accentLight }}>
+                <span className="material-symbols-outlined text-[18px]" style={{ color: section.accentColor }}>
                   {item.icon}
                 </span>
               </div>
-              <h4 className="font-headline font-bold text-[#1a1a2e] text-base mb-2 uppercase tracking-wide">
-                {item.title}
-              </h4>
-              <p className="text-[#1a1a2e]/50 text-sm leading-relaxed">{item.desc}</p>
+              <div>
+                <h4 className="font-headline font-bold text-[#1a1a2e] text-sm uppercase tracking-wide group-hover/item:text-primary transition-colors">
+                  {item.title}
+                </h4>
+                <p className="text-[#1a1a2e]/50 text-xs leading-relaxed mt-1">{item.desc}</p>
+              </div>
             </div>
           ))}
         </div>
 
-        {/* Book Now CTA */}
-        {!formVisible && (
-          <div className="flex justify-center">
-            <button
-              id={`book-btn-${section.id}`}
-              onClick={() => setFormVisible(true)}
-              className="group flex items-center gap-3 px-10 py-5 text-white font-bold text-sm uppercase tracking-widest rounded-xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] shadow-lg hover:shadow-xl"
-              style={{ background: section.accentColor }}
-            >
-              <span className="material-symbols-outlined text-lg">calendar_month</span>
-              Book a {section.id === "corporate" ? "Session" : "Workshop"} / Guest Lecture
-              <span className="material-symbols-outlined text-lg group-hover:translate-x-1 transition-transform">
-                arrow_forward
-              </span>
-            </button>
-          </div>
-        )}
+        {/* Book Now Button */}
+        <button
+          onClick={() => setFormVisible(true)}
+          className="w-full flex items-center justify-center gap-3 px-6 py-4 text-white font-bold text-sm uppercase tracking-widest rounded-xl transition-all duration-300 shadow-md hover:shadow-lg hover:scale-[1.02]"
+          style={{ background: section.accentColor }}
+        >
+          <span className="material-symbols-outlined text-lg">calendar_month</span>
+          Book Session
+        </button>
+      </div>
 
-        {/* Booking Form */}
-        {formVisible && (
-          <div
-            className="mt-8 bg-white rounded-3xl border border-black/8 shadow-xl overflow-hidden"
-            id={`form-${section.id}`}
-          >
-            {/* Form Header */}
-            <div className="px-8 py-6 flex items-center justify-between" style={{ background: section.accentLight, borderBottom: `1px solid rgba(0,0,0,0.06)` }}>
+      {/* Modal for Booking Form */}
+      {formVisible && mounted && createPortal(
+        <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md">
+          <div className="bg-white w-full max-w-3xl rounded-[2rem] shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-in fade-in zoom-in-95 duration-200">
+            {/* Modal Header */}
+            <div className="px-6 py-5 md:px-8 flex items-center justify-between shrink-0" style={{ background: section.accentLight, borderBottom: `1px solid rgba(0,0,0,0.06)` }}>
               <div>
-                <h3 className="font-headline font-black text-2xl text-[#1a1a2e] uppercase tracking-tight">
-                  Book Your{" "}
-                  {section.id === "corporate" ? "Corporate Session" : section.title.replace("Workshops for ", "")} Session
+                <h3 className="font-headline font-black text-xl md:text-2xl text-[#1a1a2e] uppercase tracking-tight">
+                  Book Your {section.id === "corporate" ? "Corporate Session" : section.title.replace("Workshops for ", "")}
                 </h3>
-                <p className="text-[#1a1a2e]/50 text-sm mt-1">
+                <p className="text-[#1a1a2e]/60 text-xs md:text-sm mt-1">
                   Fill the form below — our team will contact you within 24 hours.
                 </p>
               </div>
               <button
                 onClick={() => { setFormVisible(false); setSubmitted(false); setError(""); }}
-                className="p-2 rounded-lg text-[#1a1a2e]/40 hover:text-[#1a1a2e] hover:bg-black/5 transition-colors"
-                aria-label="Close form"
+                className="w-10 h-10 rounded-full flex items-center justify-center bg-white/50 text-[#1a1a2e]/50 hover:text-[#1a1a2e] hover:bg-white transition-colors border border-black/5"
               >
-                <span className="material-symbols-outlined text-2xl">close</span>
+                <span className="material-symbols-outlined text-xl">close</span>
               </button>
             </div>
 
-            {submitted ? (
-              <div className="flex flex-col items-center justify-center py-20 px-8 text-center">
-                <div
-                  className="w-20 h-20 rounded-full flex items-center justify-center mb-6"
-                  style={{ background: section.accentLight }}
-                >
-                  <span className="material-symbols-outlined text-4xl" style={{ color: section.accentColor }}>
-                    check_circle
-                  </span>
-                </div>
-                <h4 className="font-headline font-black text-2xl text-[#1a1a2e] uppercase mb-3">
-                  Booking Request Sent!
-                </h4>
-                <p className="text-[#1a1a2e]/50 max-w-md">
-                  Thank you! Our team has received your request and will get in touch with you shortly to confirm the details.
-                </p>
-                <button
-                  onClick={() => { setSubmitted(false); setFormVisible(false); }}
-                  className="mt-8 px-8 py-4 font-bold text-sm uppercase tracking-widest rounded-xl text-white transition-all duration-300 hover:scale-[1.02]"
-                  style={{ background: section.accentColor }}
-                >
-                  Done
-                </button>
-              </div>
-            ) : (
-              <form onSubmit={handleSubmit} className="p-8 grid sm:grid-cols-2 gap-5">
-                {/* Organization Name */}
-                <div className="sm:col-span-2">
-                  <label className="block text-[11px] font-black font-mono uppercase tracking-widest text-[#1a1a2e]/40 mb-2">
-                    {section.orgLabel} <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    required
-                    name="organizationName"
-                    value={form.organizationName}
-                    onChange={handleChange}
-                    placeholder={section.orgLabel}
-                    className="w-full bg-[#f8f8fa] border border-black/8 rounded-xl px-5 py-4 text-[#1a1a2e] text-sm placeholder:text-[#1a1a2e]/30 focus:outline-none focus:border-black/25 focus:bg-white transition-colors"
-                  />
-                </div>
-
-                {/* Contact Person */}
-                <div>
-                  <label className="block text-[11px] font-black font-mono uppercase tracking-widest text-[#1a1a2e]/40 mb-2">
-                    {section.contactLabel} <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    required
-                    name="contactPerson"
-                    value={form.contactPerson}
-                    onChange={handleChange}
-                    placeholder="Full Name"
-                    className="w-full bg-[#f8f8fa] border border-black/8 rounded-xl px-5 py-4 text-[#1a1a2e] text-sm placeholder:text-[#1a1a2e]/30 focus:outline-none focus:border-black/25 focus:bg-white transition-colors"
-                  />
-                </div>
-
-                {/* Designation (conditional) */}
-                {section.designationShow ? (
-                  <div>
-                    <label className="block text-[11px] font-black font-mono uppercase tracking-widest text-[#1a1a2e]/40 mb-2">
-                      Designation / Role
-                    </label>
-                    <input
-                      name="designation"
-                      value={form.designation}
-                      onChange={handleChange}
-                      placeholder="e.g. HOD, HR Manager, CEO"
-                      className="w-full bg-[#f8f8fa] border border-black/8 rounded-xl px-5 py-4 text-[#1a1a2e] text-sm placeholder:text-[#1a1a2e]/30 focus:outline-none focus:border-black/25 focus:bg-white transition-colors"
-                    />
-                  </div>
-                ) : (
-                  <div />
-                )}
-
-                {/* Phone */}
-                <div>
-                  <label className="block text-[11px] font-black font-mono uppercase tracking-widest text-[#1a1a2e]/40 mb-2">
-                    Phone Number <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    required
-                    type="tel"
-                    name="phone"
-                    value={form.phone}
-                    onChange={handleChange}
-                    placeholder="+91 XXXXX XXXXX"
-                    className="w-full bg-[#f8f8fa] border border-black/8 rounded-xl px-5 py-4 text-[#1a1a2e] text-sm placeholder:text-[#1a1a2e]/30 focus:outline-none focus:border-black/25 focus:bg-white transition-colors"
-                  />
-                </div>
-
-                {/* Email */}
-                <div>
-                  <label className="block text-[11px] font-black font-mono uppercase tracking-widest text-[#1a1a2e]/40 mb-2">
-                    Email Address <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    required
-                    type="email"
-                    name="email"
-                    value={form.email}
-                    onChange={handleChange}
-                    placeholder="yourname@example.com"
-                    className="w-full bg-[#f8f8fa] border border-black/8 rounded-xl px-5 py-4 text-[#1a1a2e] text-sm placeholder:text-[#1a1a2e]/30 focus:outline-none focus:border-black/25 focus:bg-white transition-colors"
-                  />
-                </div>
-
-                {/* City */}
-                <div>
-                  <label className="block text-[11px] font-black font-mono uppercase tracking-widest text-[#1a1a2e]/40 mb-2">
-                    City <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    required
-                    name="city"
-                    value={form.city}
-                    onChange={handleChange}
-                    placeholder="Your City"
-                    className="w-full bg-[#f8f8fa] border border-black/8 rounded-xl px-5 py-4 text-[#1a1a2e] text-sm placeholder:text-[#1a1a2e]/30 focus:outline-none focus:border-black/25 focus:bg-white transition-colors"
-                  />
-                </div>
-
-                {/* Department (conditional) */}
-                {section.departmentShow && (
-                  <div>
-                    <label className="block text-[11px] font-black font-mono uppercase tracking-widest text-[#1a1a2e]/40 mb-2">
-                      Department / Stream
-                    </label>
-                    <input
-                      name="department"
-                      value={form.department}
-                      onChange={handleChange}
-                      placeholder="e.g. CSE, Mechanical, MBA"
-                      className="w-full bg-[#f8f8fa] border border-black/8 rounded-xl px-5 py-4 text-[#1a1a2e] text-sm placeholder:text-[#1a1a2e]/30 focus:outline-none focus:border-black/25 focus:bg-white transition-colors"
-                    />
-                  </div>
-                )}
-
-                {/* Industry (conditional) */}
-                {section.industryShow && (
-                  <div>
-                    <label className="block text-[11px] font-black font-mono uppercase tracking-widest text-[#1a1a2e]/40 mb-2">
-                      Industry / Domain
-                    </label>
-                    <input
-                      name="industry"
-                      value={form.industry}
-                      onChange={handleChange}
-                      placeholder="e.g. Manufacturing, IT, Healthcare"
-                      className="w-full bg-[#f8f8fa] border border-black/8 rounded-xl px-5 py-4 text-[#1a1a2e] text-sm placeholder:text-[#1a1a2e]/30 focus:outline-none focus:border-black/25 focus:bg-white transition-colors"
-                    />
-                  </div>
-                )}
-
-                {/* Full Address */}
-                <div className="sm:col-span-2">
-                  <label className="block text-[11px] font-black font-mono uppercase tracking-widest text-[#1a1a2e]/40 mb-2">
-                    Full Address / Venue <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    required
-                    name="address"
-                    value={form.address}
-                    onChange={handleChange}
-                    placeholder="Where should the workshop/guest lecture take place?"
-                    className="w-full bg-[#f8f8fa] border border-black/8 rounded-xl px-5 py-4 text-[#1a1a2e] text-sm placeholder:text-[#1a1a2e]/30 focus:outline-none focus:border-black/25 focus:bg-white transition-colors"
-                  />
-                </div>
-
-                {/* Session Type */}
-                <div>
-                  <label className="block text-[11px] font-black font-mono uppercase tracking-widest text-[#1a1a2e]/40 mb-3">
-                    Type of Session <span className="text-red-500">*</span>
-                  </label>
-                  <div className="flex gap-4">
-                    {[
-                      { value: "workshop", label: "Workshop" },
-                      { value: "guest-lecture", label: section.id === "corporate" ? "Guest Lecture / Keynote" : "Guest Lecture" },
-                    ].map((opt) => (
-                      <label
-                        key={opt.value}
-                        className={`flex items-center gap-2 cursor-pointer px-5 py-4 rounded-xl border text-sm font-semibold transition-all duration-200 flex-1 justify-center ${
-                          form.sessionType === opt.value
-                            ? "border-transparent text-white"
-                            : "bg-[#f8f8fa] border-black/8 text-[#1a1a2e]/60 hover:border-black/20"
-                        }`}
-                        style={
-                          form.sessionType === opt.value
-                            ? { background: section.accentColor }
-                            : {}
-                        }
-                      >
-                        <input
-                          type="radio"
-                          name="sessionType"
-                          value={opt.value}
-                          checked={form.sessionType === opt.value}
-                          onChange={handleChange}
-                          className="sr-only"
-                        />
-                        {opt.label}
-                      </label>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Duration */}
-                <div>
-                  <label className="block text-[11px] font-black font-mono uppercase tracking-widest text-[#1a1a2e]/40 mb-2">
-                    Duration <span className="text-red-500">*</span>
-                  </label>
-                  <select
-                    required
-                    name="duration"
-                    value={form.duration}
-                    onChange={handleChange}
-                    disabled={!form.sessionType}
-                    className="w-full bg-[#f8f8fa] border border-black/8 rounded-xl px-5 py-4 text-[#1a1a2e] text-sm focus:outline-none focus:border-black/25 focus:bg-white transition-colors disabled:opacity-40"
+            {/* Modal Body */}
+            <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-6 md:p-8">
+              {submitted ? (
+                <div className="flex flex-col items-center justify-center py-10 md:py-20 text-center">
+                  <div
+                    className="w-24 h-24 rounded-full flex items-center justify-center mb-6 shadow-sm mx-auto"
+                    style={{ background: section.accentLight }}
                   >
-                    <option value="">
-                      {form.sessionType ? "Select Duration" : "Select session type first"}
-                    </option>
-                    {getDurationOptions().map((d) => (
-                      <option key={d} value={d}>
-                        {d}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                {/* Preferred Date */}
-                <div>
-                  <label className="block text-[11px] font-black font-mono uppercase tracking-widest text-[#1a1a2e]/40 mb-2">
-                    Preferred Date <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    required
-                    type="date"
-                    name="preferredDate"
-                    value={form.preferredDate}
-                    onChange={handleChange}
-                    min={new Date().toISOString().split("T")[0]}
-                    className="w-full bg-[#f8f8fa] border border-black/8 rounded-xl px-5 py-4 text-[#1a1a2e] text-sm focus:outline-none focus:border-black/25 focus:bg-white transition-colors"
-                  />
-                </div>
-
-                {/* Participant Count */}
-                <div>
-                  <label className="block text-[11px] font-black font-mono uppercase tracking-widest text-[#1a1a2e]/40 mb-2">
-                    {section.participantLabel} <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    required
-                    type="number"
-                    name="participantCount"
-                    value={form.participantCount}
-                    onChange={handleChange}
-                    placeholder="e.g. 50"
-                    min="1"
-                    className="w-full bg-[#f8f8fa] border border-black/8 rounded-xl px-5 py-4 text-[#1a1a2e] text-sm placeholder:text-[#1a1a2e]/30 focus:outline-none focus:border-black/25 focus:bg-white transition-colors"
-                  />
-                </div>
-
-                {/* Special Requirements */}
-                <div className="sm:col-span-2">
-                  <label className="block text-[11px] font-black font-mono uppercase tracking-widest text-[#1a1a2e]/40 mb-2">
-                    Special Requirements / Message
-                  </label>
-                  <textarea
-                    name="specialRequirements"
-                    value={form.specialRequirements}
-                    onChange={handleChange}
-                    placeholder="Any specific topics, equipment needs, or additional information..."
-                    rows={4}
-                    className="w-full bg-[#f8f8fa] border border-black/8 rounded-xl px-5 py-4 text-[#1a1a2e] text-sm placeholder:text-[#1a1a2e]/30 focus:outline-none focus:border-black/25 focus:bg-white transition-colors resize-none"
-                  />
-                </div>
-
-                {/* Error */}
-                {error && (
-                  <div className="sm:col-span-2 px-5 py-4 bg-red-50 border border-red-200 rounded-xl text-red-600 text-sm">
-                    {error}
+                    <span className="material-symbols-outlined text-5xl" style={{ color: section.accentColor }}>
+                      check_circle
+                    </span>
                   </div>
-                )}
-
-                {/* Submit */}
-                <div className="sm:col-span-2 flex gap-4 pt-2">
+                  <h4 className="font-headline font-black text-2xl text-[#1a1a2e] uppercase mb-3">
+                    Booking Request Sent!
+                  </h4>
+                  <p className="text-[#1a1a2e]/50 max-w-md mb-8 mx-auto">
+                    Thank you! Our team has received your request and will get in touch with you shortly to confirm the details.
+                  </p>
                   <button
-                    type="submit"
-                    disabled={loading}
-                    className="flex-1 py-5 font-bold text-sm uppercase tracking-widest rounded-xl text-white transition-all duration-300 hover:scale-[1.01] active:scale-[0.99] disabled:opacity-60 flex items-center justify-center gap-2"
+                    onClick={() => { setSubmitted(false); setFormVisible(false); }}
+                    className="px-10 py-4 font-bold text-sm uppercase tracking-widest rounded-xl text-white transition-all duration-300 hover:scale-[1.02]"
                     style={{ background: section.accentColor }}
                   >
-                    {loading ? (
-                      <>
-                        <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
-                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                        </svg>
-                        Sending...
-                      </>
-                    ) : (
-                      <>
-                        <span className="material-symbols-outlined text-lg">send</span>
-                        Submit Booking Request
-                      </>
-                    )}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => { setFormVisible(false); setError(""); }}
-                    className="px-8 py-5 bg-[#f8f8fa] border border-black/8 text-[#1a1a2e]/60 font-bold text-sm uppercase tracking-widest rounded-xl hover:border-black/20 hover:text-[#1a1a2e] transition-all"
-                  >
-                    Cancel
+                    Done
                   </button>
                 </div>
-              </form>
-            )}
+              ) : (
+                <form onSubmit={handleSubmit} className="grid sm:grid-cols-2 gap-5">
+                  <div className="sm:col-span-2">
+                    <label className="block text-[11px] font-black font-mono uppercase tracking-widest text-[#1a1a2e]/50 mb-2">
+                      {section.orgLabel} <span className="text-red-500">*</span>
+                    </label>
+                    <input required name="organizationName" value={form.organizationName} onChange={handleChange} placeholder={section.orgLabel} className="w-full bg-[#f8f8fa] border border-black/8 rounded-xl px-4 py-3.5 text-[#1a1a2e] text-sm focus:outline-none focus:border-black/25 focus:bg-white transition-colors" />
+                  </div>
+                  <div>
+                    <label className="block text-[11px] font-black font-mono uppercase tracking-widest text-[#1a1a2e]/50 mb-2">
+                      {section.contactLabel} <span className="text-red-500">*</span>
+                    </label>
+                    <input required name="contactPerson" value={form.contactPerson} onChange={handleChange} placeholder="Full Name" className="w-full bg-[#f8f8fa] border border-black/8 rounded-xl px-4 py-3.5 text-[#1a1a2e] text-sm focus:outline-none focus:border-black/25 focus:bg-white transition-colors" />
+                  </div>
+                  {section.designationShow ? (
+                    <div>
+                      <label className="block text-[11px] font-black font-mono uppercase tracking-widest text-[#1a1a2e]/50 mb-2">
+                        Designation / Role
+                      </label>
+                      <input name="designation" value={form.designation} onChange={handleChange} placeholder="e.g. HOD, HR Manager" className="w-full bg-[#f8f8fa] border border-black/8 rounded-xl px-4 py-3.5 text-[#1a1a2e] text-sm focus:outline-none focus:border-black/25 focus:bg-white transition-colors" />
+                    </div>
+                  ) : <div />}
+                  <div>
+                    <label className="block text-[11px] font-black font-mono uppercase tracking-widest text-[#1a1a2e]/50 mb-2">
+                      Phone Number <span className="text-red-500">*</span>
+                    </label>
+                    <input required type="tel" name="phone" value={form.phone} onChange={handleChange} placeholder="+91 XXXXX XXXXX" className="w-full bg-[#f8f8fa] border border-black/8 rounded-xl px-4 py-3.5 text-[#1a1a2e] text-sm focus:outline-none focus:border-black/25 focus:bg-white transition-colors" />
+                  </div>
+                  <div>
+                    <label className="block text-[11px] font-black font-mono uppercase tracking-widest text-[#1a1a2e]/50 mb-2">
+                      Email Address <span className="text-red-500">*</span>
+                    </label>
+                    <input required type="email" name="email" value={form.email} onChange={handleChange} placeholder="name@example.com" className="w-full bg-[#f8f8fa] border border-black/8 rounded-xl px-4 py-3.5 text-[#1a1a2e] text-sm focus:outline-none focus:border-black/25 focus:bg-white transition-colors" />
+                  </div>
+                  <div>
+                    <label className="block text-[11px] font-black font-mono uppercase tracking-widest text-[#1a1a2e]/50 mb-2">
+                      City <span className="text-red-500">*</span>
+                    </label>
+                    <input required name="city" value={form.city} onChange={handleChange} placeholder="Your City" className="w-full bg-[#f8f8fa] border border-black/8 rounded-xl px-4 py-3.5 text-[#1a1a2e] text-sm focus:outline-none focus:border-black/25 focus:bg-white transition-colors" />
+                  </div>
+                  {section.departmentShow && (
+                    <div>
+                      <label className="block text-[11px] font-black font-mono uppercase tracking-widest text-[#1a1a2e]/50 mb-2">
+                        Department / Stream
+                      </label>
+                      <input name="department" value={form.department} onChange={handleChange} placeholder="e.g. CSE, Mechanical" className="w-full bg-[#f8f8fa] border border-black/8 rounded-xl px-4 py-3.5 text-[#1a1a2e] text-sm focus:outline-none focus:border-black/25 focus:bg-white transition-colors" />
+                    </div>
+                  )}
+                  {section.industryShow && (
+                    <div>
+                      <label className="block text-[11px] font-black font-mono uppercase tracking-widest text-[#1a1a2e]/50 mb-2">
+                        Industry / Domain
+                      </label>
+                      <input name="industry" value={form.industry} onChange={handleChange} placeholder="e.g. Manufacturing, IT" className="w-full bg-[#f8f8fa] border border-black/8 rounded-xl px-4 py-3.5 text-[#1a1a2e] text-sm focus:outline-none focus:border-black/25 focus:bg-white transition-colors" />
+                    </div>
+                  )}
+                  <div className="sm:col-span-2">
+                    <label className="block text-[11px] font-black font-mono uppercase tracking-widest text-[#1a1a2e]/50 mb-2">
+                      Full Address / Venue <span className="text-red-500">*</span>
+                    </label>
+                    <input required name="address" value={form.address} onChange={handleChange} placeholder="Where should the session take place?" className="w-full bg-[#f8f8fa] border border-black/8 rounded-xl px-4 py-3.5 text-[#1a1a2e] text-sm focus:outline-none focus:border-black/25 focus:bg-white transition-colors" />
+                  </div>
+                  <div className="sm:col-span-2">
+                    <label className="block text-[11px] font-black font-mono uppercase tracking-widest text-[#1a1a2e]/50 mb-3">
+                      Type of Session <span className="text-red-500">*</span>
+                    </label>
+                    <div className="flex gap-4">
+                      {[
+                        { value: "workshop", label: "Workshop" },
+                        { value: "guest-lecture", label: section.id === "corporate" ? "Guest Lecture" : "Guest Lecture" },
+                      ].map((opt) => (
+                        <label key={opt.value} className={`flex items-center gap-2 cursor-pointer px-4 py-3.5 rounded-xl border text-sm font-semibold transition-all duration-200 flex-1 justify-center ${form.sessionType === opt.value ? "border-transparent text-white" : "bg-[#f8f8fa] border-black/8 text-[#1a1a2e]/60 hover:border-black/20"}`} style={form.sessionType === opt.value ? { background: section.accentColor } : {}}>
+                          <input type="radio" name="sessionType" value={opt.value} checked={form.sessionType === opt.value} onChange={handleChange} className="sr-only" />
+                          {opt.label}
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-[11px] font-black font-mono uppercase tracking-widest text-[#1a1a2e]/50 mb-2">
+                      Duration <span className="text-red-500">*</span>
+                    </label>
+                    <select required name="duration" value={form.duration} onChange={handleChange} disabled={!form.sessionType} className="w-full bg-[#f8f8fa] border border-black/8 rounded-xl px-4 py-3.5 text-[#1a1a2e] text-sm focus:outline-none focus:border-black/25 focus:bg-white transition-colors disabled:opacity-40">
+                      <option value="">{form.sessionType ? "Select Duration" : "Select session type first"}</option>
+                      {getDurationOptions().map((d) => (
+                        <option key={d} value={d}>{d}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-[11px] font-black font-mono uppercase tracking-widest text-[#1a1a2e]/50 mb-2">
+                      Preferred Date <span className="text-red-500">*</span>
+                    </label>
+                    <input required type="date" name="preferredDate" value={form.preferredDate} onChange={handleChange} min={new Date().toISOString().split("T")[0]} className="w-full bg-[#f8f8fa] border border-black/8 rounded-xl px-4 py-3.5 text-[#1a1a2e] text-sm focus:outline-none focus:border-black/25 focus:bg-white transition-colors" />
+                  </div>
+                  <div className="sm:col-span-2">
+                    <label className="block text-[11px] font-black font-mono uppercase tracking-widest text-[#1a1a2e]/50 mb-2">
+                      {section.participantLabel} <span className="text-red-500">*</span>
+                    </label>
+                    <input required type="number" name="participantCount" value={form.participantCount} onChange={handleChange} placeholder="e.g. 50" min="1" className="w-full bg-[#f8f8fa] border border-black/8 rounded-xl px-4 py-3.5 text-[#1a1a2e] text-sm focus:outline-none focus:border-black/25 focus:bg-white transition-colors" />
+                  </div>
+                  <div className="sm:col-span-2">
+                    <label className="block text-[11px] font-black font-mono uppercase tracking-widest text-[#1a1a2e]/50 mb-2">
+                      Special Requirements / Message
+                    </label>
+                    <textarea name="specialRequirements" value={form.specialRequirements} onChange={handleChange} placeholder="Any specific topics, equipment needs, or additional information..." rows={3} className="w-full bg-[#f8f8fa] border border-black/8 rounded-xl px-4 py-3.5 text-[#1a1a2e] text-sm focus:outline-none focus:border-black/25 focus:bg-white transition-colors resize-none" />
+                  </div>
+                  {error && (
+                    <div className="sm:col-span-2 px-4 py-3 bg-red-50 border border-red-200 rounded-xl text-red-600 text-sm">
+                      {error}
+                    </div>
+                  )}
+                  <div className="sm:col-span-2 flex gap-4 pt-4 mt-2 border-t border-black/5">
+                    <button type="button" onClick={() => { setFormVisible(false); setError(""); }} className="px-6 py-4 bg-[#f8f8fa] border border-black/8 text-[#1a1a2e]/60 font-bold text-sm uppercase tracking-widest rounded-xl hover:border-black/20 hover:text-[#1a1a2e] transition-all">
+                      Cancel
+                    </button>
+                    <button type="submit" disabled={loading} className="flex-1 py-4 font-bold text-sm uppercase tracking-widest rounded-xl text-white transition-all duration-300 hover:scale-[1.01] active:scale-[0.99] disabled:opacity-60 flex items-center justify-center gap-2" style={{ background: section.accentColor }}>
+                      {loading ? "Sending..." : "Submit Booking Request"}
+                    </button>
+                  </div>
+                </form>
+              )}
+            </div>
           </div>
-        )}
-      </div>
-    </section>
+        </div>,
+        document.body
+      )}
+    </>
   );
 }
 
@@ -782,9 +572,17 @@ export default function WorkshopsPage() {
       </section>
 
       {/* Three Workshop Sections */}
-      {sections.map((section, index) => (
-        <WorkshopSection key={section.id} section={section} index={index} />
-      ))}
+      <section className="py-20 relative bg-[#f8f8fa]">
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute top-[20%] left-[-100px] w-[500px] h-[500px] bg-primary/3 rounded-full blur-[150px]" />
+          <div className="absolute bottom-[20%] right-[-100px] w-[500px] h-[500px] bg-blue-500/5 rounded-full blur-[150px]" />
+        </div>
+        <div className="max-w-[1440px] mx-auto px-6 md:px-10 relative z-10 grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {sections.map((section, index) => (
+            <WorkshopSection key={section.id} section={section} index={index} />
+          ))}
+        </div>
+      </section>
 
       {/* Experts Section */}
       <section className="py-24 bg-white border-t border-black/6 relative overflow-hidden">
