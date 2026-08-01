@@ -205,12 +205,12 @@ export default function PythonCurriculumModal({
           <div className="bg-blue-50 p-4 rounded-xl border border-blue-100 mt-4">
             <h5 className="font-bold text-blue-800 mb-2 uppercase text-xs tracking-wider">What Students Will Get</h5>
             <ul className="space-y-2 text-sm text-blue-700 font-medium">
-              <li className="flex items-center gap-2"><span className="material-symbols-outlined text-sm">workspace_premium</span> AIR G International Certificate of Completion</span></li>
-              <li className="flex items-center gap-2"><span className="material-symbols-outlined text-sm">code</span> 2 Mini Projects</span></li>
-              <li className="flex items-center gap-2"><span className="material-symbols-outlined text-sm">rocket_launch</span> 1 Capstone Project</span></li>
-              <li className="flex items-center gap-2"><span className="material-symbols-outlined text-sm">folder_open</span> GitHub Repository with all projects</span></li>
-              <li className="flex items-center gap-2"><span className="material-symbols-outlined text-sm">analytics</span> Final Assessment Report</span></li>
-              <li className="flex items-center gap-2"><span className="material-symbols-outlined text-sm">campaign</span> LinkedIn Certificate Announcement Template</span></li>
+              <li className="flex items-center gap-2"><span className="material-symbols-outlined text-sm">workspace_premium</span> AIR G International Certificate of Completion</li>
+              <li className="flex items-center gap-2"><span className="material-symbols-outlined text-sm">code</span> 2 Mini Projects</li>
+              <li className="flex items-center gap-2"><span className="material-symbols-outlined text-sm">rocket_launch</span> 1 Capstone Project</li>
+              <li className="flex items-center gap-2"><span className="material-symbols-outlined text-sm">folder_open</span> GitHub Repository with all projects</li>
+              <li className="flex items-center gap-2"><span className="material-symbols-outlined text-sm">analytics</span> Final Assessment Report</li>
+              <li className="flex items-center gap-2"><span className="material-symbols-outlined text-sm">campaign</span> LinkedIn Certificate Announcement Template</li>
             </ul>
           </div>
         </div>
