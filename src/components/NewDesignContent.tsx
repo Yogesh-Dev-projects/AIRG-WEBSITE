@@ -3910,7 +3910,7 @@ export default function NewDesignContent() {
               </div>
               
               {/* Python Bootcamp Section */}
-              <div className="space-y-6 mb-16 pt-6 relative">
+              <div id="python-course" className="space-y-6 mb-16 pt-6 relative scroll-mt-24">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-black/5 pb-4 relative z-10 mt-8">
                   <h3 className="text-xl font-headline font-black text-[#1a1a2e] uppercase tracking-tight flex items-center gap-2">
                     <span className="material-symbols-outlined text-primary text-xl">code</span>
