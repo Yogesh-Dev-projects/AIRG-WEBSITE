@@ -159,6 +159,7 @@ import { useAppContext } from "@/context/AppContext";
 import AuthModal from "./AuthModal";
 import { useAuth } from "@/context/auth-context";
 import CertificateModal from "./CertificateModal";
+import PythonCurriculumModal from "./PythonCurriculumModal";
 import ProductDetailModal from "./ProductDetailModal";
 import { CheckoutModal } from "./store/CheckoutModal";
 import { PythonBootcampModal } from "./PythonBootcampModal";
@@ -415,6 +416,7 @@ export default function NewDesignContent() {
   const [showCallButton, setShowCallButton] = useState(false);
   const [isCertModalOpen, setIsCertModalOpen] = useState(false);
   const [isPythonModalOpen, setIsPythonModalOpen] = useState(false);
+  const [isCurriculumModalOpen, setIsCurriculumModalOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<{ name: string; price: string; img: string; tag: string; desc: string } | null>(null);
   const rotationRef = useRef({ x: 0, y: 0 });
   const [isTransitioning, setIsTransitioning] = useState(false);
@@ -3979,7 +3981,14 @@ export default function NewDesignContent() {
                         </div>
                       </div>
                     </div>
-                    <div className="pt-6 mt-8 border-t border-black/5 md:w-1/3 md:absolute md:bottom-8 md:right-8 md:mt-0 md:pt-0 md:border-t-0">
+                    <div className="pt-6 mt-8 border-t border-black/5 md:w-1/3 md:absolute md:bottom-8 md:right-8 md:mt-0 md:pt-0 md:border-t-0 flex flex-col gap-3">
+                      <button 
+                        onClick={() => setIsCurriculumModalOpen(true)}
+                        className="w-full bg-white hover:bg-gray-50 text-[#1a1a2e] border-2 border-black/10 py-3.5 rounded-xl font-black uppercase tracking-widest text-xs transition-all flex items-center justify-center gap-2 cursor-pointer hover:border-black/30"
+                      >
+                        <span className="material-symbols-outlined text-sm">menu_book</span>
+                        View Full Curriculum
+                      </button>
                       <button 
                         onClick={() => setIsPythonModalOpen(true)}
                         className="w-full bg-primary hover:bg-[#eb0028]/95 py-4 rounded-xl font-black uppercase tracking-widest text-xs text-white transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md hover:scale-[1.02] glow-red"
@@ -5710,6 +5719,7 @@ export default function NewDesignContent() {
         </div>
       )}
       
+      <PythonCurriculumModal isOpen={isCurriculumModalOpen} onClose={() => setIsCurriculumModalOpen(false)} />
       <PythonBootcampModal 
         isOpen={isPythonModalOpen} 
         onClose={() => setIsPythonModalOpen(false)} 
