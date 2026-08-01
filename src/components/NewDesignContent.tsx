@@ -1104,6 +1104,7 @@ export default function NewDesignContent() {
                       >
                         Workshops
                       </button>
+                      </div>
                     </div>
                   </div>
                 );
@@ -3874,6 +3875,7 @@ export default function NewDesignContent() {
                         <span className="material-symbols-outlined text-sm">payments</span>
                         Pay Half Fee (₹3,000)
                       </button>
+                      </div>
                     </div>
                   </div>
 
@@ -3918,6 +3920,7 @@ export default function NewDesignContent() {
                         <span className="material-symbols-outlined text-sm">payments</span>
                         Pay Full Fee (₹6,000)
                       </button>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -3937,7 +3940,8 @@ export default function NewDesignContent() {
                     <div className="absolute top-0 right-0 px-4 py-1.5 bg-primary text-white rounded-bl-2xl text-[8px] font-black font-mono uppercase tracking-widest shadow-md">
                       Live Online Training
                     </div>
-                    <div className="space-y-4 md:w-3/4">
+                    <div className="flex flex-col md:flex-row gap-8 justify-between w-full h-full">
+                      <div className="space-y-4 md:w-2/3 flex flex-col justify-between">
                       <div className="flex items-center gap-3">
                         <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all duration-300 shrink-0">
                           <span className="material-symbols-outlined text-2xl">terminal</span>
@@ -3981,7 +3985,7 @@ export default function NewDesignContent() {
                         </div>
                       </div>
                     </div>
-                    <div className="pt-6 mt-8 border-t border-black/5 md:w-1/3 md:absolute md:bottom-8 md:right-8 md:mt-0 md:pt-0 md:border-t-0 flex flex-col gap-3">
+                      <div className="pt-6 mt-8 border-t border-black/5 md:w-[30%] md:mt-auto md:pt-0 md:border-t-0 flex flex-col gap-3 shrink-0">
                       <button 
                         onClick={() => setIsCurriculumModalOpen(true)}
                         className="w-full bg-white hover:bg-gray-50 text-[#1a1a2e] border-2 border-black/10 py-3.5 rounded-xl font-black uppercase tracking-widest text-xs transition-all flex items-center justify-center gap-2 cursor-pointer hover:border-black/30"
@@ -3996,6 +4000,7 @@ export default function NewDesignContent() {
                         <span className="material-symbols-outlined text-sm">app_registration</span>
                         Register Now
                       </button>
+                      </div>
                     </div>
                   </div>
                 </div>

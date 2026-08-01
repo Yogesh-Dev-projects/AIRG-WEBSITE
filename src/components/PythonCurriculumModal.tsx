@@ -25,38 +25,38 @@ export default function PythonCurriculumModal({
         <div className="space-y-4">
           <div>
             <h5 className="font-bold text-[#1a1a2e] mb-2 uppercase text-xs tracking-wider">Basics</h5>
-            <ul className="list-disc pl-5 space-y-1 text-sm text-[#1a1a2e]/70">
-              <li>Introduction to Programming</li>
-              <li>What is Python?</li>
-              <li>Why Python?</li>
-              <li>Real-world Applications of Python</li>
-              <li>Installing Python</li>
-              <li>Installing VS Code</li>
-              <li>Running Your First Program</li>
+            <ul className="space-y-2.5 mt-2 text-sm text-[#1a1a2e]/70">
+              <li className="flex gap-2 items-start"><span className="material-symbols-outlined text-[16px] text-primary mt-0.5 shrink-0">check_circle</span> <span>Introduction to Programming</span></li>
+              <li className="flex gap-2 items-start"><span className="material-symbols-outlined text-[16px] text-primary mt-0.5 shrink-0">check_circle</span> <span>What is Python?</span></li>
+              <li className="flex gap-2 items-start"><span className="material-symbols-outlined text-[16px] text-primary mt-0.5 shrink-0">check_circle</span> <span>Why Python?</span></li>
+              <li className="flex gap-2 items-start"><span className="material-symbols-outlined text-[16px] text-primary mt-0.5 shrink-0">check_circle</span> <span>Real-world Applications of Python</span></li>
+              <li className="flex gap-2 items-start"><span className="material-symbols-outlined text-[16px] text-primary mt-0.5 shrink-0">check_circle</span> <span>Installing Python</span></li>
+              <li className="flex gap-2 items-start"><span className="material-symbols-outlined text-[16px] text-primary mt-0.5 shrink-0">check_circle</span> <span>Installing VS Code</span></li>
+              <li className="flex gap-2 items-start"><span className="material-symbols-outlined text-[16px] text-primary mt-0.5 shrink-0">check_circle</span> <span>Running Your First Program</span></li>
             </ul>
           </div>
           <div>
             <h5 className="font-bold text-[#1a1a2e] mb-2 uppercase text-xs tracking-wider">Fundamentals</h5>
-            <ul className="list-disc pl-5 space-y-1 text-sm text-[#1a1a2e]/70">
-              <li>Variables</li>
-              <li>Data Types</li>
-              <li>Type Conversion</li>
-              <li>Comments</li>
-              <li>Keywords</li>
-              <li>Input()</li>
-              <li>Print()</li>
-              <li>String Formatting (f-strings)</li>
-              <li>Basic Practice Questions</li>
+            <ul className="space-y-2.5 mt-2 text-sm text-[#1a1a2e]/70">
+              <li className="flex gap-2 items-start"><span className="material-symbols-outlined text-[16px] text-primary mt-0.5 shrink-0">check_circle</span> <span>Variables</span></li>
+              <li className="flex gap-2 items-start"><span className="material-symbols-outlined text-[16px] text-primary mt-0.5 shrink-0">check_circle</span> <span>Data Types</span></li>
+              <li className="flex gap-2 items-start"><span className="material-symbols-outlined text-[16px] text-primary mt-0.5 shrink-0">check_circle</span> <span>Type Conversion</span></li>
+              <li className="flex gap-2 items-start"><span className="material-symbols-outlined text-[16px] text-primary mt-0.5 shrink-0">check_circle</span> <span>Comments</span></li>
+              <li className="flex gap-2 items-start"><span className="material-symbols-outlined text-[16px] text-primary mt-0.5 shrink-0">check_circle</span> <span>Keywords</span></li>
+              <li className="flex gap-2 items-start"><span className="material-symbols-outlined text-[16px] text-primary mt-0.5 shrink-0">check_circle</span> <span>Input()</span></li>
+              <li className="flex gap-2 items-start"><span className="material-symbols-outlined text-[16px] text-primary mt-0.5 shrink-0">check_circle</span> <span>Print()</span></li>
+              <li className="flex gap-2 items-start"><span className="material-symbols-outlined text-[16px] text-primary mt-0.5 shrink-0">check_circle</span> <span>String Formatting (f-strings)</span></li>
+              <li className="flex gap-2 items-start"><span className="material-symbols-outlined text-[16px] text-primary mt-0.5 shrink-0">check_circle</span> <span>Basic Practice Questions</span></li>
             </ul>
           </div>
           <div>
             <h5 className="font-bold text-[#1a1a2e] mb-2 flex items-center gap-2 uppercase text-xs tracking-wider">
               <span className="text-xl">👨‍💻</span> Hands-on Practice
             </h5>
-            <ul className="list-disc pl-5 space-y-1 text-sm text-[#1a1a2e]/70">
-              <li>Age Calculator</li>
-              <li>Simple Calculator</li>
-              <li>Student Information Program</li>
+            <ul className="space-y-2.5 mt-2 text-sm text-[#1a1a2e]/70">
+              <li className="flex gap-2 items-start"><span className="material-symbols-outlined text-[16px] text-primary mt-0.5 shrink-0">check_circle</span> <span>Age Calculator</span></li>
+              <li className="flex gap-2 items-start"><span className="material-symbols-outlined text-[16px] text-primary mt-0.5 shrink-0">check_circle</span> <span>Simple Calculator</span></li>
+              <li className="flex gap-2 items-start"><span className="material-symbols-outlined text-[16px] text-primary mt-0.5 shrink-0">check_circle</span> <span>Student Information Program</span></li>
             </ul>
           </div>
           <div className="bg-[#f8f8fa] p-4 rounded-xl border border-black/5 mt-4">
@@ -64,12 +64,12 @@ export default function PythonCurriculumModal({
               <span className="text-xl">📝</span> Assignment 1
             </h5>
             <p className="text-sm text-[#1a1a2e]/70 mb-2">Build a Student Information System that asks the user for:</p>
-            <ul className="list-disc pl-5 space-y-1 text-sm text-[#1a1a2e]/70">
-              <li>Name</li>
-              <li>Age</li>
-              <li>College</li>
-              <li>Branch</li>
-              <li>Displays formatted output.</li>
+            <ul className="space-y-2.5 mt-2 text-sm text-[#1a1a2e]/70">
+              <li className="flex gap-2 items-start"><span className="material-symbols-outlined text-[16px] text-primary mt-0.5 shrink-0">check_circle</span> <span>Name</span></li>
+              <li className="flex gap-2 items-start"><span className="material-symbols-outlined text-[16px] text-primary mt-0.5 shrink-0">check_circle</span> <span>Age</span></li>
+              <li className="flex gap-2 items-start"><span className="material-symbols-outlined text-[16px] text-primary mt-0.5 shrink-0">check_circle</span> <span>College</span></li>
+              <li className="flex gap-2 items-start"><span className="material-symbols-outlined text-[16px] text-primary mt-0.5 shrink-0">check_circle</span> <span>Branch</span></li>
+              <li className="flex gap-2 items-start"><span className="material-symbols-outlined text-[16px] text-primary mt-0.5 shrink-0">check_circle</span> <span>Displays formatted output.</span></li>
             </ul>
           </div>
         </div>
@@ -82,31 +82,31 @@ export default function PythonCurriculumModal({
         <div className="space-y-4">
           <div>
             <h5 className="font-bold text-[#1a1a2e] mb-2 uppercase text-xs tracking-wider">Topics</h5>
-            <ul className="list-disc pl-5 space-y-1 text-sm text-[#1a1a2e]/70">
-              <li>Operators</li>
-              <li>Comparison Operators</li>
-              <li>Logical Operators</li>
-              <li>Conditional Statements</li>
-              <li>Nested if</li>
-              <li>Loops (range(), break, continue, pass)</li>
+            <ul className="space-y-2.5 mt-2 text-sm text-[#1a1a2e]/70">
+              <li className="flex gap-2 items-start"><span className="material-symbols-outlined text-[16px] text-primary mt-0.5 shrink-0">check_circle</span> <span>Operators</span></li>
+              <li className="flex gap-2 items-start"><span className="material-symbols-outlined text-[16px] text-primary mt-0.5 shrink-0">check_circle</span> <span>Comparison Operators</span></li>
+              <li className="flex gap-2 items-start"><span className="material-symbols-outlined text-[16px] text-primary mt-0.5 shrink-0">check_circle</span> <span>Logical Operators</span></li>
+              <li className="flex gap-2 items-start"><span className="material-symbols-outlined text-[16px] text-primary mt-0.5 shrink-0">check_circle</span> <span>Conditional Statements</span></li>
+              <li className="flex gap-2 items-start"><span className="material-symbols-outlined text-[16px] text-primary mt-0.5 shrink-0">check_circle</span> <span>Nested if</span></li>
+              <li className="flex gap-2 items-start"><span className="material-symbols-outlined text-[16px] text-primary mt-0.5 shrink-0">check_circle</span> <span>Loops (range(), break, continue, pass)</span></li>
             </ul>
           </div>
           <div>
             <h5 className="font-bold text-[#1a1a2e] mb-2 uppercase text-xs tracking-wider">Functions</h5>
-            <ul className="list-disc pl-5 space-y-1 text-sm text-[#1a1a2e]/70">
-              <li>Why Functions?</li>
-              <li>Creating Functions</li>
-              <li>Parameters</li>
-              <li>Arguments</li>
-              <li>Return Statement</li>
+            <ul className="space-y-2.5 mt-2 text-sm text-[#1a1a2e]/70">
+              <li className="flex gap-2 items-start"><span className="material-symbols-outlined text-[16px] text-primary mt-0.5 shrink-0">check_circle</span> <span>Why Functions?</span></li>
+              <li className="flex gap-2 items-start"><span className="material-symbols-outlined text-[16px] text-primary mt-0.5 shrink-0">check_circle</span> <span>Creating Functions</span></li>
+              <li className="flex gap-2 items-start"><span className="material-symbols-outlined text-[16px] text-primary mt-0.5 shrink-0">check_circle</span> <span>Parameters</span></li>
+              <li className="flex gap-2 items-start"><span className="material-symbols-outlined text-[16px] text-primary mt-0.5 shrink-0">check_circle</span> <span>Arguments</span></li>
+              <li className="flex gap-2 items-start"><span className="material-symbols-outlined text-[16px] text-primary mt-0.5 shrink-0">check_circle</span> <span>Return Statement</span></li>
             </ul>
           </div>
           <div>
             <h5 className="font-bold text-[#1a1a2e] mb-2 uppercase text-xs tracking-wider">Debugging Basics</h5>
-            <ul className="list-disc pl-5 space-y-1 text-sm text-[#1a1a2e]/70">
-              <li>Reading Errors</li>
-              <li>Common Python Errors</li>
-              <li>VS Code Debugger</li>
+            <ul className="space-y-2.5 mt-2 text-sm text-[#1a1a2e]/70">
+              <li className="flex gap-2 items-start"><span className="material-symbols-outlined text-[16px] text-primary mt-0.5 shrink-0">check_circle</span> <span>Reading Errors</span></li>
+              <li className="flex gap-2 items-start"><span className="material-symbols-outlined text-[16px] text-primary mt-0.5 shrink-0">check_circle</span> <span>Common Python Errors</span></li>
+              <li className="flex gap-2 items-start"><span className="material-symbols-outlined text-[16px] text-primary mt-0.5 shrink-0">check_circle</span> <span>VS Code Debugger</span></li>
             </ul>
           </div>
           <div>
@@ -133,15 +133,15 @@ export default function PythonCurriculumModal({
         <div className="space-y-4">
           <div>
             <h5 className="font-bold text-[#1a1a2e] mb-2 uppercase text-xs tracking-wider">Topics</h5>
-            <ul className="list-disc pl-5 space-y-1 text-sm text-[#1a1a2e]/70">
-              <li>Lists</li>
-              <li>Tuples</li>
-              <li>Sets</li>
-              <li>Dictionaries</li>
-              <li>Nested Lists & Nested Dictionary</li>
-              <li>String Methods</li>
-              <li>File Handling (Read Files, Write Files, Append Files)</li>
-              <li>Exception Handling (Try, Except, Finally)</li>
+            <ul className="space-y-2.5 mt-2 text-sm text-[#1a1a2e]/70">
+              <li className="flex gap-2 items-start"><span className="material-symbols-outlined text-[16px] text-primary mt-0.5 shrink-0">check_circle</span> <span>Lists</span></li>
+              <li className="flex gap-2 items-start"><span className="material-symbols-outlined text-[16px] text-primary mt-0.5 shrink-0">check_circle</span> <span>Tuples</span></li>
+              <li className="flex gap-2 items-start"><span className="material-symbols-outlined text-[16px] text-primary mt-0.5 shrink-0">check_circle</span> <span>Sets</span></li>
+              <li className="flex gap-2 items-start"><span className="material-symbols-outlined text-[16px] text-primary mt-0.5 shrink-0">check_circle</span> <span>Dictionaries</span></li>
+              <li className="flex gap-2 items-start"><span className="material-symbols-outlined text-[16px] text-primary mt-0.5 shrink-0">check_circle</span> <span>Nested Lists & Nested Dictionary</span></li>
+              <li className="flex gap-2 items-start"><span className="material-symbols-outlined text-[16px] text-primary mt-0.5 shrink-0">check_circle</span> <span>String Methods</span></li>
+              <li className="flex gap-2 items-start"><span className="material-symbols-outlined text-[16px] text-primary mt-0.5 shrink-0">check_circle</span> <span>File Handling (Read Files, Write Files, Append Files)</span></li>
+              <li className="flex gap-2 items-start"><span className="material-symbols-outlined text-[16px] text-primary mt-0.5 shrink-0">check_circle</span> <span>Exception Handling (Try, Except, Finally)</span></li>
             </ul>
           </div>
           <div>
@@ -168,11 +168,11 @@ export default function PythonCurriculumModal({
         <div className="space-y-4">
           <div>
             <h5 className="font-bold text-[#1a1a2e] mb-2 uppercase text-xs tracking-wider">OOP</h5>
-            <ul className="list-disc pl-5 space-y-1 text-sm text-[#1a1a2e]/70">
-              <li>Class</li>
-              <li>Object</li>
-              <li>Constructor</li>
-              <li>Methods</li>
+            <ul className="space-y-2.5 mt-2 text-sm text-[#1a1a2e]/70">
+              <li className="flex gap-2 items-start"><span className="material-symbols-outlined text-[16px] text-primary mt-0.5 shrink-0">check_circle</span> <span>Class</span></li>
+              <li className="flex gap-2 items-start"><span className="material-symbols-outlined text-[16px] text-primary mt-0.5 shrink-0">check_circle</span> <span>Object</span></li>
+              <li className="flex gap-2 items-start"><span className="material-symbols-outlined text-[16px] text-primary mt-0.5 shrink-0">check_circle</span> <span>Constructor</span></li>
+              <li className="flex gap-2 items-start"><span className="material-symbols-outlined text-[16px] text-primary mt-0.5 shrink-0">check_circle</span> <span>Methods</span></li>
             </ul>
           </div>
           <div>
@@ -186,31 +186,31 @@ export default function PythonCurriculumModal({
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
             <div className="bg-[#f8f8fa] p-4 rounded-xl border border-black/5">
               <h5 className="font-bold text-[#1a1a2e] mb-2 uppercase text-xs tracking-wider">Final Assessment</h5>
-              <ul className="list-disc pl-5 space-y-1 text-sm text-[#1a1a2e]/70">
-                <li>30% MCQ Quiz</li>
-                <li>30% Coding Questions</li>
-                <li>40% Capstone Project</li>
+              <ul className="space-y-2.5 mt-2 text-sm text-[#1a1a2e]/70">
+                <li className="flex gap-2 items-start"><span className="material-symbols-outlined text-[16px] text-primary mt-0.5 shrink-0">check_circle</span> <span>30% MCQ Quiz</span></li>
+                <li className="flex gap-2 items-start"><span className="material-symbols-outlined text-[16px] text-primary mt-0.5 shrink-0">check_circle</span> <span>30% Coding Questions</span></li>
+                <li className="flex gap-2 items-start"><span className="material-symbols-outlined text-[16px] text-primary mt-0.5 shrink-0">check_circle</span> <span>40% Capstone Project</span></li>
               </ul>
             </div>
             <div className="bg-emerald-50 p-4 rounded-xl border border-emerald-100">
               <h5 className="font-bold text-emerald-800 mb-2 uppercase text-xs tracking-wider">Certificate Criteria</h5>
-              <ul className="list-disc pl-5 space-y-1 text-sm text-emerald-700">
-                <li>Attendance ≥ 80%</li>
-                <li>Assignment Submission</li>
-                <li>Project Completion</li>
-                <li>Final Assessment</li>
+              <ul className="space-y-2.5 mt-2 text-sm text-emerald-700">
+                <li className="flex gap-2 items-start"><span className="material-symbols-outlined text-[16px] text-primary mt-0.5 shrink-0">check_circle</span> <span>Attendance ≥ 80%</span></li>
+                <li className="flex gap-2 items-start"><span className="material-symbols-outlined text-[16px] text-primary mt-0.5 shrink-0">check_circle</span> <span>Assignment Submission</span></li>
+                <li className="flex gap-2 items-start"><span className="material-symbols-outlined text-[16px] text-primary mt-0.5 shrink-0">check_circle</span> <span>Project Completion</span></li>
+                <li className="flex gap-2 items-start"><span className="material-symbols-outlined text-[16px] text-primary mt-0.5 shrink-0">check_circle</span> <span>Final Assessment</span></li>
               </ul>
             </div>
           </div>
           <div className="bg-blue-50 p-4 rounded-xl border border-blue-100 mt-4">
             <h5 className="font-bold text-blue-800 mb-2 uppercase text-xs tracking-wider">What Students Will Get</h5>
             <ul className="space-y-2 text-sm text-blue-700 font-medium">
-              <li className="flex items-center gap-2"><span className="material-symbols-outlined text-sm">workspace_premium</span> AIR G International Certificate of Completion</li>
-              <li className="flex items-center gap-2"><span className="material-symbols-outlined text-sm">code</span> 2 Mini Projects</li>
-              <li className="flex items-center gap-2"><span className="material-symbols-outlined text-sm">rocket_launch</span> 1 Capstone Project</li>
-              <li className="flex items-center gap-2"><span className="material-symbols-outlined text-sm">folder_open</span> GitHub Repository with all projects</li>
-              <li className="flex items-center gap-2"><span className="material-symbols-outlined text-sm">analytics</span> Final Assessment Report</li>
-              <li className="flex items-center gap-2"><span className="material-symbols-outlined text-sm">campaign</span> LinkedIn Certificate Announcement Template</li>
+              <li className="flex items-center gap-2"><span className="material-symbols-outlined text-sm">workspace_premium</span> AIR G International Certificate of Completion</span></li>
+              <li className="flex items-center gap-2"><span className="material-symbols-outlined text-sm">code</span> 2 Mini Projects</span></li>
+              <li className="flex items-center gap-2"><span className="material-symbols-outlined text-sm">rocket_launch</span> 1 Capstone Project</span></li>
+              <li className="flex items-center gap-2"><span className="material-symbols-outlined text-sm">folder_open</span> GitHub Repository with all projects</span></li>
+              <li className="flex items-center gap-2"><span className="material-symbols-outlined text-sm">analytics</span> Final Assessment Report</span></li>
+              <li className="flex items-center gap-2"><span className="material-symbols-outlined text-sm">campaign</span> LinkedIn Certificate Announcement Template</span></li>
             </ul>
           </div>
         </div>
@@ -222,9 +222,10 @@ export default function PythonCurriculumModal({
     <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md">
       <div className="bg-white w-full max-w-4xl rounded-[2rem] shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-in fade-in zoom-in-95 duration-200">
         {/* Header */}
-        <div className="px-6 py-5 md:px-8 flex items-center justify-between shrink-0 border-b border-black/5 bg-gray-50/50">
+        <div className="px-6 py-6 md:px-8 flex items-center justify-between shrink-0 border-b border-black/5 bg-gradient-to-r from-primary/5 via-transparent to-transparent relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
           <div>
-            <h3 className="font-headline font-black text-xl md:text-2xl text-[#1a1a2e] uppercase tracking-tight flex items-center gap-2">
+            <h3 className="font-headline font-black text-2xl md:text-3xl text-[#1a1a2e] uppercase tracking-tight flex items-center gap-2 relative z-10">
               <span className="material-symbols-outlined text-primary">menu_book</span>
               Course Curriculum
             </h3>
@@ -266,7 +267,7 @@ export default function PythonCurriculumModal({
               >
                 <button
                   onClick={() => setOpenWeek(openWeek === item.week ? null : item.week)}
-                  className={`w-full text-left px-6 py-4 flex items-center justify-between transition-colors ${openWeek === item.week ? 'bg-primary/5' : 'bg-white hover:bg-gray-50/50'}`}
+                  className={`w-full text-left px-6 py-5 flex items-center justify-between transition-all duration-300 ${openWeek === item.week ? 'bg-gradient-to-r from-primary/10 to-transparent' : 'bg-white hover:bg-gray-50/50'}`}
                 >
                   <span className="font-headline font-bold text-[#1a1a2e] text-sm md:text-base">{item.title}</span>
                   <span className={`material-symbols-outlined text-[#1a1a2e]/40 transition-transform duration-300 ${openWeek === item.week ? 'rotate-180 text-primary' : ''}`}>
