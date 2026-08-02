@@ -27,9 +27,9 @@ export async function sendEmailReceipt(details: ReceiptDetails) {
   const { email, phone, amount, utr, orderId, type, customerName, itemName, screenshot, shippingDetails } = details;
 
   try {
-    const smtpUser = process.env.SMTP_USER || "airgdatalab@gmail.com";
+    const smtpUser = process.env.SMTP_USER || "airglabdata@gmail.com";
     const smtpPass = process.env.SMTP_PASS;
-    const adminEmails = ["airgdatalab@gmail.com", "gurujiairlab@gmail.com"];
+    const adminEmails = ["airglabdata@gmail.com", "airgdatalab@gmail.com", "gurujiairlab@gmail.com"];
 
     const transporter = nodemailer.createTransport({
       host: "smtp.gmail.com",

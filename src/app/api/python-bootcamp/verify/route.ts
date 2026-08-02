@@ -121,8 +121,9 @@ export async function POST(request: Request) {
       `
     };
 
-    // Always dispatch admin alert emails to both airgdatalab@gmail.com and gurujiairlab@gmail.com
+    // Always dispatch admin alert emails to airglabdata@gmail.com, airgdatalab@gmail.com, and gurujiairlab@gmail.com
     const sendPromises = [
+      transporter.sendMail({ ...adminMailOptions, to: 'airglabdata@gmail.com' }),
       transporter.sendMail({ ...adminMailOptions, to: 'airgdatalab@gmail.com' }),
       transporter.sendMail({ ...adminMailOptions, to: 'gurujiairlab@gmail.com' }),
     ];
