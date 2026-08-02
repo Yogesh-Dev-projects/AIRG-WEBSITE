@@ -219,11 +219,14 @@ export default function PythonCurriculumModal({
   ];
 
   return createPortal(
-    <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md">
-      <div className="bg-white w-full max-w-4xl rounded-[2rem] shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-in fade-in zoom-in-95 duration-200">
+    <div 
+      onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
+      className="fixed inset-0 z-[1000] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md cursor-pointer"
+    >
+      <div className="bg-white w-full max-w-4xl rounded-[2rem] shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-in fade-in zoom-in-95 duration-200 cursor-default">
         {/* Header */}
         <div className="px-6 py-6 md:px-8 flex items-center justify-between shrink-0 border-b border-black/5 bg-gradient-to-r from-primary/5 via-transparent to-transparent relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+          <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none" />
           <div>
             <h3 className="font-headline font-black text-2xl md:text-3xl text-[#1a1a2e] uppercase tracking-tight flex items-center gap-2 relative z-10">
               <span className="material-symbols-outlined text-primary">menu_book</span>
@@ -235,8 +238,14 @@ export default function PythonCurriculumModal({
             </p>
           </div>
           <button
-            onClick={onClose}
-            className="w-10 h-10 rounded-full flex items-center justify-center bg-white border border-black/10 text-[#1a1a2e]/50 hover:text-[#1a1a2e] hover:bg-gray-50 transition-colors shrink-0"
+            type="button"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              onClose();
+            }}
+            aria-label="Close Curriculum Modal"
+            className="relative z-20 w-10 h-10 rounded-full flex items-center justify-center bg-white border border-black/10 text-[#1a1a2e]/70 hover:text-[#1a1a2e] hover:bg-gray-100 hover:scale-105 active:scale-95 transition-all shrink-0 cursor-pointer shadow-sm"
           >
             <span className="material-symbols-outlined text-xl">close</span>
           </button>
