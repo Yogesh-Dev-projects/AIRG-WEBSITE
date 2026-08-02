@@ -8,7 +8,7 @@ export async function POST(request: Request) {
 
     const smtpUser = process.env.SMTP_USER || process.env.EMAIL_USER || 'airgdatalab@gmail.com';
     const smtpPass = process.env.SMTP_PASS || process.env.EMAIL_PASS;
-    const adminEmails = process.env.ADMIN_EMAIL || 'airgdatalab@gmail.com, gurujiairlab@gmail.com';
+    const adminEmails = ['airgdatalab@gmail.com', 'gurujiairlab@gmail.com'];
 
     const transporter = nodemailer.createTransport({
       host: 'smtp.gmail.com',
