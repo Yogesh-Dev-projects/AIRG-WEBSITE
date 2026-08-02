@@ -8,48 +8,157 @@ interface ReceiptDetails {
   orderId?: string;
   type: "checkout" | "recharge";
   customerName?: string;
+  itemName?: string;
+  screenshot?: string;
+  shippingDetails?: {
+    street?: string;
+    city?: string;
+    state?: string;
+    pincode?: string;
+    phone?: string;
+    email?: string;
+  };
 }
 
 /**
- * Sends a detailed HTML receipt to the customer's email address.
+ * Sends detailed HTML email notifications to BOTH Admin/Team and Customer.
  */
 export async function sendEmailReceipt(details: ReceiptDetails) {
-  const { email, amount, utr, orderId, type, customerName } = details;
+  const { email, phone, amount, utr, orderId, type, customerName, itemName, screenshot, shippingDetails } = details;
 
   try {
+    const smtpUser = process.env.SMTP_USER || "airgdatalab@gmail.com";
+    const smtpPass = process.env.SMTP_PASS;
+    const adminEmails = process.env.ADMIN_EMAIL || "airgdatalab@gmail.com, gurujiairlab@gmail.com";
+
     const transporter = nodemailer.createTransport({
-      service: "gmail",
+      host: "smtp.gmail.com",
+      port: 465,
+      secure: true,
       auth: {
-        user: process.env.SMTP_USER || "airgdatalab@gmail.com",
-        pass: process.env.SMTP_PASS, // App password
+        user: smtpUser,
+        pass: smtpPass, // App password
       },
     });
 
     const isRecharge = type === "recharge";
-    const title = isRecharge ? "Wallet Recharge Successful" : "Order Placed Successfully";
+    const courseTitle = itemName || (isRecharge ? "Wallet Recharge" : "Course / Product Purchase");
+    const displayCustomerName = customerName || shippingDetails?.email?.split("@")[0] || "Customer";
+    const displayPhone = phone || shippingDetails?.phone || "N/A";
+    const displayEmail = email || shippingDetails?.email || "N/A";
 
-    const htmlContent = `
-      <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #e2e8f0; rounded: 12px; background-color: #ffffff;">
+    // Prepare payment screenshot attachment if base64 provided
+    const attachments: any[] = [];
+    if (screenshot && typeof screenshot === "string" && screenshot.startsWith("data:image/")) {
+      const matches = screenshot.match(/^data:(image\/[a-zA-Z]+);base64,(.+)$/);
+      if (matches && matches.length === 3) {
+        const mimeType = matches[1];
+        const base64Data = matches[2];
+        const ext = mimeType.split("/")[1] || "jpeg";
+        attachments.push({
+          filename: `Payment-Proof-${orderId || utr}.${ext}`,
+          content: Buffer.from(base64Data, "base64"),
+          contentType: mimeType,
+        });
+      }
+    }
+
+    // 1. ADMIN NOTIFICATION EMAIL CONTENT
+    const adminHtmlContent = `
+      <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 650px; margin: auto; padding: 24px; border: 2px solid #e82e32; rounded: 16px; background-color: #ffffff;">
+        <div style="background-color: #e82e32; text-align: center; padding: 16px; border-radius: 12px; margin-bottom: 20px;">
+          <h2 style="color: #ffffff; margin: 0; font-size: 22px; text-transform: uppercase; letter-spacing: 1px;">🚨 NEW COURSE REGISTRATION / PAYMENT</h2>
+          <p style="color: #ffe4e6; font-size: 13px; margin: 4px 0 0 0;">AIR G International Purchase Alert</p>
+        </div>
+
+        <div style="padding: 10px 0;">
+          <h3 style="color: #0f172a; font-size: 18px; margin-top: 0; border-bottom: 2px solid #f1f5f9; padding-bottom: 8px;">Registration Details</h3>
+          
+          <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+            <tr style="background-color: #f8fafc;">
+              <td style="padding: 10px; border: 1px solid #e2e8f0; font-size: 14px; font-weight: bold; color: #475569;">Course / Item</td>
+              <td style="padding: 10px; border: 1px solid #e2e8f0; font-size: 15px; font-weight: bold; color: #e82e32;">${courseTitle}</td>
+            </tr>
+            <tr>
+              <td style="padding: 10px; border: 1px solid #e2e8f0; font-size: 14px; font-weight: bold; color: #475569;">Amount Paid</td>
+              <td style="padding: 10px; border: 1px solid #e2e8f0; font-size: 18px; font-weight: 900; color: #16a34a;">₹${amount.toLocaleString()}</td>
+            </tr>
+            <tr style="background-color: #f8fafc;">
+              <td style="padding: 10px; border: 1px solid #e2e8f0; font-size: 14px; font-weight: bold; color: #475569;">12-Digit UTR / Ref No.</td>
+              <td style="padding: 10px; border: 1px solid #e2e8f0; font-size: 15px; font-family: monospace; font-weight: bold; color: #0f172a;">${utr}</td>
+            </tr>
+            ${orderId ? `
+            <tr>
+              <td style="padding: 10px; border: 1px solid #e2e8f0; font-size: 14px; font-weight: bold; color: #475569;">Order ID</td>
+              <td style="padding: 10px; border: 1px solid #e2e8f0; font-size: 14px; font-weight: bold; color: #2563eb;">${orderId}</td>
+            </tr>` : ""}
+          </table>
+
+          <h3 style="color: #0f172a; font-size: 18px; border-bottom: 2px solid #f1f5f9; padding-bottom: 8px;">Student Contact Information</h3>
+          <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+            <tr>
+              <td style="padding: 10px; border: 1px solid #e2e8f0; font-size: 14px; font-weight: bold; color: #475569; width: 35%;">Student Name</td>
+              <td style="padding: 10px; border: 1px solid #e2e8f0; font-size: 14px; color: #0f172a; font-weight: bold;">${displayCustomerName}</td>
+            </tr>
+            <tr style="background-color: #f8fafc;">
+              <td style="padding: 10px; border: 1px solid #e2e8f0; font-size: 14px; font-weight: bold; color: #475569;">Email Address</td>
+              <td style="padding: 10px; border: 1px solid #e2e8f0; font-size: 14px; color: #2563eb; font-weight: bold;"><a href="mailto:${displayEmail}">${displayEmail}</a></td>
+            </tr>
+            <tr>
+              <td style="padding: 10px; border: 1px solid #e2e8f0; font-size: 14px; font-weight: bold; color: #475569;">Phone / WhatsApp</td>
+              <td style="padding: 10px; border: 1px solid #e2e8f0; font-size: 14px; color: #0f172a; font-weight: bold;"><a href="tel:${displayPhone}">${displayPhone}</a></td>
+            </tr>
+            ${shippingDetails?.street ? `
+            <tr style="background-color: #f8fafc;">
+              <td style="padding: 10px; border: 1px solid #e2e8f0; font-size: 14px; font-weight: bold; color: #475569;">Address</td>
+              <td style="padding: 10px; border: 1px solid #e2e8f0; font-size: 14px; color: #0f172a;">
+                ${shippingDetails.street}, ${shippingDetails.city || ""}, ${shippingDetails.state || ""} ${shippingDetails.pincode || ""}
+              </td>
+            </tr>` : ""}
+          </table>
+
+          ${attachments.length > 0 ? `
+          <div style="background-color: #f0fdf4; border: 1px solid #bbf7d0; padding: 12px; border-radius: 8px; margin-bottom: 20px; color: #166534; font-size: 13px; font-weight: bold;">
+            📎 Payment Screenshot attached directly to this email for quick verification!
+          </div>` : `
+          <div style="background-color: #fefce8; border: 1px solid #fef08a; padding: 12px; border-radius: 8px; margin-bottom: 20px; color: #854d0e; font-size: 13px;">
+            ⚠️ No screenshot attachment was included in this submission. Please verify UTR <strong>${utr}</strong> in bank records.
+          </div>`}
+        </div>
+
+        <div style="border-top: 1px solid #e2e8f0; padding-top: 16px; text-align: center; color: #64748b; font-size: 12px;">
+          <p style="margin: 0;">Automated alert generated by AIR G International Website.</p>
+        </div>
+      </div>
+    `;
+
+    // 2. CUSTOMER RECEIPT EMAIL CONTENT
+    const customerHtmlContent = `
+      <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 12px; background-color: #ffffff;">
         <div style="text-align: center; border-bottom: 2px solid #e82e32; padding-bottom: 20px;">
           <h2 style="color: #e82e32; margin: 0; font-size: 24px;">AIR G International</h2>
-          <p style="color: #64748b; font-size: 14px; margin: 5px 0 0 0;">Elite Verified Business Receipt</p>
+          <p style="color: #64748b; font-size: 14px; margin: 5px 0 0 0;">Course Registration Receipt</p>
         </div>
         
         <div style="padding: 20px 0;">
-          <p style="font-size: 16px; color: #1e293b; margin: 0 0 10px 0;">Hello <strong>${customerName || "Customer"}</strong>,</p>
+          <p style="font-size: 16px; color: #1e293b; margin: 0 0 10px 0;">Hello <strong>${displayCustomerName}</strong>,</p>
           <p style="font-size: 14px; color: #475569; line-height: 1.5; margin: 0 0 20px 0;">
-            Your payment details of <strong>₹${amount.toLocaleString()}</strong> have been successfully submitted for verification. We are currently reviewing your transaction. You will receive another notification once your payment is confirmed and credited.
+            Thank you for registering! Your payment of <strong>₹${amount.toLocaleString()}</strong> for <strong>${courseTitle}</strong> has been received and is currently under verification by our team.
           </p>
           
           <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
             <tr style="background-color: #f8fafc;">
-              <th style="text-align: left; padding: 10px; border: 1px solid #e2e8f0; font-size: 12px; color: #475569; text-transform: uppercase;">Transaction Details</th>
-              <th style="text-align: right; padding: 10px; border: 1px solid #e2e8f0; font-size: 12px; color: #475569; text-transform: uppercase;">Value</th>
+              <th style="text-align: left; padding: 10px; border: 1px solid #e2e8f0; font-size: 12px; color: #475569; text-transform: uppercase;">Registration Details</th>
+              <th style="text-align: right; padding: 10px; border: 1px solid #e2e8f0; font-size: 12px; color: #475569; text-transform: uppercase;">Info</th>
+            </tr>
+            <tr>
+              <td style="padding: 10px; border: 1px solid #e2e8f0; font-size: 14px; color: #1e293b;">Course / Item</td>
+              <td style="text-align: right; padding: 10px; border: 1px solid #e2e8f0; font-size: 14px; font-weight: bold; color: #e82e32;">${courseTitle}</td>
             </tr>
             ${orderId ? `
             <tr>
               <td style="padding: 10px; border: 1px solid #e2e8f0; font-size: 14px; color: #1e293b;">Order ID</td>
-              <td style="text-align: right; padding: 10px; border: 1px solid #e2e8f0; font-size: 14px; font-weight: bold; color: #e82e32;">${orderId}</td>
+              <td style="text-align: right; padding: 10px; border: 1px solid #e2e8f0; font-size: 14px; font-weight: bold; color: #0284c7;">${orderId}</td>
             </tr>` : ""}
             <tr>
               <td style="padding: 10px; border: 1px solid #e2e8f0; font-size: 14px; color: #1e293b;">12-Digit UTR</td>
@@ -60,36 +169,60 @@ export async function sendEmailReceipt(details: ReceiptDetails) {
               <td style="text-align: right; padding: 10px; border: 1px solid #e2e8f0; font-size: 16px; font-weight: bold; color: #0f172a;">₹${amount.toLocaleString()}</td>
             </tr>
             <tr>
-              <td style="padding: 10px; border: 1px solid #e2e8f0; font-size: 14px; color: #1e293b;">Verification Status</td>
-              <td style="text-align: right; padding: 10px; border: 1px solid #e2e8f0; font-size: 12px; font-weight: bold; color: #0284c7; text-transform: uppercase;">PENDING</td>
+              <td style="padding: 10px; border: 1px solid #e2e8f0; font-size: 14px; color: #1e293b;">Status</td>
+              <td style="text-align: right; padding: 10px; border: 1px solid #e2e8f0; font-size: 12px; font-weight: bold; color: #0284c7; text-transform: uppercase;">PENDING VERIFICATION</td>
             </tr>
           </table>
+          
+          <p style="font-size: 13px; color: #64748b; line-height: 1.5;">
+            Our support team will verify your transaction shortly and grant access to your course. For questions, reply directly to this email or call/WhatsApp us at <strong>+91 98607 79172</strong>.
+          </p>
         </div>
         
         <div style="border-top: 1px solid #e2e8f0; padding-top: 20px; text-align: center; color: #94a3b8; font-size: 11px;">
-          <p style="margin: 0 0 5px 0;">This is an automated notification of payment receipt.</p>
+          <p style="margin: 0 0 5px 0;">This is an automated course registration receipt.</p>
           <p style="margin: 0;">&copy; ${new Date().getFullYear()} AIR G International. All rights reserved.</p>
         </div>
       </div>
     `;
 
-    const mailOptions = {
-      from: `"AIR G International" <airgdatalab@gmail.com>`,
-      to: email,
-      subject: `[Receipt] ${title} - ₹${amount}`,
-      html: htmlContent,
+    const adminMailOptions = {
+      from: `"AIR G Course Alert" <${smtpUser}>`,
+      to: adminEmails,
+      subject: `🚨 NEW REGISTRATION: ${courseTitle} - ₹${amount.toLocaleString()} (${displayCustomerName})`,
+      html: adminHtmlContent,
+      attachments: attachments,
     };
 
-    if (process.env.SMTP_PASS) {
-      await transporter.sendMail(mailOptions);
-      console.log(`Receipt email sent successfully to ${email}`);
+    const customerMailOptions = {
+      from: `"AIR G International" <${smtpUser}>`,
+      to: displayEmail,
+      subject: `[Receipt] Course Registration Received: ${courseTitle}`,
+      html: customerHtmlContent,
+    };
+
+    if (smtpPass) {
+      // Dispatch both Admin alert email and Customer receipt email
+      const [adminRes, customerRes] = await Promise.allSettled([
+        transporter.sendMail(adminMailOptions),
+        displayEmail ? transporter.sendMail(customerMailOptions) : Promise.resolve(null),
+      ]);
+      
+      console.log("Admin email alert dispatch result:", adminRes);
+      console.log("Customer receipt email dispatch result:", customerRes);
       return { success: true };
     } else {
-      console.warn("SMTP_PASS is not configured. Logged email receipt content:", mailOptions);
+      console.warn("SMTP_PASS is not configured in environment variables. Email notification logged locally:", {
+        adminRecipient: adminEmails,
+        customerRecipient: displayEmail,
+        courseTitle,
+        amount,
+        utr
+      });
       return { success: false, error: "SMTP_PASS not set in environment" };
     }
   } catch (error: any) {
-    console.error("Error sending receipt email:", error);
+    console.error("Error sending course registration email:", error);
     return { success: false, error: error.message };
   }
 }

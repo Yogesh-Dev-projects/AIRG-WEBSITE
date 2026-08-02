@@ -10,12 +10,7 @@ export async function POST(req: NextRequest) {
   try {
     await connectDB();
     const sessionCookie = req.cookies.get("aig_user_session");
-
-    if (!sessionCookie) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const { utr, amount, type, orderId, shippingDetails, screenshot } = await req.json();
+    const { utr, amount, type, orderId, shippingDetails, screenshot, itemName } = await req.json();
 
     if (!utr || !/^\d{12}$/.test(utr)) {
       return NextResponse.json({ error: "Invalid UTR. Must be a 12-digit number." }, { status: 400 });
@@ -25,21 +20,32 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Invalid amount." }, { status: 400 });
     }
 
-    // Retrieve user
-    const dbUser = await User.findById(sessionCookie.value);
-    if (!dbUser) {
-      return NextResponse.json({ error: "User not found" }, { status: 401 });
+    // Retrieve user if logged in, or create a guest placeholder
+    let dbUser = null;
+    if (sessionCookie?.value) {
+      try {
+        dbUser = await User.findById(sessionCookie.value);
+      } catch (err) {
+        dbUser = null;
+      }
     }
+
+    const customerEmail = shippingDetails?.email || dbUser?.email || "customer@airg.com";
+    const customerName = dbUser?.displayName || (shippingDetails?.email ? shippingDetails.email.split('@')[0] : "Customer");
+    const customerPhone = shippingDetails?.phone || dbUser?.phone || "";
 
     // Trigger notifications asynchronously so they don't block the API response
     const notificationPayload = {
-      email: shippingDetails?.email || dbUser.email,
-      phone: shippingDetails?.phone,
+      email: customerEmail,
+      phone: customerPhone,
       amount,
       utr,
       orderId: type === "checkout" ? orderId : undefined,
       type: type as "checkout" | "recharge",
-      customerName: dbUser.displayName,
+      customerName,
+      itemName,
+      screenshot,
+      shippingDetails,
     };
 
     // Run notifications without blocking HTTP response
@@ -88,12 +94,12 @@ export async function POST(req: NextRequest) {
         { orderId: rechargeId },
         { 
           orderId: rechargeId, 
-          userId: dbUser._id, 
+          userId: dbUser?._id || null, 
           amount, 
           status: "pending", 
           shippingDetails: {
-            phone: shippingDetails?.phone || "",
-            email: dbUser.email,
+            phone: customerPhone,
+            email: customerEmail,
             street: "Wallet Recharge Request",
             city: "",
             state: "",
@@ -107,12 +113,12 @@ export async function POST(req: NextRequest) {
 
       // Log to Google Sheet (includes base64 upload to Google Drive)
       logPaymentToGoogleSheet({
-        email: dbUser.email,
-        phone: shippingDetails?.phone,
+        email: customerEmail,
+        phone: customerPhone,
         amount,
         utr,
         orderId: rechargeId,
-        customerName: dbUser.displayName,
+        customerName,
         screenshot: screenshot // Send the base64 string to Apps Script to store in Drive
       }).catch(err => console.error("Sheet logging error:", err));
 
@@ -154,7 +160,7 @@ export async function POST(req: NextRequest) {
         { orderId },
         { 
           orderId, 
-          userId: dbUser._id, 
+          userId: dbUser?._id || null, 
           amount, 
           status: "pending", 
           shippingDetails, 
@@ -166,12 +172,12 @@ export async function POST(req: NextRequest) {
 
       // Log to Google Sheet (includes base64 upload to Google Drive)
       logPaymentToGoogleSheet({
-        email: shippingDetails?.email || dbUser.email,
-        phone: shippingDetails?.phone,
+        email: customerEmail,
+        phone: customerPhone,
         amount,
         utr,
         orderId,
-        customerName: dbUser.displayName,
+        customerName,
         screenshot: screenshot // Send the base64 string to Apps Script to store in Drive
       }).catch(err => console.error("Sheet logging error:", err));
 

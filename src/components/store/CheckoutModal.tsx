@@ -375,7 +375,8 @@ export function CheckoutModal({ isOpen, onClose, item, type = "product", onSucce
           type: "checkout",
           orderId,
           shippingDetails,
-          screenshot: screenshotBase64
+          screenshot: screenshotBase64,
+          itemName: item?.name
         })
       });
       const data = await res.json();
