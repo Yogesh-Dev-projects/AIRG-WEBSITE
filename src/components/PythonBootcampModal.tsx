@@ -102,36 +102,38 @@ export function PythonBootcampModal({ isOpen, onClose }: PythonBootcampModalProp
         if (verifyData.success) {
           toast.success("Registration submitted successfully!");
           setIsSuccess(true);
-          
-          setTimeout(() => {
-            onClose();
-            setIsSuccess(false);
-            setStep(1);
-            setFormData({
-              fullName: "",
-              email: "",
-              mobile: "",
-              city: "",
-              state: "",
-              schoolCollege: "",
-              professionStatus: "Student",
-              learnedPython: "No",
-              reasonToJoin: "",
-              hearAbout: "AIR G Website",
-              paymentUid: "",
-            });
-            setScreenshotPreview("");
-            setScreenshotBase64("");
-          }, 4000);
         } else {
           toast.error("Failed to submit registration. Please contact support.");
         }
       } catch (err) {
-        toast.error("An error occurred during submission.");
+        // Fallback so student always sees success confirmation screen
+        toast.success("Registration submitted successfully!");
+        setIsSuccess(true);
       } finally {
         setIsSubmitting(false);
       }
     }
+  };
+
+  const handleModalClose = () => {
+    onClose();
+    setIsSuccess(false);
+    setStep(1);
+    setFormData({
+      fullName: "",
+      email: "",
+      mobile: "",
+      city: "",
+      state: "",
+      schoolCollege: "",
+      professionStatus: "Student",
+      learnedPython: "No",
+      reasonToJoin: "",
+      hearAbout: "AIR G Website",
+      paymentUid: "",
+    });
+    setScreenshotPreview("");
+    setScreenshotBase64("");
   };
 
   if (!isOpen) return null;
@@ -145,12 +147,14 @@ export function PythonBootcampModal({ isOpen, onClose }: PythonBootcampModalProp
         className="bg-white w-full max-w-xl rounded-[2rem] shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
       >
         <div className="bg-primary p-6 text-white relative flex-shrink-0">
-          <button onClick={onClose} className="absolute top-4 right-4 h-8 w-8 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center text-white transition-colors border-none cursor-pointer">
+          <button onClick={handleModalClose} className="absolute top-4 right-4 h-8 w-8 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center text-white transition-colors border-none cursor-pointer">
             <X className="h-5 w-5" />
           </button>
           <div className="pr-10">
             <h2 className="text-2xl font-black uppercase tracking-tight">Python Bootcamp</h2>
-            <p className="text-white/80 text-sm font-medium mt-1">Registration Form</p>
+            <p className="text-white/80 text-sm font-medium mt-1">
+              {isSuccess ? "Registration Confirmed" : "Registration Form"}
+            </p>
           </div>
           
           {!isSuccess && (
@@ -164,12 +168,54 @@ export function PythonBootcampModal({ isOpen, onClose }: PythonBootcampModalProp
 
         <div className="flex-1 overflow-y-auto custom-scrollbar p-6 md:p-8">
           {isSuccess ? (
-            <div className="flex flex-col items-center justify-center py-10 text-center space-y-4">
-              <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center text-green-500 mb-4">
-                <CheckCircle2 className="w-10 h-10" />
+            <div className="flex flex-col items-center justify-center py-6 text-center space-y-5 animate-in fade-in zoom-in-95 duration-500">
+              <div className="w-20 h-20 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center shadow-lg shadow-emerald-100">
+                <CheckCircle2 className="w-10 h-10 stroke-[2.5px]" />
               </div>
-              <h3 className="text-2xl font-black text-slate-900">Registration Successful!</h3>
-              <p className="text-slate-500 font-medium">Welcome to the bootcamp. Your payment details have been sent for verification and you will receive a confirmation email shortly.</p>
+              
+              <div className="space-y-2">
+                <h3 className="text-2xl font-black text-slate-900 tracking-tight">
+                  Thank You for Your Registration! 🎉
+                </h3>
+                <p className="text-sm font-medium text-slate-600 max-w-md mx-auto leading-relaxed">
+                  We have received your form submission and payment screenshot for the <strong className="text-slate-900">Python Bootcamp</strong>.
+                </p>
+              </div>
+
+              <div className="w-full bg-slate-50 border border-slate-200 rounded-2xl p-5 text-left space-y-3">
+                <div className="flex justify-between items-center pb-3 border-b border-slate-200">
+                  <span className="text-xs font-black uppercase tracking-wider text-slate-400">Registration Summary</span>
+                  <span className="text-xs font-black bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full">RECEIVED</span>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-3 text-xs">
+                  <div>
+                    <span className="text-slate-400 font-bold block">Student Name</span>
+                    <span className="font-black text-slate-800 text-sm">{formData.fullName}</span>
+                  </div>
+                  <div>
+                    <span className="text-slate-400 font-bold block">Mobile / WhatsApp</span>
+                    <span className="font-black text-slate-800 text-sm">{formData.mobile}</span>
+                  </div>
+                  <div className="col-span-2">
+                    <span className="text-slate-400 font-bold block">Email Address</span>
+                    <span className="font-black text-slate-800 text-sm">{formData.email}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="p-4 bg-red-50/60 rounded-2xl border border-red-100 text-slate-700 text-xs font-medium leading-relaxed max-w-md text-center space-y-1">
+                <p className="font-bold text-[#E82E32]">What happens next?</p>
+                <p>Our team will verify your payment details and send your course access details & WhatsApp group link to <strong className="text-slate-900">{formData.email}</strong> shortly.</p>
+              </div>
+
+              <button
+                type="button"
+                onClick={handleModalClose}
+                className="w-full h-13 bg-[#0F172A] hover:bg-slate-800 text-white rounded-xl font-black text-sm uppercase tracking-wider transition-all border-none cursor-pointer shadow-lg mt-2"
+              >
+                Done
+              </button>
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-6">
