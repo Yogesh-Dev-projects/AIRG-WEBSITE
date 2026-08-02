@@ -20,7 +20,27 @@ export async function POST(request: Request) {
       }
     });
 
-    // 1. Prepare Admin Email HTML with inline image display
+    let attachments: any[] = [];
+    const hasScreenshot = Boolean(screenshotBase64 && typeof screenshotBase64 === 'string' && screenshotBase64.length > 50);
+
+    if (hasScreenshot) {
+      try {
+        const cleanBase64 = screenshotBase64.includes(';base64,')
+          ? screenshotBase64.split(';base64,')[1]
+          : screenshotBase64;
+        if (cleanBase64) {
+          attachments.push({
+            filename: `payment_proof_${formData.fullName.replace(/\s+/g, '_')}.png`,
+            content: Buffer.from(cleanBase64, 'base64'),
+            cid: 'payment_proof_img'
+          });
+        }
+      } catch (attachErr) {
+        console.error("Failed to parse base64 attachment:", attachErr);
+      }
+    }
+
+    // 1. Prepare Admin Email HTML with CID inline image display
     const adminHtml = `
       <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #333; max-width: 600px; margin: 0 auto; border: 2px solid #EE2C3C; padding: 24px; border-radius: 12px; background-color: #ffffff;">
         <div style="background-color: #EE2C3C; text-align: center; padding: 16px; border-radius: 8px; margin-bottom: 20px;">
@@ -50,10 +70,10 @@ export async function POST(request: Request) {
           <tr style="background-color: #f8fafc;"><td style="padding: 8px; border: 1px solid #e2e8f0; font-weight: bold; width: 35%;">Transaction UID / UTR</td><td style="padding: 8px; border: 1px solid #e2e8f0; font-family: monospace; font-weight: bold; color: #0f172a;">${formData.paymentUid || "Not Provided"}</td></tr>
         </table>
 
-        ${screenshotBase64 ? `
+        ${hasScreenshot ? `
         <div style="margin-top: 20px; padding: 16px; border: 1px solid #cbd5e1; border-radius: 8px; background-color: #f8fafc; text-align: center;">
           <h4 style="color: #0f172a; margin: 0 0 12px 0; font-size: 14px;">Uploaded Payment Proof Screenshot:</h4>
-          <img src="${screenshotBase64}" style="max-width: 100%; height: auto; max-height: 450px; border-radius: 8px; border: 1px solid #e2e8f0;" alt="Payment Screenshot Proof" />
+          <img src="cid:payment_proof_img" style="max-width: 100%; height: auto; max-height: 500px; border-radius: 8px; border: 1px solid #cbd5e1;" alt="Payment Screenshot Proof" />
         </div>` : `
         <div style="background-color: #fefce8; border: 1px solid #fef08a; padding: 12px; border-radius: 8px; color: #854d0e; font-size: 13px;">
           No screenshot uploaded.
@@ -98,7 +118,7 @@ export async function POST(request: Request) {
       `
     };
 
-    // Dispatch admin alert emails individually
+    // Dispatch admin alert emails individually with CID attachment
     for (const targetAdminEmail of adminEmails) {
       try {
         await transporter.sendMail({
@@ -106,6 +126,7 @@ export async function POST(request: Request) {
           to: targetAdminEmail,
           subject: `[NEW REGISTRATION] Python Bootcamp - ${formData.fullName}`,
           html: adminHtml,
+          attachments: attachments,
         });
         console.log(`Admin alert successfully sent to ${targetAdminEmail}`);
       } catch (adminMailErr) {
