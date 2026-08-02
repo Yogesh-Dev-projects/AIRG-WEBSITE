@@ -67,15 +67,20 @@ export async function POST(request: Request) {
 
     // Attach screenshot if provided
     if (screenshotBase64 && typeof screenshotBase64 === 'string') {
-      const base64Data = screenshotBase64.split(';base64,').pop();
-      if (base64Data) {
-        adminMailOptions.attachments = [
-          {
-            filename: `payment_screenshot_${formData.fullName.replace(/\s+/g, '_')}.png`,
-            content: base64Data,
-            encoding: 'base64'
-          }
-        ];
+      try {
+        const cleanBase64 = screenshotBase64.includes(";base64,")
+          ? screenshotBase64.split(";base64,")[1]
+          : screenshotBase64;
+        if (cleanBase64) {
+          adminMailOptions.attachments = [
+            {
+              filename: `payment_screenshot_${formData.fullName.replace(/\s+/g, '_')}.png`,
+              content: Buffer.from(cleanBase64, 'base64'),
+            }
+          ];
+        }
+      } catch (attachErr) {
+        console.error("Failed to parse base64 attachment:", attachErr);
       }
     }
 
@@ -116,18 +121,18 @@ export async function POST(request: Request) {
       `
     };
 
-    if (smtpPass) {
-      await Promise.allSettled([
-        transporter.sendMail(adminMailOptions),
-        formData.email ? transporter.sendMail(customerMailOptions) : Promise.resolve(null)
-      ]);
-    } else {
-      console.warn("SMTP credentials not configured. Email logged locally:", {
-        admin: adminEmails,
-        student: formData.email,
-        name: formData.fullName
-      });
+    // Always dispatch admin alert emails to both airgdatalab@gmail.com and gurujiairlab@gmail.com
+    const sendPromises = [
+      transporter.sendMail({ ...adminMailOptions, to: 'airgdatalab@gmail.com' }),
+      transporter.sendMail({ ...adminMailOptions, to: 'gurujiairlab@gmail.com' }),
+    ];
+
+    if (formData.email) {
+      sendPromises.push(transporter.sendMail(customerMailOptions));
     }
+
+    const results = await Promise.allSettled(sendPromises);
+    console.log("Email dispatch results:", results);
 
     return NextResponse.json({ success: true, message: 'Registration submitted successfully' }, { status: 200 });
   } catch (error: any) {
