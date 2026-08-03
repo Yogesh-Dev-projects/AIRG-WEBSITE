@@ -3490,7 +3490,7 @@ export default function NewDesignContent() {
                 <div className="absolute left-[-20px] top-0 h-full w-[1px] bg-black/5">
                   <div className="absolute top-0 left-[-4px] w-2 h-2 bg-primary rounded-full animate-pulse" />
                 </div>
-                <span className="text-primary font-bold uppercase tracking-[0.5em] text-[10px] mb-4 block font-mono">Operational Training</span>
+                <span className="text-primary font-extrabold tracking-[0.2em] uppercase text-[11px] md:text-xs mb-4 block font-sans">Operational Training</span>
                 <h2 className="font-headline tracking-tighter leading-[0.9]">
                   <span className="block text-4xl md:text-6xl font-black text-[#1a1a2e] uppercase">
                     Field
@@ -3611,7 +3611,7 @@ export default function NewDesignContent() {
                 <div className="absolute left-[-20px] top-0 h-full w-[1px] bg-black/5">
                   <div className="absolute top-0 left-[-4px] w-2 h-2 bg-primary rounded-full animate-pulse" />
                 </div>
-                <span className="text-primary font-bold tracking-[0.5em] uppercase text-[10px] mb-4 block font-mono">Official Merchandise</span>
+                <span className="text-primary font-extrabold tracking-[0.2em] uppercase text-[11px] md:text-xs mb-4 block font-sans">Official Merchandise</span>
                 <h2 className="font-headline tracking-tighter leading-[0.9]">
                   <span className="block text-4xl md:text-6xl font-black text-[#1a1a2e] uppercase">
                     AIR G
@@ -3749,7 +3749,7 @@ export default function NewDesignContent() {
                 <div className="absolute left-[-20px] top-0 h-full w-[1px] bg-black/5">
                   <div className="absolute top-0 left-[-4px] w-2 h-2 bg-primary rounded-full animate-pulse" />
                 </div>
-                <span className="text-primary font-bold tracking-[0.5em] uppercase text-[10px] mb-4 block font-mono">Academic & Innovation Portal</span>
+                <span className="text-primary font-extrabold tracking-[0.2em] uppercase text-[11px] md:text-xs mb-4 block font-sans">Academic & Innovation Portal</span>
                 <h2 className="font-headline tracking-tighter leading-[0.9]">
                   <span className="block text-4xl md:text-6xl font-black text-[#1a1a2e] uppercase">
                     Learning &
