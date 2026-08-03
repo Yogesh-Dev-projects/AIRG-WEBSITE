@@ -3762,6 +3762,87 @@ export default function NewDesignContent() {
                   Register for state-level engineering challenges, track active student nodes, and synchronize your curriculums via the official AIR G Learning App.
                 </p>
 
+              {/* Python Bootcamp Section */}
+              <div id="python-course" className="space-y-6 mb-16 pt-6 relative scroll-mt-24">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-black/5 pb-4 relative z-10 mt-8">
+                  <h3 className="text-xl font-headline font-black text-[#1a1a2e] uppercase tracking-tight flex items-center gap-2">
+                    <span className="material-symbols-outlined text-primary text-xl">code</span>
+                    AIR G International Python Fundamentals Bootcamp
+                  </h3>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 relative z-10">
+                  <div className="glass-premium p-8 rounded-[2.5rem] border-2 border-primary/20 hover:border-primary/45 transition-all duration-300 relative overflow-hidden group shadow-md flex flex-col justify-between h-full bg-white/80 backdrop-blur-sm md:col-span-2">
+                    <div className="absolute top-0 right-0 px-4 py-1.5 bg-primary text-white rounded-bl-2xl text-[8px] font-black font-mono uppercase tracking-widest shadow-md">
+                      Live Online Training
+                    </div>
+                    <div className="flex flex-col md:flex-row gap-8 justify-between items-start md:items-end w-full mt-6">
+                      <div className="space-y-4 md:w-2/3">
+                        <div className="flex items-center gap-3">
+                          <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all duration-300 shrink-0">
+                            <span className="material-symbols-outlined text-2xl">terminal</span>
+                          </div>
+                          <div>
+                            <h4 className="text-lg font-headline font-black text-[#1a1a2e] uppercase tracking-tight">Python Fundamentals Bootcamp</h4>
+                            <span className="px-2.5 py-0.5 border border-primary/20 bg-primary/5 rounded-full text-[9px] font-black font-mono text-primary uppercase tracking-widest mt-1 inline-block">20-Hour Program</span>
+                          </div>
+                        </div>
+                        <p className="text-xs text-[#1a1a2e]/60 leading-relaxed font-light font-body pt-2 text-left">
+                          This premium, instructor-led bootcamp is meticulously designed for students and professionals looking to master Python from scratch. Get hands-on experience with real-world projects, industry-standard practices, and build a strong programming foundation. <strong className="text-primary font-medium">Unlock your potential and accelerate your tech career today!</strong>
+                        </p>
+                        
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4 text-xs font-medium text-[#1a1a2e]/80">
+                          <div className="flex items-center gap-2">
+                            <span className="material-symbols-outlined text-[16px] text-primary">calendar_month</span>
+                            Duration: 1 Month (20 Hours)
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="material-symbols-outlined text-[16px] text-primary">desktop_windows</span>
+                            Mode: Live Online
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="material-symbols-outlined text-[16px] text-primary">schedule</span>
+                            Sat (2 Hrs) & Sun (3 Hrs)
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="material-symbols-outlined text-[16px] text-primary">person</span>
+                            Trainer: Miss. Shravani Khanvilkar (Software Developer)
+                          </div>
+                        </div>
+
+                        <div className="pt-4 flex items-center justify-between md:justify-start gap-8">
+                          <div className="text-left">
+                            <div className="text-3xl font-black font-mono text-primary">₹3,000</div>
+                            <div className="text-[9px] font-mono text-[#1a1a2e]/30 uppercase tracking-widest mt-0.5">Course Fee</div>
+                          </div>
+                          <div className="flex items-center gap-2 bg-emerald-50 text-emerald-700 px-3 py-2 rounded-xl border border-emerald-100">
+                            <span className="material-symbols-outlined text-[18px]">workspace_premium</span>
+                            <div className="text-[10px] font-bold leading-tight text-left">AIR G International<br/>Certificate of Completion</div>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div className="pt-6 mt-8 border-t border-black/5 md:w-[30%] md:mt-0 md:pt-0 md:border-t-0 flex flex-col gap-3 shrink-0 w-full">
+                        <button 
+                          onClick={() => setIsCurriculumModalOpen(true)}
+                          className="w-full bg-white hover:bg-gray-50 text-[#1a1a2e] border-2 border-black/10 py-3.5 rounded-xl font-black uppercase tracking-widest text-xs transition-all flex items-center justify-center gap-2 cursor-pointer hover:border-black/30"
+                        >
+                          <span className="material-symbols-outlined text-sm">menu_book</span>
+                          View Full Curriculum
+                        </button>
+                        <button 
+                          onClick={() => setIsPythonModalOpen(true)}
+                          className="w-full bg-primary hover:bg-[#eb0028]/95 py-4 rounded-xl font-black uppercase tracking-widest text-xs text-white transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md hover:scale-[1.02] glow-red"
+                        >
+                          <span className="material-symbols-outlined text-sm">app_registration</span>
+                          Register Now
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
               {/* Premium Implant Training Program 2026 Section */}
               <div className="space-y-6 mb-16 pt-6 relative">
                 {/* Ambient glow behind cards */}
@@ -3923,87 +4004,6 @@ export default function NewDesignContent() {
                 </div>
               </div>
               
-              {/* Python Bootcamp Section */}
-              <div id="python-course" className="space-y-6 mb-16 pt-6 relative scroll-mt-24">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-black/5 pb-4 relative z-10 mt-8">
-                  <h3 className="text-xl font-headline font-black text-[#1a1a2e] uppercase tracking-tight flex items-center gap-2">
-                    <span className="material-symbols-outlined text-primary text-xl">code</span>
-                    AIR G International Python Fundamentals Bootcamp
-                  </h3>
-                </div>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 relative z-10">
-                  <div className="glass-premium p-8 rounded-[2.5rem] border-2 border-primary/20 hover:border-primary/45 transition-all duration-300 relative overflow-hidden group shadow-md flex flex-col justify-between h-full bg-white/80 backdrop-blur-sm md:col-span-2">
-                    <div className="absolute top-0 right-0 px-4 py-1.5 bg-primary text-white rounded-bl-2xl text-[8px] font-black font-mono uppercase tracking-widest shadow-md">
-                      Live Online Training
-                    </div>
-                    <div className="flex flex-col md:flex-row gap-8 justify-between items-start md:items-end w-full mt-6">
-                      <div className="space-y-4 md:w-2/3">
-                        <div className="flex items-center gap-3">
-                          <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all duration-300 shrink-0">
-                            <span className="material-symbols-outlined text-2xl">terminal</span>
-                          </div>
-                          <div>
-                            <h4 className="text-lg font-headline font-black text-[#1a1a2e] uppercase tracking-tight">Python Fundamentals Bootcamp</h4>
-                            <span className="px-2.5 py-0.5 border border-primary/20 bg-primary/5 rounded-full text-[9px] font-black font-mono text-primary uppercase tracking-widest mt-1 inline-block">20-Hour Program</span>
-                          </div>
-                        </div>
-                        <p className="text-xs text-[#1a1a2e]/60 leading-relaxed font-light font-body pt-2 text-left">
-                          This premium, instructor-led bootcamp is meticulously designed for students and professionals looking to master Python from scratch. Get hands-on experience with real-world projects, industry-standard practices, and build a strong programming foundation. <strong className="text-primary font-medium">Unlock your potential and accelerate your tech career today!</strong>
-                        </p>
-                        
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4 text-xs font-medium text-[#1a1a2e]/80">
-                          <div className="flex items-center gap-2">
-                            <span className="material-symbols-outlined text-[16px] text-primary">calendar_month</span>
-                            Duration: 1 Month (20 Hours)
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <span className="material-symbols-outlined text-[16px] text-primary">desktop_windows</span>
-                            Mode: Live Online
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <span className="material-symbols-outlined text-[16px] text-primary">schedule</span>
-                            Sat (2 Hrs) & Sun (3 Hrs)
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <span className="material-symbols-outlined text-[16px] text-primary">person</span>
-                            Trainer: Miss. Shravani Khanvilkar (Software Developer)
-                          </div>
-                        </div>
-
-                        <div className="pt-4 flex items-center justify-between md:justify-start gap-8">
-                          <div className="text-left">
-                            <div className="text-3xl font-black font-mono text-primary">₹3,000</div>
-                            <div className="text-[9px] font-mono text-[#1a1a2e]/30 uppercase tracking-widest mt-0.5">Course Fee</div>
-                          </div>
-                          <div className="flex items-center gap-2 bg-emerald-50 text-emerald-700 px-3 py-2 rounded-xl border border-emerald-100">
-                            <span className="material-symbols-outlined text-[18px]">workspace_premium</span>
-                            <div className="text-[10px] font-bold leading-tight text-left">AIR G International<br/>Certificate of Completion</div>
-                          </div>
-                        </div>
-                      </div>
-                      
-                      <div className="pt-6 mt-8 border-t border-black/5 md:w-[30%] md:mt-0 md:pt-0 md:border-t-0 flex flex-col gap-3 shrink-0 w-full">
-                        <button 
-                          onClick={() => setIsCurriculumModalOpen(true)}
-                          className="w-full bg-white hover:bg-gray-50 text-[#1a1a2e] border-2 border-black/10 py-3.5 rounded-xl font-black uppercase tracking-widest text-xs transition-all flex items-center justify-center gap-2 cursor-pointer hover:border-black/30"
-                        >
-                          <span className="material-symbols-outlined text-sm">menu_book</span>
-                          View Full Curriculum
-                        </button>
-                        <button 
-                          onClick={() => setIsPythonModalOpen(true)}
-                          className="w-full bg-primary hover:bg-[#eb0028]/95 py-4 rounded-xl font-black uppercase tracking-widest text-xs text-white transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md hover:scale-[1.02] glow-red"
-                        >
-                          <span className="material-symbols-outlined text-sm">app_registration</span>
-                          Register Now
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
                {/* Free Training Courses Section (Full Width, 4 columns) */}
                <div className="space-y-6 mb-16 pt-6">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-black/5 pb-4">
