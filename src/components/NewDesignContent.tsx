@@ -3458,57 +3458,25 @@ export default function NewDesignContent() {
                                 </span>
                               </div>
 
-                              <div className="grid md:grid-cols-12 gap-8 pt-2">
-                                {/* Left side: Details */}
-                                <div className="md:col-span-7 space-y-6">
-                                  <div className="space-y-1">
-                                    <span className="text-[10px] font-mono text-[#1a1a2e]/40 uppercase tracking-widest block font-bold">Initiatives Description:</span>
-                                    <p className="text-sm text-[#1a1a2e]/75 font-light leading-relaxed">{current.desc}</p>
-                                  </div>
-                                  
-                                  <div className="grid grid-cols-2 gap-4">
-                                    <div className="space-y-1">
-                                      <span className="text-[10px] font-mono text-[#1a1a2e]/40 uppercase tracking-widest block font-bold">Scope &amp; Reach:</span>
-                                      <p className="text-sm text-primary font-bold">{current.reach}</p>
-                                    </div>
-                                    <div className="space-y-1">
-                                      <span className="text-[10px] font-mono text-[#1a1a2e]/40 uppercase tracking-widest block font-bold">Active Cities / Nodes:</span>
-                                      <p className="text-sm text-[#1a1a2e]/70 font-semibold">{current.coordinates}</p>
-                                    </div>
-                                  </div>
-
-                                  <div className="space-y-1 border-t border-black/5 pt-4">
-                                    <span className="text-[10px] font-mono text-[#1a1a2e]/40 uppercase tracking-widest block font-bold">Presence Coordinators:</span>
-                                    <p className="text-sm text-[#1a1a2e]/70 font-semibold">{current.details}</p>
-                                  </div>
+                              <div className="grid md:grid-cols-2 gap-8 pt-2">
+                                <div className="space-y-1">
+                                  <span className="text-[10px] font-mono text-[#1a1a2e]/40 uppercase tracking-widest block font-bold">Initiatives Description:</span>
+                                  <p className="text-sm text-[#1a1a2e]/75 font-light leading-relaxed">{current.desc}</p>
                                 </div>
+                                <div className="space-y-1">
+                                  <span className="text-[10px] font-mono text-[#1a1a2e]/40 uppercase tracking-widest block font-bold">Scope &amp; Reach:</span>
+                                  <p className="text-sm text-primary font-bold">{current.reach}</p>
+                                </div>
+                              </div>
 
-                                {/* Right side: Sliding Global Centres Photos */}
-                                <div className="md:col-span-5 relative flex flex-col justify-center">
-                                  <div className="absolute -inset-2 bg-gradient-to-tr from-[#EE2C3C]/10 to-transparent rounded-2xl blur-lg pointer-events-none" />
-                                  
-                                  <div className="relative aspect-[4/3] w-full rounded-[1.8rem] overflow-hidden border border-black/10 shadow-lg bg-slate-900 group">
-                                    <img 
-                                      src={globalPhotoList[globalPhotoIndex]} 
-                                      alt="Global Hub Gallery" 
-                                      className="w-full h-full object-cover transition-all duration-700 group-hover:scale-105"
-                                    />
-                                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950/60 via-transparent to-transparent pointer-events-none" />
-                                    
-                                    {/* Indicator Dots */}
-                                    <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-1.5 z-20">
-                                      {globalPhotoList.map((_, idx) => (
-                                        <button
-                                          key={idx}
-                                          onClick={() => setGlobalPhotoIndex(idx)}
-                                          className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${
-                                            globalPhotoIndex === idx ? "bg-[#EE2C3C] scale-125 w-3.5" : "bg-white/50 hover:bg-white/80"
-                                          }`}
-                                          aria-label={`Slide ${idx + 1}`}
-                                        />
-                                      ))}
-                                    </div>
-                                  </div>
+                              <div className="grid md:grid-cols-2 gap-8 border-t border-black/5 pt-6">
+                                <div className="space-y-1">
+                                  <span className="text-[10px] font-mono text-[#1a1a2e]/40 uppercase tracking-widest block font-bold">Presence Coordinators:</span>
+                                  <p className="text-sm text-[#1a1a2e]/70 font-semibold">{current.details}</p>
+                                </div>
+                                <div className="space-y-1">
+                                  <span className="text-[10px] font-mono text-[#1a1a2e]/40 uppercase tracking-widest block font-bold">Active Cities / Nodes:</span>
+                                  <p className="text-sm text-[#1a1a2e]/70 font-semibold">{current.coordinates}</p>
                                 </div>
                               </div>
                             </motion.div>
@@ -3527,6 +3495,83 @@ export default function NewDesignContent() {
                 </div>
               </div>
 
+              {/* NEW SECTION: Global Infrastructure Gallery */}
+              <div className="mt-24 border-t border-black/5 pt-16 space-y-10">
+                <div className="text-center max-w-3xl mx-auto space-y-3">
+                  <span className="text-primary font-extrabold tracking-[0.2em] uppercase text-[10px] md:text-xs block font-mono">// VISUAL AUDIT</span>
+                  <h2 className="font-headline text-3xl md:text-5xl font-black text-[#1a1a2e] uppercase tracking-tighter leading-none">
+                    Global Hub <span className="text-primary text-glow-red">Gallery</span>
+                  </h2>
+                  <p className="text-sm md:text-base text-[#1a1a2e]/55 font-light leading-relaxed max-w-2xl mx-auto">
+                    Visual highlights showcasing classroom training, global certifications, and lab setup across our worldwide operational centres.
+                  </p>
+                </div>
+
+                {/* Rotating Slideshow */}
+                <div className="relative max-w-4xl mx-auto group/gallery">
+                  {/* Outer subtle Patriotic ambient glows */}
+                  <div className="absolute -inset-4 bg-gradient-to-tr from-[#EE2C3C]/10 via-[#0038A8]/5 to-transparent rounded-[2.5rem] blur-2xl opacity-75 pointer-events-none" />
+                  
+                  {/* Slideshow Card Container */}
+                  <div className="relative rounded-[2.5rem] overflow-hidden border-2 border-[#EE2C3C]/20 bg-slate-950 shadow-2xl">
+                    <div className="aspect-[16/10] md:aspect-[21/9] w-full relative">
+                      <AnimatePresence mode="wait">
+                        <motion.img 
+                          key={globalPhotoIndex}
+                          src={globalPhotoList[globalPhotoIndex]} 
+                          alt={`Global Centre Photo ${globalPhotoIndex + 1}`} 
+                          initial={{ opacity: 0, scale: 1.02 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          exit={{ opacity: 0, scale: 0.98 }}
+                          transition={{ duration: 0.5, ease: "easeInOut" }}
+                          className="w-full h-full object-cover opacity-95 select-none pointer-events-none"
+                        />
+                      </AnimatePresence>
+                      <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent opacity-80 pointer-events-none" />
+
+                      {/* Top-Left Hub Badge */}
+                      <div className="absolute top-6 left-6 z-20 bg-black/80 backdrop-blur-md px-3.5 py-1.5 rounded-xl border border-white/10 shadow-lg select-none">
+                        <span className="text-[10px] font-black uppercase tracking-[0.15em] text-[#EE2C3C] font-mono">GLOBAL HUBS</span>
+                      </div>
+
+                      {/* Carousel Arrow Controls */}
+                      <div className="absolute inset-y-0 left-4 right-4 flex items-center justify-between pointer-events-none z-20">
+                        <button 
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setGlobalPhotoIndex((prev) => (prev - 1 + globalPhotoList.length) % globalPhotoList.length);
+                          }}
+                          className="w-12 h-12 rounded-full bg-black/60 hover:bg-[#EE2C3C] text-white hover:text-white border border-white/10 flex items-center justify-center shadow-lg transition-all duration-300 pointer-events-auto cursor-pointer"
+                        >
+                          <span className="material-symbols-outlined text-xl">chevron_left</span>
+                        </button>
+                        <button 
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setGlobalPhotoIndex((prev) => (prev + 1) % globalPhotoList.length);
+                          }}
+                          className="w-12 h-12 rounded-full bg-black/60 hover:bg-[#EE2C3C] text-white hover:text-white border border-white/10 flex items-center justify-center shadow-lg transition-all duration-300 pointer-events-auto cursor-pointer"
+                        >
+                          <span className="material-symbols-outlined text-xl">chevron_right</span>
+                        </button>
+                      </div>
+
+                      {/* Sliding indicator dots */}
+                      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2 z-20">
+                        {globalPhotoList.map((_, idx) => (
+                          <button
+                            key={idx}
+                            onClick={() => setGlobalPhotoIndex(idx)}
+                            className={`h-2 rounded-full transition-all duration-300 ${
+                              globalPhotoIndex === idx ? "bg-[#EE2C3C] w-6 scale-110" : "bg-white/40 hover:bg-white/70 w-2"
+                            }`}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </section>
 
