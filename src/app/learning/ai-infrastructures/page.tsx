@@ -397,56 +397,44 @@ export default function AIInfrastructuresB2BPage() {
 
               {/* Bottom Fixed Section (Thumbnail + Button) */}
               <div className="mt-auto pt-4">
-                {/* Video Preview Thumbnail */}
-                <div 
-                  onClick={() => {
-                    setActiveVideoUrl("/video/bharat_ai_2.mp4");
-                    setActiveVideoTitle("Bharat AI 2.0 Version Overview");
-                  }}
-                  className="mb-6 relative aspect-video rounded-2xl overflow-hidden border border-black/5 hover:border-[#1e293b]/30 shadow-sm cursor-pointer group/video z-10"
+                {/* Booklet Preview Thumbnail */}
+                <a 
+                  href="/booklet_bharat_ai_2.pdf"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mb-6 block relative aspect-video rounded-2xl overflow-hidden border border-black/5 hover:border-[#1e293b]/30 shadow-sm cursor-pointer group/video z-10"
                 >
                   <img 
                     src="/bharat_ai_2_booklet_cover.png" 
-                    alt="Bharat AI 2.0 Video Preview" 
+                    alt="Bharat AI 2.0 Booklet Preview" 
                     className="w-full h-full object-cover transition-transform duration-500 group-hover/video:scale-105"
                   />
                   <div className="absolute inset-0 bg-black/20 group-hover/video:bg-black/40 transition-colors flex items-center justify-center">
                     <div className="w-14 h-14 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white flex items-center justify-center shadow-2xl group-hover/video:scale-110 group-hover/video:bg-[#1e293b] group-hover/video:text-white group-hover/video:border-transparent transition-all duration-300">
-                      <span className="material-symbols-outlined text-3xl font-bold">play_arrow</span>
+                      <span className="material-symbols-outlined text-3xl font-bold">menu_book</span>
                     </div>
                   </div>
                   {/* Top-Left Bharat AI branding */}
                   <div className="absolute top-3 left-3 z-20 select-none bg-black/80 backdrop-blur-md px-3 py-1 rounded-md border border-white/20">
                     <span className="text-[10px] font-black uppercase tracking-[0.15em] text-white font-mono">BHARAT AI 2.0</span>
                   </div>
-                  {/* Bottom-Left Watch badge */}
+                  {/* Bottom-Left Download badge */}
                   <div className="absolute bottom-3 left-3 bg-black/60 backdrop-blur-md px-2.5 py-1 rounded-md border border-white/10 flex items-center gap-1.5 z-20">
                     <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse"></span>
-                    <span className="text-[9px] font-black uppercase tracking-wider text-white">Watch Version Info</span>
+                    <span className="text-[9px] font-black uppercase tracking-wider text-white">Download Booklet</span>
                   </div>
-                </div>
+                </a>
 
-                {/* Professional Consultation Button & Download Booklet Link */}
-                <div className="flex flex-col gap-3">
-                  <a 
-                    href="https://wa.me/919860779172?text=Hello%2C%20I%20would%20like%20to%20request%20an%20official%20consultation%20for%20Bharat%20AI%202.0%20(Professional%20Edition)"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="w-full py-4 px-4 rounded-xl bg-[#1e293b] hover:bg-[#0f172a] text-white font-bold text-xs uppercase tracking-widest transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer shadow-md hover:shadow-lg"
-                  >
-                    <span className="material-symbols-outlined text-base">forum</span>
-                    Request Official Consultation
-                  </a>
-                  <a 
-                    href="/booklet_bharat_ai_2.pdf"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="w-full py-2.5 px-4 rounded-xl border border-[#1e293b]/20 hover:bg-[#1e293b]/5 text-[#1e293b] font-bold text-[10px] uppercase tracking-widest transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer"
-                  >
-                    <span className="material-symbols-outlined text-sm">download</span>
-                    Download Booklet
-                  </a>
-                </div>
+                {/* Professional Consultation Button */}
+                <a 
+                  href="https://wa.me/919860779172?text=Hello%2C%20I%20would%20like%20to%20request%20an%20official%20consultation%20for%20Bharat%20AI%202.0%20(Professional%20Edition)"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full py-4 px-4 rounded-xl bg-[#1e293b] hover:bg-[#0f172a] text-white font-bold text-xs uppercase tracking-widest transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer shadow-md hover:shadow-lg"
+                >
+                  <span className="material-symbols-outlined text-base">forum</span>
+                  Request Official Consultation
+                </a>
               </div>
             </div>
 
