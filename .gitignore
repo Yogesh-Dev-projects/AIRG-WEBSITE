@@ -63,5 +63,5 @@ inspect-*.js
 projected_*.txt
 scratch/
 
-/public/video/airg_labs_overview.mp4
-video/
+# /public/video/airg_labs_overview.mp4
+# video/

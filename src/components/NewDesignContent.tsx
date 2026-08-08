@@ -647,6 +647,21 @@ export default function NewDesignContent() {
     return () => clearInterval(interval);
   }, [heroLabImages.length]);
 
+  const globalPhotoList = [
+    "/global-centres/centre_photo_1.jpg",
+    "/global-centres/centre_photo_2.jpg",
+    "/global-centres/centre_photo_3.jpg",
+    "/global-centres/centre_photo_4.jpg"
+  ];
+  const [globalPhotoIndex, setGlobalPhotoIndex] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setGlobalPhotoIndex((prev) => (prev + 1) % globalPhotoList.length);
+    }, 3500);
+    return () => clearInterval(interval);
+  }, [globalPhotoList.length]);
+
   const getUpiDeepLink = (app?: string) => {
     const MERCHANT_UPI = "9860779172-5@ybl";
     const MERCHANT_NAME = "AIR G International";
@@ -3073,7 +3088,7 @@ export default function NewDesignContent() {
                 </div>
                 <video
                   ref={tourVideoRef}
-                  src={videoLang === 'en' ? "https://airginternational.com/video/airg_labs_overview_compressed.mp4" : "https://airginternational.com/video/airg_labs_overview_marathi.mp4"}
+                  src={videoLang === 'en' ? "/video/airg_labs_overview_compressed.mp4" : "/video/airg_labs_overview_marathi.mp4"}
                   controls
                   poster="/attachments/thumbnail.png"
                   playsInline
@@ -3443,25 +3458,57 @@ export default function NewDesignContent() {
                                 </span>
                               </div>
 
-                              <div className="grid md:grid-cols-2 gap-8 pt-2">
-                                <div className="space-y-1">
-                                  <span className="text-[10px] font-mono text-[#1a1a2e]/40 uppercase tracking-widest block font-bold">Initiatives Description:</span>
-                                  <p className="text-sm text-[#1a1a2e]/75 font-light leading-relaxed">{current.desc}</p>
-                                </div>
-                                <div className="space-y-1">
-                                  <span className="text-[10px] font-mono text-[#1a1a2e]/40 uppercase tracking-widest block font-bold">Scope &amp; Reach:</span>
-                                  <p className="text-sm text-primary font-bold">{current.reach}</p>
-                                </div>
-                              </div>
+                              <div className="grid md:grid-cols-12 gap-8 pt-2">
+                                {/* Left side: Details */}
+                                <div className="md:col-span-7 space-y-6">
+                                  <div className="space-y-1">
+                                    <span className="text-[10px] font-mono text-[#1a1a2e]/40 uppercase tracking-widest block font-bold">Initiatives Description:</span>
+                                    <p className="text-sm text-[#1a1a2e]/75 font-light leading-relaxed">{current.desc}</p>
+                                  </div>
+                                  
+                                  <div className="grid grid-cols-2 gap-4">
+                                    <div className="space-y-1">
+                                      <span className="text-[10px] font-mono text-[#1a1a2e]/40 uppercase tracking-widest block font-bold">Scope &amp; Reach:</span>
+                                      <p className="text-sm text-primary font-bold">{current.reach}</p>
+                                    </div>
+                                    <div className="space-y-1">
+                                      <span className="text-[10px] font-mono text-[#1a1a2e]/40 uppercase tracking-widest block font-bold">Active Cities / Nodes:</span>
+                                      <p className="text-sm text-[#1a1a2e]/70 font-semibold">{current.coordinates}</p>
+                                    </div>
+                                  </div>
 
-                              <div className="grid md:grid-cols-2 gap-8 border-t border-black/5 pt-6">
-                                <div className="space-y-1">
-                                  <span className="text-[10px] font-mono text-[#1a1a2e]/40 uppercase tracking-widest block font-bold">Presence Coordinators:</span>
-                                  <p className="text-sm text-[#1a1a2e]/70 font-semibold">{current.details}</p>
+                                  <div className="space-y-1 border-t border-black/5 pt-4">
+                                    <span className="text-[10px] font-mono text-[#1a1a2e]/40 uppercase tracking-widest block font-bold">Presence Coordinators:</span>
+                                    <p className="text-sm text-[#1a1a2e]/70 font-semibold">{current.details}</p>
+                                  </div>
                                 </div>
-                                <div className="space-y-1">
-                                  <span className="text-[10px] font-mono text-[#1a1a2e]/40 uppercase tracking-widest block font-bold">Active Cities / Nodes:</span>
-                                  <p className="text-sm text-[#1a1a2e]/70 font-semibold">{current.coordinates}</p>
+
+                                {/* Right side: Sliding Global Centres Photos */}
+                                <div className="md:col-span-5 relative flex flex-col justify-center">
+                                  <div className="absolute -inset-2 bg-gradient-to-tr from-[#EE2C3C]/10 to-transparent rounded-2xl blur-lg pointer-events-none" />
+                                  
+                                  <div className="relative aspect-[4/3] w-full rounded-[1.8rem] overflow-hidden border border-black/10 shadow-lg bg-slate-900 group">
+                                    <img 
+                                      src={globalPhotoList[globalPhotoIndex]} 
+                                      alt="Global Hub Gallery" 
+                                      className="w-full h-full object-cover transition-all duration-700 group-hover:scale-105"
+                                    />
+                                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950/60 via-transparent to-transparent pointer-events-none" />
+                                    
+                                    {/* Indicator Dots */}
+                                    <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-1.5 z-20">
+                                      {globalPhotoList.map((_, idx) => (
+                                        <button
+                                          key={idx}
+                                          onClick={() => setGlobalPhotoIndex(idx)}
+                                          className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${
+                                            globalPhotoIndex === idx ? "bg-[#EE2C3C] scale-125 w-3.5" : "bg-white/50 hover:bg-white/80"
+                                          }`}
+                                          aria-label={`Slide ${idx + 1}`}
+                                        />
+                                      ))}
+                                    </div>
+                                  </div>
                                 </div>
                               </div>
                             </motion.div>

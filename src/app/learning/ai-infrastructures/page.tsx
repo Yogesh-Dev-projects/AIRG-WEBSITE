@@ -313,7 +313,7 @@ export default function AIInfrastructuresB2BPage() {
                 {/* Video Preview Thumbnail */}
                 <div 
                   onClick={() => {
-                    setActiveVideoUrl("https://airginternational.com/video/bharat_ai_1.mp4");
+                    setActiveVideoUrl("/video/bharat_ai_1.mp4");
                     setActiveVideoTitle("Bharat AI 1.0 Version Overview");
                   }}
                   className="mb-6 relative aspect-video rounded-2xl overflow-hidden border border-black/5 hover:border-primary/30 shadow-sm cursor-pointer group/video z-10"
@@ -400,7 +400,7 @@ export default function AIInfrastructuresB2BPage() {
                 {/* Video Preview Thumbnail */}
                 <div 
                   onClick={() => {
-                    setActiveVideoUrl("https://airginternational.com/video/bharat_ai_2.mp4");
+                    setActiveVideoUrl("/video/bharat_ai_2.mp4");
                     setActiveVideoTitle("Bharat AI 2.0 Version Overview");
                   }}
                   className="mb-6 relative aspect-video rounded-2xl overflow-hidden border border-black/5 hover:border-[#1e293b]/30 shadow-sm cursor-pointer group/video z-10"
@@ -438,7 +438,7 @@ export default function AIInfrastructuresB2BPage() {
                     Request Official Consultation
                   </a>
                   <a 
-                    href="https://airginternational.com/booklet_bharat_ai_2.pdf"
+                    href="/booklet_bharat_ai_2.pdf"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="w-full py-2.5 px-4 rounded-xl border border-[#1e293b]/20 hover:bg-[#1e293b]/5 text-[#1e293b] font-bold text-[10px] uppercase tracking-widest transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer"
@@ -498,7 +498,7 @@ export default function AIInfrastructuresB2BPage() {
                 {/* Video Preview Thumbnail */}
                 <div 
                   onClick={() => {
-                    setActiveVideoUrl("https://airginternational.com/video/bharat_ai_3.mp4");
+                    setActiveVideoUrl("/video/bharat_ai_3.mp4");
                     setActiveVideoTitle("Bharat AI 3.0 Version Overview");
                   }}
                   className="mb-6 relative aspect-video rounded-2xl overflow-hidden border border-black/5 hover:border-emerald-500/30 shadow-sm cursor-pointer group/video z-10"
