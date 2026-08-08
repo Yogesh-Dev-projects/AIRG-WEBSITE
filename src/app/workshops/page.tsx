@@ -584,108 +584,8 @@ export default function WorkshopsPage() {
         </div>
       </section>
 
-      {/* Experts Section */}
-      <section className="py-24 bg-white border-t border-black/6 relative overflow-hidden">
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-primary/4 rounded-full blur-[150px] opacity-60" />
-          <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-red-50 rounded-full blur-[130px] opacity-50" />
-        </div>
-
-        <div className="max-w-[1440px] mx-auto px-6 md:px-20 relative z-10">
-          {/* Section Header — matches Advisory Board style */}
-          <div className="flex items-center gap-3 mb-12">
-            <div className="w-8 h-8 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0">
-              <span className="material-symbols-outlined text-sm text-primary">groups</span>
-            </div>
-            <h2 className="font-headline text-xl md:text-2xl font-black text-[#1a1a2e] uppercase tracking-widest">
-              Advisory Board &amp; Industry Experts
-            </h2>
-          </div>
-
-          {/* Horizontal expert cards — 3 per row */}
-          <div className="grid md:grid-cols-3 gap-x-8 gap-y-6">
-            {[
-              {
-                name: "Mr. Saptparishi Ghosh",
-                title: "CEO, Symbiosis TBI",
-                desc: "Incubation and startup ecosystem expert leading Symbiosis Technology Business Incubator.",
-                photo: "/team/sapptarishi.png",
-              },
-              {
-                name: "Mr. Aashish Banka",
-                title: "CEO, Goosebumps.biz",
-                desc: "Digital transformation leader driving experiential marketing and technology solutions.",
-                photo: "/team/aashish.png",
-              },
-              {
-                name: "Mr. Tushar Agarwal",
-                title: "MD, Edelweiss Mutual",
-                desc: "Financial services leader with deep expertise in fund management and strategic investments.",
-                photo: "/team/tushar_a.png",
-              },
-              {
-                name: "Mr. Tushar Suryawanshi",
-                title: "Ex. COO, Microficial",
-                desc: "Operations specialist with experience scaling technology hardware production and operations.",
-                photo: "/team/tushar_s.png",
-              },
-              {
-                name: "Mr. Vijay Trimbake",
-                title: "CFO, Air G International",
-                desc: "Overseeing financial strategy, budgeting, and fiscal operations across all AIRG global hubs.",
-                photo: "/team/vijay.png",
-              },
-              {
-                name: "Mr. Chakravarti Gupta",
-                title: "Chief Technology Advisor",
-                desc: "Senior technology strategist advising on AI infrastructure architecture and enterprise systems.",
-                photo: "/team/chakravarti.png",
-              },
-              {
-                name: "Mr. Suyash Patil",
-                title: "Manager",
-                desc: "Manager at AIR G International",
-                photo: "/team/suyash.jpeg",
-              },
-              {
-                name: "Mr. Prasad Shelke",
-                title: "Associate Manager",
-                desc: "Associate Manager at AIR G International",
-                photo: "/team/prasad.jpeg",
-              },
-            ].map((expert, i) => (
-              <div
-                key={i}
-                className="group flex items-start gap-4 bg-white border border-black/6 rounded-2xl p-5 hover:border-primary/20 hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5"
-              >
-                {/* Rectangular photo — left side */}
-                <div className="w-[90px] h-[100px] rounded-xl overflow-hidden shrink-0 border border-black/6 group-hover:border-primary/20 transition-all duration-300">
-                  <img
-                    src={expert.photo}
-                    alt={expert.name}
-                    className="w-full h-full object-cover object-top"
-                  />
-                </div>
-                {/* Text — right side */}
-                <div className="flex-1 min-w-0">
-                  <h3 className="font-headline font-black text-[#1a1a2e] text-[13px] uppercase tracking-tight leading-tight mb-1">
-                    {expert.name}
-                  </h3>
-                  <p className="text-[#EE2C3C] text-[10px] font-bold font-mono uppercase tracking-widest mb-2">
-                    {expert.title}
-                  </p>
-                  <p className="text-[#1a1a2e]/50 text-xs leading-relaxed">
-                    {expert.desc}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* Our Clients Section */}
-      <section className="py-20 bg-[#f8f8fa] border-t border-black/6 relative overflow-hidden">
+      <section className="py-20 bg-white border-t border-black/6 relative overflow-hidden">
         <div className="absolute inset-0 pointer-events-none">
           <div className="absolute top-0 left-0 w-[400px] h-[400px] bg-primary/3 rounded-full blur-[150px] opacity-50" />
           <div className="absolute bottom-0 right-0 w-[350px] h-[350px] bg-red-50 rounded-full blur-[130px] opacity-60" />
@@ -738,10 +638,14 @@ export default function WorkshopsPage() {
                 name: "COEP Technological University",
                 logo: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRI2tvDsfTZuEF_mE2GXD9Jb8pPDO_dfYjMXB2BSzGJJg&s=10",
               },
+              {
+                name: "Symbiosis Institute of Technology (Pune)",
+                logo: "https://www.sitpune.edu.in/index/assets/images/logo-3.png",
+              },
             ].map((client, i) => (
               <div
                 key={i}
-                className="group bg-white border border-black/6 rounded-2xl p-5 flex flex-col items-center text-center gap-4 hover:border-primary/20 hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5"
+                className="group bg-[#f8f8fa] border border-black/6 rounded-2xl p-5 flex flex-col items-center text-center gap-4 hover:border-primary/20 hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5"
               >
                 {/* Logo */}
                 <div className="w-full h-20 sm:h-24 flex items-center justify-center p-2 overflow-visible">
@@ -759,6 +663,106 @@ export default function WorkshopsPage() {
                 <p className="text-[#1a1a2e] text-[11px] font-bold uppercase tracking-wide leading-tight">
                   {client.name}
                 </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Experts Section */}
+      <section className="py-24 bg-[#f8f8fa] border-t border-black/6 relative overflow-hidden">
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-primary/4 rounded-full blur-[150px] opacity-60" />
+          <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-red-50 rounded-full blur-[130px] opacity-50" />
+        </div>
+
+        <div className="max-w-[1440px] mx-auto px-6 md:px-20 relative z-10">
+          {/* Section Header — matches Advisory Board style */}
+          <div className="flex items-center gap-3 mb-12">
+            <div className="w-8 h-8 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0">
+              <span className="material-symbols-outlined text-sm text-primary">groups</span>
+            </div>
+            <h2 className="font-headline text-xl md:text-2xl font-black text-[#1a1a2e] uppercase tracking-widest">
+              Industry Experts
+            </h2>
+          </div>
+
+          {/* Horizontal expert cards — 3 per row */}
+          <div className="grid md:grid-cols-3 gap-x-8 gap-y-6">
+            {[
+              {
+                name: "Mr. Saptparishi Ghosh",
+                title: "Entrepreneurship & Innovation Expert",
+                desc: "Incubation and startup ecosystem expert specializing in entrepreneurship and innovation.",
+                photo: "/team/sapptarishi.png",
+              },
+              {
+                name: "Mr. Aashish Banka",
+                title: "CEO, Goosebumps.biz",
+                desc: "Digital transformation leader driving experiential marketing and technology solutions.",
+                photo: "/team/aashish.png",
+              },
+              {
+                name: "Mr. Tushar Agarwal",
+                title: "MD, Edelweiss Mutual",
+                desc: "Financial services leader with deep expertise in fund management and strategic investments.",
+                photo: "/team/tushar_a.png",
+              },
+              {
+                name: "Mr. Tushar Suryawanshi",
+                title: "Software Developer, TATA",
+                desc: "Software developer at TATA, specializing in full-stack development and enterprise systems.",
+                photo: "/team/tushar_s.png",
+              },
+              {
+                name: "Mr. Vijay Trimbake",
+                title: "GST & Audit Expert",
+                desc: "Expert in GST compliance, financial auditing, tax planning, and corporate finance.",
+                photo: "/team/vijay.png",
+              },
+              {
+                name: "Mr. Chakravarti Gupta",
+                title: "AI Tech Lead, Capgemini",
+                desc: "AI Tech Lead at Capgemini, advising on AI infrastructure architecture and enterprise systems.",
+                photo: "/team/chakravarti.png",
+              },
+              {
+                name: "Mr. Suyash Patil",
+                title: "Electronics Expert",
+                desc: "Electronics expert specializing in hardware design and embedded systems.",
+                photo: "/team/suyash.jpeg",
+              },
+              {
+                name: "Mr. Prasad Shelke",
+                title: "AI Expert",
+                desc: "AI expert specializing in machine learning, deep learning, and intelligent systems.",
+                photo: "/team/prasad.jpeg",
+              },
+            ].map((expert, i) => (
+              <div
+                key={i}
+                className="group flex items-start gap-4 bg-white border border-black/6 rounded-2xl p-5 hover:border-primary/20 hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5"
+              >
+                {/* Rectangular photo — left side */}
+                <div className="w-[90px] h-[100px] rounded-xl overflow-hidden shrink-0 border border-black/6 group-hover:border-primary/20 transition-all duration-300">
+                  <img
+                    src={expert.photo}
+                    alt={expert.name}
+                    className="w-full h-full object-cover object-top"
+                  />
+                </div>
+                {/* Text — right side */}
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-headline font-black text-[#1a1a2e] text-[13px] uppercase tracking-tight leading-tight mb-1">
+                    {expert.name}
+                  </h3>
+                  <p className="text-[#EE2C3C] text-[10px] font-bold font-mono uppercase tracking-widest mb-2">
+                    {expert.title}
+                  </p>
+                  <p className="text-[#1a1a2e]/50 text-xs leading-relaxed">
+                    {expert.desc}
+                  </p>
+                </div>
               </div>
             ))}
           </div>
