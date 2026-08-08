@@ -876,7 +876,7 @@ export default function AchievementsPartners() {
                   desc: "Focuses on rural digital literacy, youth skill development, and community welfare initiatives."
                 },
                 { 
-                  name: "Sanjyot Bahuuddeshiya Sanstha", 
+                  name: "SUNJA Bahuuddeshiya Sanstha", 
                   logo: "/logos/sanjyot_logo.png",
                   desc: "Supports elementary education assistance, social support programs, and rural vocational training." 
                 },

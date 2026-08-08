@@ -635,7 +635,7 @@ const calculateGrandTotal = () => {
                     </div>
                     <video
                       ref={schoolVideoRef}
-                      src={videoLang === 'en' ? "/video/airg_labs_overview_compressed.mp4" : "/video/airg_labs_overview_marathi.mp4"}
+                      src={videoLang === 'en' ? "https://airginternational.com/video/airg_labs_overview_compressed.mp4" : "https://airginternational.com/video/airg_labs_overview_marathi.mp4"}
                       controls
                       poster="/attachments/thumbnail.png"
                       playsInline
