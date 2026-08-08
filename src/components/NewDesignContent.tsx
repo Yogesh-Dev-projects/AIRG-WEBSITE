@@ -648,10 +648,10 @@ export default function NewDesignContent() {
   }, [heroLabImages.length]);
 
   const globalPhotoList = [
-    "/global-centres/centre_photo_1.jpg",
-    "/global-centres/centre_photo_2.jpg",
-    "/global-centres/centre_photo_3.jpg",
-    "/global-centres/centre_photo_4.jpg"
+    "/global-centres/centre_photo_1.jpeg",
+    "/global-centres/centre_photo_2.jpeg",
+    "/global-centres/centre_photo_3.jpeg",
+    "/global-centres/centre_photo_4.jpeg"
   ];
   const [globalPhotoIndex, setGlobalPhotoIndex] = useState(0);
 
