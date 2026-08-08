@@ -462,7 +462,7 @@ export default function NewDesignContent() {
 
   const [currentEmblemLetter, setCurrentEmblemLetter] = useState("A");
   const [isEmblemMirrored, setIsEmblemMirrored] = useState(false);
-  const [videoLang, setVideoLang] = useState<'en' | 'mr'>('en');
+  const [videoLang, setVideoLang] = useState<'en' | 'mr' | 'tour'>('tour');
   const tourVideoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
@@ -3066,6 +3066,16 @@ export default function NewDesignContent() {
                 {/* Floating Language Selector */}
                 <div className="absolute top-4 right-4 z-30 flex items-center gap-1 bg-black/60 backdrop-blur-md p-1 rounded-full border border-white/10 select-none">
                   <button
+                    onClick={() => setVideoLang('tour')}
+                    className={`px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-wider transition-all duration-300 ${
+                      videoLang === 'tour'
+                        ? 'bg-[#EE2C3C] text-white shadow-lg'
+                        : 'text-white/60 hover:text-white hover:bg-white/5'
+                    }`}
+                  >
+                    Lab Tour
+                  </button>
+                  <button
                     onClick={() => setVideoLang('en')}
                     className={`px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-wider transition-all duration-300 ${
                       videoLang === 'en'
@@ -3088,7 +3098,13 @@ export default function NewDesignContent() {
                 </div>
                 <video
                   ref={tourVideoRef}
-                  src={videoLang === 'en' ? "/video/airg_labs_overview_compressed.mp4" : "/video/airg_labs_overview_marathi.mp4"}
+                  src={
+                    videoLang === 'tour'
+                      ? "/video/airg_labs_tour.mp4"
+                      : videoLang === 'en'
+                      ? "/video/airg_labs_overview_compressed.mp4"
+                      : "/video/airg_labs_overview_marathi.mp4"
+                  }
                   controls
                   poster="/attachments/thumbnail.png"
                   playsInline
