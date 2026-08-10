@@ -1058,14 +1058,15 @@ export default function NewDesignContent() {
             <Logo />
           </div>
           <div className="hidden lg:flex flex-1 items-center justify-evenly px-6 xl:px-12">
-            {['hero', 'learning', 'store', 'labs', 'ai-infrastructures', 'centres'].map((item) => {
+            {['hero', 'learning', 'store', 'labs', 'ai-infrastructures', 'centres', 'careers'].map((item) => {
               const labels: Record<string, string> = {
                 hero: 'Home',
                 learning: 'Labs',
                 store: 'Store',
                 labs: 'Airg Labs',
                 'ai-infrastructures': 'AI Infra',
-                centres: 'Global Centres'
+                centres: 'Global Centres',
+                careers: 'Careers'
               };
               
               if (item === 'learning') {
@@ -1130,6 +1131,18 @@ export default function NewDesignContent() {
                     key={item}
                     href="/learning/ai-infrastructures"
                     className={`nav-link font-semibold transition-colors text-xs uppercase tracking-widest ${activeFace === item ? 'text-primary' : 'text-[#1a1a2e]/40 hover:text-[#1a1a2e]'}`}
+                  >
+                    {labels[item]}
+                  </Link>
+                );
+              }
+
+              if (item === 'careers') {
+                return (
+                  <Link
+                    key={item}
+                    href="/careers"
+                    className="nav-link font-semibold transition-colors text-xs uppercase tracking-widest text-[#1a1a2e]/40 hover:text-[#1a1a2e]"
                   >
                     {labels[item]}
                   </Link>
@@ -1235,14 +1248,15 @@ export default function NewDesignContent() {
               className="absolute inset-x-0 top-20 z-[99] lg:hidden bg-white/95 backdrop-blur-lg border-b border-black/5 shadow-lg p-6 flex flex-col gap-6"
             >
               <div className="flex flex-col gap-4">
-                {['hero', 'learning', 'store', 'labs', 'ai-infrastructures', 'centres'].map((item) => {
+                {['hero', 'learning', 'store', 'labs', 'ai-infrastructures', 'centres', 'careers'].map((item) => {
                   const labels: Record<string, string> = {
                     hero: 'Home',
                     learning: 'Labs',
                     store: 'Store',
                     labs: 'Airg Labs',
                     'ai-infrastructures': 'AI Infra',
-                    centres: 'Global Centres'
+                    centres: 'Global Centres',
+                    careers: 'Careers'
                   };
                   
                   if (item === 'learning') {
@@ -1319,6 +1333,19 @@ export default function NewDesignContent() {
                         className={`text-left py-2 font-bold text-sm uppercase tracking-widest border-b border-black/5 transition-colors ${
                           activeFace === item ? 'text-primary' : 'text-[#1a1a2e]/60 hover:text-[#1a1a2e]'
                         }`}
+                        onClick={() => setIsMobileMenuOpen(false)}
+                      >
+                        {labels[item]}
+                      </Link>
+                    );
+                  }
+
+                  if (item === 'careers') {
+                    return (
+                      <Link
+                        key={item}
+                        href="/careers"
+                        className="text-left py-2 font-bold text-sm uppercase tracking-widest border-b border-black/5 transition-colors text-[#1a1a2e]/60 hover:text-[#1a1a2e]"
                         onClick={() => setIsMobileMenuOpen(false)}
                       >
                         {labels[item]}
