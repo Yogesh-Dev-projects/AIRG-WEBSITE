@@ -35,7 +35,8 @@ export function Navbar() {
     { name: "Store", href: "/#store" },
     { name: "Airg Labs", href: "/#labs" },
     { name: "AI Infra", href: "/learning/ai-infrastructures" },
-    { name: "Global Centres", href: "/#centres" }
+    { name: "Global Centres", href: "/#centres" },
+    { name: "Careers", href: "/careers" }
   ];
 
   return (
