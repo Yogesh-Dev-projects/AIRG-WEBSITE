@@ -7,7 +7,7 @@ import { CheckoutModal } from "@/components/store/CheckoutModal";
 import {
   Cpu, Sprout, Milestone, GraduationCap, Users, ShieldCheck,
   ArrowRight, Lightbulb, MapPin, Award, CheckCircle2, ChevronRight,
-  TrendingUp, Globe, FileText, Settings
+  TrendingUp, Globe, FileText, Settings, Calendar, DollarSign, Handshake
 } from "lucide-react";
 
 const prathamMedia = [
@@ -97,10 +97,13 @@ const PrathamMediaCarousel = () => {
 };
 
 export default function GrampanchayatAILabPage() {
-  const [activeZone, setActiveZone] = useState(0);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
   const [checkoutItem, setCheckoutItem] = useState<{ name: string; price: number; image?: string; category?: string } | null>(null);
+
+  // States for new interactive components
+  const [activeYearTab, setActiveYearTab] = useState<1 | 2 | 3>(1);
+  const [activeCostTab, setActiveCostTab] = useState<"setup" | "operational" | "summary">("setup");
 
   const [formData, setFormData] = useState({
     name: "",
@@ -165,97 +168,9 @@ export default function GrampanchayatAILabPage() {
     return () => clearInterval(interval);
   }, [labImages.length]);
 
-  const [zones, setZones] = useState([
-    {
-      name: "Rural AI & Digital Literacy Zone",
-      icon: "school",
-      image: "/lab-smartlearning.png",
-      items: [
-        { name: "Local Language AI Assistants & LMS Platforms", qty: 0, unitCost: 1500, isLot: false },
-        { name: "Computing Terminals & Mini PCs", qty: 0, unitCost: 18000, isLot: false },
-        { name: "Digital Literacy Training Manuals (Regional Languages)", qty: 0, unitCost: 500, isLot: false },
-        { name: "Edge Computing & local AI Nodes", qty: 0, unitCost: 12000, isLot: false }
-      ]
-    },
-    {
-      name: "Agricultural IoT & Sensor Tech Station",
-      icon: "agriculture",
-      image: "/lab-electronics.png",
-      items: [
-        { name: "Smart Soil Moisture & Temperature Sensor Kits", qty: 0, unitCost: 1500, isLot: false },
-        { name: "Automatic Irrigation Controller Kits", qty: 0, unitCost: 3500, isLot: false },
-        { name: "Weather Station Monitoring Modules", qty: 0, unitCost: 8500, isLot: false },
-        { name: "LoRaWAN long-range communication nodes", qty: 0, unitCost: 5000, isLot: false }
-      ]
-    },
-    {
-      name: "Grassroots Robotics & Automation Corner",
-      icon: "precision_manufacturing",
-      image: "/lab-robotics.png",
-      items: [
-        { name: "Robotics Assembly & Starter Kits", qty: 0, unitCost: 4500, isLot: false },
-        { name: "Microcontroller Board Packs (Arduino/Raspberry Pi)", qty: 0, unitCost: 3000, isLot: false },
-        { name: "Basic Electronic Component Starter Sets", qty: 0, unitCost: 8000, isLot: true }
-      ]
-    },
-    {
-      name: "Grampanchayat Resource Hub & Smart Display",
-      icon: "domain",
-      image: "/lab-smartlearning.png",
-      items: [
-        { name: "Interactive Smart Panel Display (65”)", qty: 0, unitCost: 95000, isLot: false },
-        { name: "Lab Branding, Guidelines, & Informative Wall Art", qty: 0, unitCost: 15000, isLot: true }
-      ]
-    }
-  ]);
-
-  const updateQuantity = (zoneIdx: number, itemIdx: number, delta: number) => {
-    setZones(prevZones => {
-      const newZones = JSON.parse(JSON.stringify(prevZones));
-      const item = newZones[zoneIdx].items[itemIdx];
-      item.qty = Math.max(0, item.qty + delta);
-      return newZones;
-    });
-  };
-
-  const calculateZoneTotal = (zoneIdx: number) => {
-    return zones[zoneIdx].items.reduce((sum, item) => sum + (item.qty * item.unitCost), 0);
-  };
-
-  const calculateGrandTotal = () => {
-    return zones.reduce((sum, _, zoneIdx) => sum + calculateZoneTotal(zoneIdx), 0);
-  };
-
   const formatCurrency = (amount: number) => {
     return amount.toLocaleString("en-IN");
   };
-
-  const processSteps = [
-    {
-      step: "01",
-      title: "Local Needs Assessment",
-      desc: "We analyze rural community needs and prepare the Grampanchayat room blueprint for optimal layout and power setup.",
-      image: "/lab-robotics.png"
-    },
-    {
-      step: "02",
-      title: "Infrastructure Installation",
-      desc: "Our engineers install smart panels, computing terminals, agricultural IoT kits, and local language AI assets.",
-      image: "/hardware_procurement_new.png"
-    },
-    {
-      step: "03",
-      title: "Local Youth Enablement",
-      desc: "We train local operators and educators to run training modules, ensuring independence and long-term utility.",
-      image: "/lab-electronics.png"
-    },
-    {
-      step: "04",
-      title: "Community Program Launch",
-      desc: "The lab opens for students, farmers (agricultural IoT testing), and youth seeking technical skills certifications.",
-      image: "/lab-smartlearning.png"
-    }
-  ];
 
   return (
     <main className="bg-[#FAFBFD] min-h-screen text-[#1a1a2e] relative overflow-x-hidden font-sans pt-20">
@@ -266,47 +181,56 @@ export default function GrampanchayatAILabPage() {
       <div className="absolute top-20 left-10 w-72 h-72 bg-primary/5 rounded-full blur-3xl pointer-events-none -z-10 animate-pulse" />
       <div className="absolute top-96 right-10 w-96 h-96 bg-blue-500/5 rounded-full blur-3xl pointer-events-none -z-10 animate-pulse" />
 
-      {/* Hero section */}
+      {/* Dedicated Hero Section for Dhamner Lab */}
       <section className="relative z-10 w-full max-w-[1440px] mx-auto px-6 md:px-20 pt-16 pb-16">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
           <div className="lg:col-span-7 space-y-6 text-left relative">
-            {/* Design Element: Accent Line */}
             <div className="absolute -left-6 top-0 bottom-0 w-1 bg-gradient-to-b from-primary via-primary/50 to-transparent hidden md:block rounded-full" />
 
             <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-primary/20 bg-primary/5 text-primary text-xs font-mono font-bold uppercase tracking-widest">
               <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-              Grassroots Tech Revolution
+              Yashwant Grampanchayat Dhamner
             </span>
-            <h1 className="font-headline text-5xl sm:text-7xl font-black uppercase tracking-tight leading-[0.9] text-[#1a1a2e]">
-              Grampanchayat <br />
-              <span className="text-primary text-glow-red">AI Labs</span>
-            </h1>
-            <p className="text-base sm:text-xl text-[#1a1a2e]/70 font-light leading-relaxed max-w-2xl">
-              Pioneering the democratization of high-compute artificial intelligence, coding, precision IoT, and modern tech skills at the very foundation of local self-governance.
+            
+            <div className="space-y-2">
+              <h1 className="font-headline text-4xl sm:text-6xl font-black uppercase tracking-tight leading-[1.0] text-[#1a1a2e]">
+                Smart AI Village <br />
+                <span className="text-primary text-glow-red">Innovation Center</span>
+              </h1>
+              <div className="flex items-center gap-2 text-sm font-semibold text-slate-600 bg-slate-100/80 px-3 py-1.5 rounded-lg w-fit border border-black/5 mt-2">
+                <MapPin className="w-4 h-4 text-primary shrink-0" />
+                <span>Taluka: Koregaon, District: Satara, Maharashtra</span>
+              </div>
+            </div>
+
+            <p className="text-base sm:text-lg text-[#1a1a2e]/70 font-light leading-relaxed max-w-2xl">
+              &ldquo;Transforming Villages into Intelligent Innovation Ecosystems&rdquo; &mdash; empowering rural communities by integrating Artificial Intelligence, Robotics, IoT, and Digital Skills directly into the village ecosystem.
             </p>
+
             <div className="flex flex-wrap gap-4 pt-2">
               <div className="flex items-center gap-2 text-xs font-mono font-bold text-primary bg-primary/5 px-3 py-1.5 rounded-lg border border-primary/10 hover:border-primary/30 transition-colors">
                 <Award className="w-4 h-4" />
-                <span>India's 1st Grassroots AI Initiative</span>
+                <span>Maharashtra's Pioneer AI Village</span>
               </div>
               <div className="flex items-center gap-2 text-xs font-mono font-bold text-[#1a1a2e]/60 bg-black/5 px-3 py-1.5 rounded-lg border border-black/5 hover:border-black/10 transition-colors">
-                <MapPin className="w-4 h-4" />
-                <span>Empowering Rural Communities</span>
+                <Users className="w-4 h-4" />
+                <span>1000+ Beneficiaries Targeted</span>
               </div>
             </div>
           </div>
+          
           <div className="lg:col-span-5 relative">
             <div className="absolute -inset-1 bg-gradient-to-r from-primary to-blue-500 rounded-[3.1rem] blur opacity-15" />
             <div className="glass-premium rounded-[3rem] border border-black/5 overflow-hidden p-3 shadow-2xl bg-white/70 relative">
               <div className="relative aspect-[4/3] rounded-[2.5rem] overflow-hidden bg-slate-900 group">
                 <img
                   src={labImages[currentImageIndex]}
-                  alt="Grampanchayat AI Lab Setup"
+                  alt="Dhamner Smart AI Village Innovation Center Setup"
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent flex items-end p-6">
                   <div>
-                    <span className="text-[10px] font-mono text-white/70 uppercase tracking-widest">Active Site Showcase</span>
+                    <span className="text-[10px] font-mono text-white/70 uppercase tracking-widest">Dhamner Lab Site</span>
                     <p className="text-sm font-bold text-white font-headline uppercase mt-0.5">Grassroots Innovation Hub</p>
                   </div>
                 </div>
@@ -316,96 +240,231 @@ export default function GrampanchayatAILabPage() {
         </div>
       </section>
 
-      {/* Milestone Spotlight: First AI Lab in Grampanchayat */}
+      {/* Vision & Objectives Section */}
+      <section className="relative z-10 w-full max-w-[1440px] mx-auto px-6 md:px-20 py-20 border-t border-black/5">
+        <div className="space-y-12">
+          <div className="max-w-3xl space-y-3">
+            <span className="text-xs font-mono font-black text-primary uppercase tracking-widest">Mission Blueprint</span>
+            <h2 className="font-headline text-3xl sm:text-5xl font-black uppercase tracking-tight leading-none text-[#1a1a2e]">
+              Vision & Objectives
+            </h2>
+            <p className="text-sm sm:text-base text-[#1a1a2e]/60 font-light leading-relaxed">
+              We aim to break technology barriers where they matter most, demonstrating that state-of-the-art technologies belong at the grassroots of our rural communities.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[
+              {
+                title: "Develop Future-Ready Students",
+                desc: "Equipping young minds in village schools with hands-on coding, computational thinking, and early exposure to AI models.",
+                icon: GraduationCap,
+                color: "from-red-500/10 to-red-600/5",
+                borderColor: "group-hover:border-red-500/30",
+                iconColor: "text-red-500"
+              },
+              {
+                title: "Upskill Villagers",
+                desc: "Introducing practical technology, digital literacy, and local-language AI assistants to help adults adapt to the digital age.",
+                icon: Users,
+                color: "from-blue-500/10 to-blue-600/5",
+                borderColor: "group-hover:border-blue-500/30",
+                iconColor: "text-blue-500"
+              },
+              {
+                title: "Enable Grassroots Innovation",
+                desc: "Fostering local, project-based development to build technology aids solving agriculture, resource, and governance issues.",
+                icon: Lightbulb,
+                color: "from-amber-500/10 to-amber-600/5",
+                borderColor: "group-hover:border-amber-500/30",
+                iconColor: "text-amber-500"
+              },
+              {
+                title: "Pioneer Smart AI Village",
+                desc: "Establishing a replicable model that positions Yashwant Grampanchayat Dhamner as Maharashtra's ideal Smart AI Village.",
+                icon: Award,
+                color: "from-emerald-500/10 to-emerald-600/5",
+                borderColor: "group-hover:border-emerald-500/30",
+                iconColor: "text-emerald-500"
+              }
+            ].map((obj, idx) => {
+              const Icon = obj.icon;
+              return (
+                <div 
+                  key={idx} 
+                  className={`group bg-gradient-to-br ${obj.color} border border-black/5 rounded-[2rem] p-6 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 flex flex-col ${obj.borderColor}`}
+                >
+                  <div className={`w-12 h-12 rounded-2xl bg-white flex items-center justify-center ${obj.iconColor} mb-5 shadow-sm group-hover:scale-110 transition-transform`}>
+                    <Icon className="w-6 h-6" />
+                  </div>
+                  <h3 className="font-headline text-lg font-black uppercase tracking-tight text-[#1a1a2e] mb-2">{obj.title}</h3>
+                  <p className="text-xs text-[#1a1a2e]/60 font-light leading-relaxed">{obj.desc}</p>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* Program Structure & Execution Roadmap (3-Year Model) */}
       <section className="relative z-10 w-full max-w-[1440px] mx-auto px-6 md:px-20 py-20 border-t border-black/5">
         <div className="bg-gradient-to-br from-[#1a1a2e] to-[#252542] rounded-[3.5rem] text-white overflow-hidden shadow-2xl relative">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(238,44,60,0.15),transparent_45%)]" />
           <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
 
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 p-8 sm:p-12 md:p-16 items-center relative z-10">
-            <div className="lg:col-span-7 space-y-6 text-left">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-mono font-bold uppercase tracking-wider">
-                <Milestone className="w-3.5 h-3.5" />
-                Historic Milestone
+          <div className="p-8 sm:p-12 md:p-16 relative z-10">
+            <div className="flex flex-col lg:flex-row gap-12 items-start justify-between mb-12">
+              <div className="space-y-4 max-w-2xl text-left">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-mono font-bold uppercase tracking-wider">
+                  <Calendar className="w-3.5 h-3.5" />
+                  Program Structure
+                </div>
+                <h2 className="font-headline text-3xl sm:text-5xl font-black uppercase tracking-tight leading-none">
+                  3-Year Execution Model
+                </h2>
+                <p className="text-sm text-white/70 font-light leading-relaxed">
+                  Our comprehensive, project-based learning model includes <strong>12 workshops per year</strong> (2 days each, 6 dedicated to school students and 6 to villagers), reinforced by continuous onsite support.
+                </p>
               </div>
-              <h2 className="font-headline text-3xl sm:text-5xl font-black uppercase tracking-tight leading-none">
-                India's First AI Lab <br />
-                <span className="text-primary text-glow-red">In A Grampanchayat</span>
-              </h2>
-              <p className="text-sm sm:text-base text-white/70 font-light leading-relaxed max-w-xl">
-                Breaking technology barriers where they matter most. We established the country's first-ever Grampanchayat AI Lab, demonstrating that state-of-the-art technologies like local generative AI models, edge compute nodes, and IoT-driven farming systems aren't just for tech hubs—they belong in our villages.
-              </p>
 
-              {/* Highlight list */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4">
-                <div className="flex items-start gap-3">
-                  <div className="mt-1 p-1 rounded-lg bg-primary/20 text-primary">
-                    <CheckCircle2 className="w-4 h-4" />
-                  </div>
-                  <div>
-                    <h4 className="text-xs font-bold font-mono tracking-wider uppercase text-white">Local Language Access</h4>
-                    <p className="text-[11px] text-white/50 font-light mt-0.5">Generative AI training in regional languages for accessibility.</p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-3">
-                  <div className="mt-1 p-1 rounded-lg bg-primary/20 text-primary">
-                    <CheckCircle2 className="w-4 h-4" />
-                  </div>
-                  <div>
-                    <h4 className="text-xs font-bold font-mono tracking-wider uppercase text-white">Smart Farming Integration</h4>
-                    <p className="text-[11px] text-white/50 font-light mt-0.5">Real IoT sensors predicting soil and moisture health locally.</p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-3">
-                  <div className="mt-1 p-1 rounded-lg bg-primary/20 text-primary">
-                    <CheckCircle2 className="w-4 h-4" />
-                  </div>
-                  <div>
-                    <h4 className="text-xs font-bold font-mono tracking-wider uppercase text-white">Self-Sustaining Model</h4>
-                    <p className="text-[11px] text-white/50 font-light mt-0.5">Managed by local youth operators trained in advanced modules.</p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-3">
-                  <div className="mt-1 p-1 rounded-lg bg-primary/20 text-primary">
-                    <CheckCircle2 className="w-4 h-4" />
-                  </div>
-                  <div>
-                    <h4 className="text-xs font-bold font-mono tracking-wider uppercase text-white">Coding & Drones corner</h4>
-                    <p className="text-[11px] text-white/50 font-light mt-0.5">Exposing rural school students to physical automation early.</p>
-                  </div>
-                </div>
+              {/* Tab Toggles */}
+              <div className="flex bg-white/5 border border-white/10 p-1.5 rounded-2xl w-full sm:w-auto self-center lg:self-start shrink-0">
+                {[1, 2, 3].map((yr) => (
+                  <button
+                    key={yr}
+                    onClick={() => setActiveYearTab(yr as 1 | 2 | 3)}
+                    className={`flex-1 sm:flex-initial px-6 py-2.5 rounded-xl font-mono text-xs uppercase tracking-wider font-bold transition-all duration-300 ${
+                      activeYearTab === yr 
+                        ? "bg-primary text-white shadow-md" 
+                        : "text-white/60 hover:text-white hover:bg-white/5"
+                    }`}
+                  >
+                    Year {yr}
+                  </button>
+                ))}
               </div>
             </div>
 
-            {/* Impact Metric Cards */}
-            <div className="lg:col-span-5 grid grid-cols-2 gap-4">
-              <div className="bg-white/5 border border-white/10 p-6 rounded-3xl text-left hover:border-primary/30 transition-all hover:scale-[1.02] duration-300">
-                <span className="text-[9px] font-mono text-primary font-bold uppercase tracking-wider bg-primary/10 px-2 py-0.5 rounded">Grassroots Impact</span>
-                <div className="text-3xl sm:text-4xl font-black font-headline text-white mt-2">500+</div>
-                <div className="text-[10px] font-mono uppercase tracking-wider text-white/70 mt-1 font-bold">Rural Students Trained</div>
-                <p className="text-[10px] text-white/40 font-light mt-2">Hands-on AI, robotics, & coding exposure in local village schools.</p>
-              </div>
+            {/* Tab content display with AnimatePresence */}
+            <div className="min-h-[280px]">
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={activeYearTab}
+                  initial={{ opacity: 0, y: 15 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -15 }}
+                  transition={{ duration: 0.3 }}
+                  className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center text-left"
+                >
+                  <div className="lg:col-span-7 space-y-6">
+                    {activeYearTab === 1 && (
+                      <>
+                        <span className="text-xs font-mono font-bold text-primary uppercase tracking-widest px-2.5 py-1 bg-primary/10 rounded-md border border-primary/20">
+                          Phase 1: Foundation & Adoption Phase
+                        </span>
+                        <h3 className="font-headline text-2xl sm:text-3xl font-black uppercase">Establishing Basic Digital Literacy & Awareness</h3>
+                        <p className="text-sm text-white/75 font-light leading-relaxed">
+                          The launch phase focuses on introducing physical computing, AI literacy, and precision sensors. We build excitement and establish regular attendance patterns among students and village groups.
+                        </p>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+                          <div className="flex items-start gap-2 bg-white/5 p-4 rounded-2xl border border-white/5">
+                            <CheckCircle2 className="w-5 h-5 text-primary shrink-0 mt-0.5" />
+                            <div>
+                              <h4 className="text-xs font-bold font-mono text-white uppercase">12 PBL Workshops</h4>
+                              <p className="text-[11px] text-white/50 font-light mt-0.5">Fully sponsored & FREE of charge to build initial community adoption.</p>
+                            </div>
+                          </div>
+                          <div className="flex items-start gap-2 bg-white/5 p-4 rounded-2xl border border-white/5">
+                            <CheckCircle2 className="w-5 h-5 text-primary shrink-0 mt-0.5" />
+                            <div>
+                              <h4 className="text-xs font-bold font-mono text-white uppercase">Dedicated Instructor</h4>
+                              <p className="text-[11px] text-white/50 font-light mt-0.5">Onsite technology specialist available 2 full days per week for guidance.</p>
+                            </div>
+                          </div>
+                        </div>
+                      </>
+                    )}
 
-              <div className="bg-white/5 border border-white/10 p-6 rounded-3xl text-left hover:border-primary/30 transition-all hover:scale-[1.02] duration-300">
-                <span className="text-[9px] font-mono text-[#4ade80] font-bold uppercase tracking-wider bg-[#4ade80]/10 px-2 py-0.5 rounded">Local Village</span>
-                <div className="text-3xl sm:text-4xl font-black font-headline text-[#4ade80] mt-2">1,500+</div>
-                <div className="text-[10px] font-mono uppercase tracking-wider text-white/70 mt-1 font-bold">Villagers Connected</div>
-                <p className="text-[10px] text-white/40 font-light mt-2">Trained on local language AI assistants & agricultural digital tools.</p>
-              </div>
+                    {activeYearTab === 2 && (
+                      <>
+                        <span className="text-xs font-mono font-bold text-[#4ade80] uppercase tracking-widest px-2.5 py-1 bg-[#4ade80]/15 rounded-md border border-[#4ade80]/20">
+                          Phase 2: Skill Development Phase
+                        </span>
+                        <h3 className="font-headline text-2xl sm:text-3xl font-black uppercase">Deep Dive into Advanced Technical Engineering</h3>
+                        <p className="text-sm text-white/75 font-light leading-relaxed">
+                          Students transition from block visual coding to real microcontroller integration, robotics assembly, and basic wireless sensor telemetry. Villagers are trained in advanced utility apps and AI workflow aids.
+                        </p>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+                          <div className="flex items-start gap-2 bg-white/5 p-4 rounded-2xl border border-white/5">
+                            <CheckCircle2 className="w-5 h-5 text-[#4ade80] shrink-0 mt-0.5" />
+                            <div>
+                              <h4 className="text-xs font-bold font-mono text-white uppercase">Advanced Curriculum</h4>
+                              <p className="text-[11px] text-white/50 font-light mt-0.5">Hands-on drone simulators, automation rules, and basic electronics logic.</p>
+                            </div>
+                          </div>
+                          <div className="flex items-start gap-2 bg-white/5 p-4 rounded-2xl border border-white/5">
+                            <CheckCircle2 className="w-5 h-5 text-[#4ade80] shrink-0 mt-0.5" />
+                            <div>
+                              <h4 className="text-xs font-bold font-mono text-white uppercase">Real-World Projects</h4>
+                              <p className="text-[11px] text-white/50 font-light mt-0.5">Applying coding and telemetry to solve actual challenges in local fields.</p>
+                            </div>
+                          </div>
+                        </div>
+                      </>
+                    )}
 
-              <div className="bg-white/5 border border-white/10 p-6 rounded-3xl text-left hover:border-primary/30 transition-all hover:scale-[1.02] duration-300">
-                <span className="text-[9px] font-mono text-primary font-bold uppercase tracking-wider bg-primary/10 px-2 py-0.5 rounded">Historic Milestone</span>
-                <div className="text-3xl sm:text-4xl font-black font-headline text-white mt-2">1st</div>
-                <div className="text-[10px] font-mono uppercase tracking-wider text-white/70 mt-1 font-bold">Grampanchayat AI Hub</div>
-                <p className="text-[10px] text-white/40 font-light mt-2">India's first pioneer lab established directly inside local self-governance.</p>
-              </div>
+                    {activeYearTab === 3 && (
+                      <>
+                        <span className="text-xs font-mono font-bold text-blue-400 uppercase tracking-widest px-2.5 py-1 bg-blue-400/10 rounded-md border border-blue-400/20">
+                          Phase 3: Innovation & Sustainability Phase
+                        </span>
+                        <h3 className="font-headline text-2xl sm:text-3xl font-black uppercase">Fostering Local Startups & Self-Sufficiency</h3>
+                        <p className="text-sm text-white/75 font-light leading-relaxed">
+                          The final phase focuses on handing operations over to local leaders. Youth apply their robotics and data logic skills to seek vocational opportunities, build custom community tools, and maintain the lab independently.
+                        </p>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+                          <div className="flex items-start gap-2 bg-white/5 p-4 rounded-2xl border border-white/5">
+                            <CheckCircle2 className="w-5 h-5 text-blue-400 shrink-0 mt-0.5" />
+                            <div>
+                              <h4 className="text-xs font-bold font-mono text-white uppercase">Livelihood & Careers</h4>
+                              <p className="text-[11px] text-white/50 font-light mt-0.5">Certifications and digital skill pathways targeting regional tech jobs.</p>
+                            </div>
+                          </div>
+                          <div className="flex items-start gap-2 bg-white/5 p-4 rounded-2xl border border-white/5">
+                            <CheckCircle2 className="w-5 h-5 text-blue-400 shrink-0 mt-0.5" />
+                            <div>
+                              <h4 className="text-xs font-bold font-mono text-white uppercase">Community Ownership</h4>
+                              <p className="text-[11px] text-white/50 font-light mt-0.5">Establishing independent committees for lab maintenance and events.</p>
+                            </div>
+                          </div>
+                        </div>
+                      </>
+                    )}
+                  </div>
 
-              <div className="bg-white/5 border border-white/10 p-6 rounded-3xl text-left hover:border-primary/30 transition-all hover:scale-[1.02] duration-300">
-                <span className="text-[9px] font-mono text-[#4ade80] font-bold uppercase tracking-wider bg-[#4ade80]/10 px-2 py-0.5 rounded">Smart Agritech</span>
-                <div className="text-3xl sm:text-4xl font-black font-headline text-[#4ade80] mt-2">10+</div>
-                <div className="text-[10px] font-mono uppercase tracking-wider text-white/70 mt-1 font-bold">Active Telemetry Sensors</div>
-                <p className="text-[10px] text-white/40 font-light mt-2">Soil moisture & crop monitoring sensors active in local fields.</p>
-              </div>
+                  {/* Highlights checklist side-cards */}
+                  <div className="lg:col-span-5 bg-white/5 border border-white/10 p-6 sm:p-8 rounded-3xl space-y-4">
+                    <h4 className="text-xs font-mono font-black uppercase text-primary tracking-wider">Curriculum Focus Areas</h4>
+                    <ul className="space-y-3">
+                      {[
+                        { title: "AI & Digital Literacy", desc: "Understanding prompts, searching, and regional LLM engines." },
+                        { title: "Robotics & Automation", desc: "Solderless breadboards, sensors, motors, and controllers." },
+                        { title: "Practical Innovation Projects", desc: "Telemetry tracking, weather nodes, and automated systems." }
+                      ].map((item, idx) => (
+                        <li key={idx} className="flex gap-3">
+                          <div className="w-5 h-5 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center text-primary text-[10px] font-bold shrink-0 mt-0.5">
+                            {idx + 1}
+                          </div>
+                          <div>
+                            <span className="text-xs font-bold text-white block">{item.title}</span>
+                            <span className="text-[10px] text-white/50 font-light">{item.desc}</span>
+                          </div>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </motion.div>
+              </AnimatePresence>
             </div>
           </div>
         </div>
@@ -466,7 +525,9 @@ export default function GrampanchayatAILabPage() {
             </div>
           </div>
         </div>
-      </section>      {/* Rural AI Infrastructure Kit Showcase */}
+      </section>
+
+      {/* Rural AI Infrastructure Kit Showcase */}
       <section className="relative z-10 w-full max-w-[1440px] mx-auto px-6 md:px-20 py-20 border-t border-black/5 text-left bg-gradient-to-b from-transparent to-[#FAFBFD]">
         <div className="space-y-12">
           <div className="max-w-3xl space-y-3">
@@ -475,7 +536,7 @@ export default function GrampanchayatAILabPage() {
               Rural AI Infrastructure Kit
             </h2>
             <p className="text-sm sm:text-base text-[#1a1a2e]/60 font-light leading-relaxed max-w-3xl">
-              Inside every Grampanchayat AI Lab, kids get hands-on access to custom hardware built specifically for offline, durable educational use.
+              Inside the Dhamner Smart AI Village Innovation Center, kids get hands-on access to custom hardware built specifically for offline, durable educational use.
             </p>
           </div>
 
@@ -582,28 +643,375 @@ export default function GrampanchayatAILabPage() {
           </div>
         </div>
       </section>
-      {/* Steps Section */}
+
+      {/* Interactive Costing & Investment Section */}
       <section className="relative z-10 w-full max-w-[1440px] mx-auto px-6 md:px-20 py-24 border-t border-black/5 text-left">
         <div className="space-y-16">
+          <div className="flex flex-col lg:flex-row gap-8 justify-between items-start lg:items-end">
+            <div className="space-y-3 max-w-2xl">
+              <span className="text-xs font-mono font-black text-primary uppercase tracking-widest">Financial Blueprint</span>
+              <h2 className="font-headline text-3xl sm:text-5xl font-black uppercase tracking-tight leading-none text-[#1a1a2e]">
+                Costing & Investment Structure
+              </h2>
+              <p className="text-sm text-[#1a1a2e]/60 font-light leading-relaxed">
+                Review the detailed financial layout for the Dhamner lab, outlining one-time infrastructure setup costs and operational costs mapped across three years.
+              </p>
+            </div>
+
+            {/* Cost Tab Controls */}
+            <div className="flex bg-slate-100 p-1.5 rounded-2xl border border-black/5 w-full lg:w-auto overflow-x-auto">
+              <button
+                onClick={() => setActiveCostTab("setup")}
+                className={`flex-1 lg:flex-initial whitespace-nowrap px-5 py-2.5 rounded-xl font-mono text-xs uppercase tracking-wider font-bold transition-all duration-300 ${
+                  activeCostTab === "setup" 
+                    ? "bg-[#1a1a2e] text-white shadow-md" 
+                    : "text-[#1a1a2e]/60 hover:text-[#1a1a2e] hover:bg-black/5"
+                }`}
+              >
+                1. Setup Cost
+              </button>
+              <button
+                onClick={() => setActiveCostTab("operational")}
+                className={`flex-1 lg:flex-initial whitespace-nowrap px-5 py-2.5 rounded-xl font-mono text-xs uppercase tracking-wider font-bold transition-all duration-300 ${
+                  activeCostTab === "operational" 
+                    ? "bg-[#1a1a2e] text-white shadow-md" 
+                    : "text-[#1a1a2e]/60 hover:text-[#1a1a2e] hover:bg-black/5"
+                }`}
+              >
+                2. Operational Cost
+              </button>
+              <button
+                onClick={() => setActiveCostTab("summary")}
+                className={`flex-1 lg:flex-initial whitespace-nowrap px-5 py-2.5 rounded-xl font-mono text-xs uppercase tracking-wider font-bold transition-all duration-300 ${
+                  activeCostTab === "summary" 
+                    ? "bg-[#1a1a2e] text-white shadow-md" 
+                    : "text-[#1a1a2e]/60 hover:text-[#1a1a2e] hover:bg-black/5"
+                }`}
+              >
+                3. Grand Summary
+              </button>
+            </div>
+          </div>
+
+          <div className="bg-white border border-black/5 rounded-[3rem] p-8 md:p-12 shadow-xl relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-slate-50 rounded-full blur-3xl pointer-events-none -z-10" />
+
+            <AnimatePresence mode="wait">
+              {activeCostTab === "setup" && (
+                <motion.div
+                  key="setup"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.25 }}
+                  className="space-y-8"
+                >
+                  <div className="flex flex-wrap items-center justify-between gap-4 pb-6 border-b border-black/5">
+                    <div>
+                      <span className="text-[10px] font-mono text-primary font-bold uppercase tracking-wider bg-primary/5 px-2.5 py-1 rounded-md border border-primary/10">
+                        One-Time Setup
+                      </span>
+                      <h3 className="font-headline text-xl font-bold uppercase mt-2 text-[#1a1a2e]">Infrastructure Setup Cost</h3>
+                    </div>
+                    <div className="text-right">
+                      <span className="text-[10px] font-mono text-slate-500 uppercase tracking-widest block">Total setup including GST</span>
+                      <span className="text-3xl font-black font-headline text-primary">₹7,67,000</span>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div className="space-y-4">
+                      <div className="flex justify-between items-center bg-slate-50 p-4 rounded-2xl border border-black/5">
+                        <span className="text-xs font-semibold text-slate-700">Smart AI Village Innovation Center Setup</span>
+                        <span className="text-sm font-bold font-mono text-slate-900">₹6,50,000</span>
+                      </div>
+                      <div className="flex justify-between items-center bg-slate-50 p-4 rounded-2xl border border-black/5">
+                        <span className="text-xs font-semibold text-slate-700">GST (18% on Setup)</span>
+                        <span className="text-sm font-bold font-mono text-slate-900">₹1,17,000</span>
+                      </div>
+                    </div>
+                    <div className="bg-slate-50 border border-black/5 p-6 rounded-3xl flex flex-col justify-center space-y-2">
+                      <h4 className="text-xs font-mono font-bold uppercase text-[#1a1a2e]/60">Includes:</h4>
+                      <p className="text-[11px] text-[#1a1a2e]/70 font-light leading-relaxed">
+                        Physical server infrastructure, computing terminals/mini-PCs, smart panel hardware, branding art, guidance posters, localized local-language AI server modules, agricultural telemetry nodes, flight simulators, and hands-on robotics trainer kits.
+                      </p>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+
+              {activeCostTab === "operational" && (
+                <motion.div
+                  key="operational"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.25 }}
+                  className="space-y-8"
+                >
+                  <div className="flex flex-wrap items-center justify-between gap-4 pb-6 border-b border-black/5">
+                    <div>
+                      <span className="text-[10px] font-mono text-[#4ade80] font-bold uppercase tracking-wider bg-[#4ade80]/10 px-2.5 py-1 rounded-md border border-[#4ade80]/20">
+                        Operational Cost
+                      </span>
+                      <h3 className="font-headline text-xl font-bold uppercase mt-2 text-[#1a1a2e]">Year-Wise Operations Budget</h3>
+                    </div>
+                    <div className="text-right">
+                      <span className="text-[10px] font-mono text-slate-500 uppercase tracking-widest block">Total 3-Year Operations</span>
+                      <span className="text-3xl font-black font-headline text-slate-900">₹9,91,200</span>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    {/* Year 1 */}
+                    <div className="bg-slate-50 border border-black/5 p-6 rounded-3xl flex flex-col justify-between">
+                      <div>
+                        <span className="text-[10px] font-mono text-slate-500 uppercase tracking-widest block mb-1">Year 1 (Foundation)</span>
+                        <div className="text-2xl font-black font-headline text-slate-900">₹2,83,200</div>
+                        <ul className="text-[11px] text-[#1a1a2e]/60 space-y-2 mt-4 font-light">
+                          <li className="flex justify-between"><span>Workshops (12):</span> <strong className="text-primary uppercase font-bold text-[9px] bg-primary/10 px-1.5 py-0.5 rounded">FREE (Sponsored)</strong></li>
+                          <li className="flex justify-between"><span>Lab Instructor:</span> <strong>₹2,40,000</strong></li>
+                          <li className="flex justify-between"><span>GST (18%):</span> <strong>₹43,200</strong></li>
+                        </ul>
+                      </div>
+                      <div className="text-[10px] text-[#1a1a2e]/50 font-light mt-4 pt-3 border-t border-black/5">
+                        Focuses on building robust adoption and digital awareness in Dhamner village.
+                      </div>
+                    </div>
+
+                    {/* Year 2 */}
+                    <div className="bg-slate-50 border border-black/5 p-6 rounded-3xl flex flex-col justify-between">
+                      <div>
+                        <span className="text-[10px] font-mono text-slate-500 uppercase tracking-widest block mb-1">Year 2 (Development)</span>
+                        <div className="text-2xl font-black font-headline text-slate-900">₹3,54,000</div>
+                        <ul className="text-[11px] text-[#1a1a2e]/60 space-y-2 mt-4 font-light">
+                          <li className="flex justify-between"><span>Workshops (12):</span> <strong>₹60,000</strong></li>
+                          <li className="flex justify-between"><span>Lab Instructor:</span> <strong>₹2,40,000</strong></li>
+                          <li className="flex justify-between"><span>GST (18%):</span> <strong>₹54,000</strong></li>
+                        </ul>
+                      </div>
+                      <div className="text-[10px] text-[#1a1a2e]/50 font-light mt-4 pt-3 border-t border-black/5">
+                        Covers advanced modules, coding logic, and real-world local integration.
+                      </div>
+                    </div>
+
+                    {/* Year 3 */}
+                    <div className="bg-slate-50 border border-black/5 p-6 rounded-3xl flex flex-col justify-between">
+                      <div>
+                        <span className="text-[10px] font-mono text-slate-500 uppercase tracking-widest block mb-1">Year 3 (Sustainability)</span>
+                        <div className="text-2xl font-black font-headline text-slate-900">₹3,54,000</div>
+                        <ul className="text-[11px] text-[#1a1a2e]/60 space-y-2 mt-4 font-light">
+                          <li className="flex justify-between"><span>Workshops (12):</span> <strong>₹60,000</strong></li>
+                          <li className="flex justify-between"><span>Lab Instructor:</span> <strong>₹2,40,000</strong></li>
+                          <li className="flex justify-between"><span>GST (18%):</span> <strong>₹54,000</strong></li>
+                        </ul>
+                      </div>
+                      <div className="text-[10px] text-[#1a1a2e]/50 font-light mt-4 pt-3 border-t border-black/5">
+                        Transfers ownership to community groups, focusing on local tech livelihood.
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+
+              {activeCostTab === "summary" && (
+                <motion.div
+                  key="summary"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.25 }}
+                  className="space-y-8"
+                >
+                  <div className="flex flex-wrap items-center justify-between gap-4 pb-6 border-b border-black/5">
+                    <div>
+                      <span className="text-[10px] font-mono text-blue-500 font-bold uppercase tracking-wider bg-blue-500/10 px-2.5 py-1 rounded-md border border-blue-500/20">
+                        Financial Summary
+                      </span>
+                      <h3 className="font-headline text-xl font-bold uppercase mt-2 text-[#1a1a2e]">3-Year Project Grand Total</h3>
+                    </div>
+                    <div className="text-right">
+                      <span className="text-[10px] font-mono text-slate-500 uppercase tracking-widest block">Grand Total (with GST)</span>
+                      <span className="text-3xl font-black font-headline text-primary">₹17,58,200</span>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
+                    <div className="md:col-span-7 space-y-3.5">
+                      <div className="flex justify-between items-center text-xs text-[#1a1a2e]/70">
+                        <span>Setup Cost (Excluding GST):</span>
+                        <span className="font-mono font-semibold">₹6,50,000</span>
+                      </div>
+                      <div className="flex justify-between items-center text-xs text-[#1a1a2e]/70">
+                        <span>Year 1 Operational (Excluding GST):</span>
+                        <span className="font-mono font-semibold">₹2,40,000</span>
+                      </div>
+                      <div className="flex justify-between items-center text-xs text-[#1a1a2e]/70">
+                        <span>Year 2 Operational (Excluding GST):</span>
+                        <span className="font-mono font-semibold">₹3,00,000</span>
+                      </div>
+                      <div className="flex justify-between items-center text-xs text-[#1a1a2e]/70">
+                        <span>Year 3 Operational (Excluding GST):</span>
+                        <span className="font-mono font-semibold">₹3,00,000</span>
+                      </div>
+                      <div className="h-px bg-black/10 my-2" />
+                      <div className="flex justify-between items-center text-sm font-bold text-slate-800">
+                        <span>Subtotal (Without GST):</span>
+                        <span className="font-mono text-slate-900">₹14,90,000</span>
+                      </div>
+                      <div className="flex justify-between items-center text-sm font-bold text-slate-600">
+                        <span>Total GST (18%):</span>
+                        <span className="font-mono">₹2,68,200</span>
+                      </div>
+                    </div>
+
+                    <div className="md:col-span-5 bg-gradient-to-br from-[#1a1a2e] to-[#252542] text-white p-6 rounded-3xl text-center space-y-4">
+                      <span className="text-[10px] font-mono text-primary font-bold uppercase tracking-wider bg-primary/10 px-2 py-0.5 rounded">Official Proposal Estimate</span>
+                      <div className="space-y-1">
+                        <span className="text-[10px] text-white/50 block font-mono">3-YEAR TOTAL INVESTMENT</span>
+                        <div className="text-3xl font-black font-headline text-white">₹17,58,200</div>
+                      </div>
+                      <p className="text-[10px] text-white/40 font-light">
+                        This reflects the combined one-time lab infrastructure deployment cost and a full 3-year project execution support model.
+                      </p>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        </div>
+      </section>
+
+      {/* Roles & Responsibilities Section */}
+      <section className="relative z-10 w-full max-w-[1440px] mx-auto px-6 md:px-20 py-20 border-t border-black/5 text-left">
+        <div className="space-y-12">
           <div className="max-w-3xl space-y-3">
-            <span className="text-xs font-mono font-black text-primary uppercase tracking-widest">Deployment Workflow</span>
-            <h2 className="font-headline text-3xl sm:text-4xl font-black uppercase tracking-tight leading-none text-[#1a1a2e]">
-              How We Set Up the Lab
+            <span className="text-xs font-mono font-black text-primary uppercase tracking-widest">Cooperative Framework</span>
+            <h2 className="font-headline text-3xl sm:text-5xl font-black uppercase tracking-tight leading-none text-[#1a1a2e]">
+              Roles & Responsibilities
             </h2>
-            <p className="text-sm text-[#1a1a2e]/55 font-light leading-relaxed">
-              Our structured approach guarantees a fully functional, self-sustaining ecosystem within the village.
+            <p className="text-sm text-[#1a1a2e]/60 font-light leading-relaxed">
+              We operate under a clear division of duties between the AIR G International team and the Local Gram Panchayat to ensure efficient delivery and sustainable support.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {processSteps.map((step, idx) => (
-              <div key={idx} className="group relative glass-premium p-6 rounded-[2rem] border border-black/5 hover:border-primary/20 hover:shadow-lg transition-all duration-300 flex flex-col bg-white overflow-hidden">
-                <div className="absolute top-0 right-0 w-24 h-24 bg-primary/5 rounded-full blur-xl group-hover:bg-primary/10 transition-colors" />
-                <span className="text-4xl font-mono font-black text-primary/25 group-hover:text-primary/45 transition-colors mb-4">{step.step}</span>
-                <h3 className="font-headline text-lg font-black uppercase tracking-tight text-[#1a1a2e] mb-2">{step.title}</h3>
-                <p className="text-xs text-[#1a1a2e]/55 font-light leading-relaxed">{step.desc}</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {/* AIR G International */}
+            <div className="bg-white border border-black/5 p-8 rounded-[2.5rem] shadow-sm space-y-6">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-primary/15 flex items-center justify-center text-primary shadow-sm shrink-0">
+                  <Cpu className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="font-headline text-lg font-black uppercase tracking-tight text-[#1a1a2e]">AIR G International</h3>
+                  <span className="text-[9px] font-mono text-primary font-bold uppercase tracking-wider">Technology Partner</span>
+                </div>
               </div>
-            ))}
+              
+              <ul className="space-y-3">
+                {[
+                  "Complete setup of the Smart AI Village Innovation Center",
+                  "Provision of the hardware and tech tools ecosystem",
+                  "Assigning and managing the local Technology Instructor",
+                  "Instructor coordination, training, and ongoing quality control",
+                  "Travel and accommodation costs for workshop experts",
+                  "Continuous program execution, review, and telemetry monitoring"
+                ].map((item, idx) => (
+                  <li key={idx} className="flex gap-2.5 text-xs text-slate-700 font-light items-start">
+                    <CheckCircle2 className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Gram Panchayat */}
+            <div className="bg-white border border-black/5 p-8 rounded-[2.5rem] shadow-sm space-y-6">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-[#4ade80]/20 flex items-center justify-center text-emerald-600 shadow-sm shrink-0">
+                  <Handshake className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="font-headline text-lg font-black uppercase tracking-tight text-[#1a1a2e]">Gram Panchayat</h3>
+                  <span className="text-[9px] font-mono text-emerald-600 font-bold uppercase tracking-wider">Local Administration</span>
+                </div>
+              </div>
+
+              <ul className="space-y-3">
+                {[
+                  "Allocation of designated physical space for the Innovation Center",
+                  "Arranging local accommodation and food for workshop experts",
+                  "Mobilizing school students and local villagers for training modules",
+                  "Facilitating necessary power supplies and local administrative approvals",
+                  "Actively supporting operations for smooth day-to-day execution"
+                ].map((item, idx) => (
+                  <li key={idx} className="flex gap-2.5 text-xs text-slate-700 font-light items-start">
+                    <CheckCircle2 className="w-4 h-4 text-[#4ade80] shrink-0 mt-0.5" />
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Key Outcomes & Impact Vision Section */}
+      <section className="relative z-10 w-full max-w-[1440px] mx-auto px-6 md:px-20 py-20 border-t border-black/5 text-left">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+          <div className="lg:col-span-6 space-y-6">
+            <span className="text-xs font-mono font-black text-primary uppercase tracking-widest">Impact Vision</span>
+            <h2 className="font-headline text-3xl sm:text-5xl font-black uppercase tracking-tight leading-none text-[#1a1a2e]">
+              Key Outcomes & Long-Term Goals
+            </h2>
+            <p className="text-sm text-slate-600 leading-relaxed font-light">
+              This initiative is structured to turn Dhamner into a self-reliant tech hub, creating Maharashtra&apos;s first-ever model AI village and introducing future-ready careers to the rural youth.
+            </p>
+
+            <div className="space-y-4">
+              {[
+                { title: "Digital + AI Learning Hub", desc: "A vibrant center where students, teachers, and farmers learn side-by-side." },
+                { title: "Rural Innovation Center", desc: "Developing localized software and sensor solutions to meet village needs." },
+                { title: "Self-Sustainable Model", desc: "A program designed to run independently under local guidance by Year 3." }
+              ].map((item, idx) => (
+                <div key={idx} className="flex gap-4 p-4 bg-slate-50 border border-black/5 rounded-2xl">
+                  <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-xs font-mono shrink-0">
+                    0{idx + 1}
+                  </div>
+                  <div>
+                    <h4 className="text-xs font-bold text-[#1a1a2e]">{item.title}</h4>
+                    <p className="text-[11px] text-slate-500 font-light mt-0.5">{item.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="lg:col-span-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="bg-white border border-black/5 p-6 rounded-3xl shadow-sm space-y-1">
+              <span className="text-[9px] font-mono text-primary font-bold uppercase tracking-wider bg-primary/5 px-2 py-0.5 rounded">Trained Users</span>
+              <div className="text-3xl font-black font-headline text-[#1a1a2e] mt-2">1,000+</div>
+              <p className="text-[10px] text-slate-500 font-light">Active students and villagers completing learning workshops.</p>
+            </div>
+            
+            <div className="bg-white border border-black/5 p-6 rounded-3xl shadow-sm space-y-1">
+              <span className="text-[9px] font-mono text-[#4ade80] font-bold uppercase tracking-wider bg-[#4ade80]/10 px-2 py-0.5 rounded">Skill Level</span>
+              <div className="text-3xl font-black font-headline text-slate-900 mt-2">AI-Ready</div>
+              <p className="text-[10px] text-slate-500 font-light">Rural youth trained directly on local edge servers & code pipelines.</p>
+            </div>
+
+            <div className="bg-white border border-black/5 p-6 rounded-3xl shadow-sm space-y-1">
+              <span className="text-[9px] font-mono text-[#4ade80] font-bold uppercase tracking-wider bg-[#4ade80]/10 px-2 py-0.5 rounded">Sensors</span>
+              <div className="text-3xl font-black font-headline text-slate-900 mt-2">Active</div>
+              <p className="text-[10px] text-slate-500 font-light">Soil and environmental telemetry active in local village fields.</p>
+            </div>
+
+            <div className="bg-white border border-black/5 p-6 rounded-3xl shadow-sm space-y-1">
+              <span className="text-[9px] font-mono text-primary font-bold uppercase tracking-wider bg-primary/5 px-2 py-0.5 rounded">Benchmark</span>
+              <div className="text-3xl font-black font-headline text-primary mt-2">Model AI</div>
+              <p className="text-[10px] text-slate-500 font-light">Recognized as Maharashtra's ideal Smart AI Village.</p>
+            </div>
           </div>
         </div>
       </section>
@@ -661,7 +1069,7 @@ export default function GrampanchayatAILabPage() {
           </div>
 
           <div className="flex flex-col items-center gap-12 max-w-6xl mx-auto">
-            {/* Row 1: Pratham (Most Value) */}
+            {/* Row 1: Pratham */}
             <div className="w-full max-w-5xl flex justify-center">
               <div className="relative bg-gradient-to-br from-slate-50 to-white p-8 md:p-12 rounded-[2.5rem] border border-black/5 shadow-xl w-full overflow-hidden text-left">
                 
@@ -947,60 +1355,87 @@ export default function GrampanchayatAILabPage() {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: '3px solid #EE2C3C', paddingBottom: '16px', marginBottom: '20px' }}>
           <div>
             <div style={{ fontSize: '22px', fontWeight: 900, color: '#EE2C3C', letterSpacing: '-0.5px' }}>AIR G INTERNATIONAL</div>
-            <div style={{ fontSize: '10px', color: '#666', marginTop: '4px' }}>Grampanchayat AI Lab Setup Customization</div>
-            <div style={{ fontSize: '10px', color: '#666' }}>Official Infrastructure Setup Quotation Estimate</div>
+            <div style={{ fontSize: '10px', color: '#666', marginTop: '4px' }}>Yashwant Grampanchayat Dhamner Setup Proposal</div>
+            <div style={{ fontSize: '10px', color: '#666' }}>Official 3-Year Infrastructure & Operations Cost Estimate</div>
           </div>
           <div style={{ textAlign: 'right' }}>
-            <div style={{ fontSize: '16px', fontWeight: 700, color: '#333' }}>ESTIMATE / QUOTATION</div>
+            <div style={{ fontSize: '16px', fontWeight: 700, color: '#333' }}>ESTIMATE / PROPOSAL</div>
             <div style={{ fontSize: '10px', color: '#666', marginTop: '4px' }}>Date: {new Date().toLocaleDateString("en-IN")}</div>
           </div>
         </div>
 
-        {/* Zone Tables */}
-        {zones.map((zone, zIdx) => {
-          const selectedItems = zone.items.filter(item => item.qty > 0);
-          if (selectedItems.length === 0) return null;
+        {/* Infrastructure Cost */}
+        <div style={{ border: '1px solid #ddd', borderRadius: '8px', padding: '12px', marginBottom: '16px' }}>
+          <div style={{ fontSize: '13px', fontWeight: 700, color: '#EE2C3C', borderBottom: '1px solid #eee', paddingBottom: '8px', marginBottom: '8px' }}>
+            1. Infrastructure Setup Cost (One-Time)
+          </div>
+          <table style={{ width: '100%', fontSize: '11px', borderCollapse: 'collapse' }}>
+            <tbody>
+              <tr style={{ borderBottom: '1px solid #f0f0f0' }}>
+                <td style={{ padding: '6px 0', color: '#333' }}>Smart AI Village Innovation Center Setup</td>
+                <td style={{ padding: '6px 0', textAlign: 'right', fontWeight: 600 }}>₹{formatCurrency(650000)}</td>
+              </tr>
+              <tr style={{ borderBottom: '1px solid #f0f0f0' }}>
+                <td style={{ padding: '6px 0', color: '#333' }}>GST (18%)</td>
+                <td style={{ padding: '6px 0', textAlign: 'right', fontWeight: 600 }}>₹{formatCurrency(117000)}</td>
+              </tr>
+              <tr>
+                <td style={{ padding: '6px 0', color: '#333', fontWeight: 700 }}>Total Setup Cost</td>
+                <td style={{ padding: '6px 0', textAlign: 'right', fontWeight: 700, color: '#EE2C3C' }}>₹{formatCurrency(767000)}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
 
-          return (
-            <div key={zIdx} style={{ border: '1px solid #ddd', borderRadius: '8px', padding: '12px', marginBottom: '16px', pageBreakInside: 'avoid' }}>
-              <div style={{ fontSize: '13px', fontWeight: 700, color: '#EE2C3C', borderBottom: '1px solid #eee', paddingBottom: '8px', marginBottom: '8px' }}>
-                Zone {String(zIdx + 1).padStart(2, '0')}: {zone.name}
-              </div>
-              <table style={{ width: '100%', fontSize: '11px', borderCollapse: 'collapse' }}>
-                <thead>
-                  <tr style={{ borderBottom: '1px solid #ccc' }}>
-                    <th style={{ textAlign: 'left', paddingBottom: '6px', color: '#555', fontWeight: 600 }}>Equipment Item</th>
-                    <th style={{ width: '60px', textAlign: 'center', paddingBottom: '6px', color: '#555', fontWeight: 600 }}>Qty</th>
-                    <th style={{ width: '100px', textAlign: 'right', paddingBottom: '6px', color: '#555', fontWeight: 600 }}>Unit Price</th>
-                    <th style={{ width: '110px', textAlign: 'right', paddingBottom: '6px', color: '#555', fontWeight: 600 }}>Subtotal</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {selectedItems.map((item, iIdx) => (
-                    <tr key={iIdx} style={{ borderBottom: '1px solid #f0f0f0' }}>
-                      <td style={{ padding: '6px 0', color: '#333' }}>{item.name}</td>
-                      <td style={{ padding: '6px 0', textAlign: 'center', color: '#444' }}>{item.isLot ? `${item.qty} Lot` : item.qty}</td>
-                      <td style={{ padding: '6px 0', textAlign: 'right', color: '#444' }}>₹{formatCurrency(item.unitCost)}</td>
-                      <td style={{ padding: '6px 0', textAlign: 'right', fontWeight: 600, color: '#222' }}>₹{formatCurrency(item.qty * item.unitCost)}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-              <div style={{ textAlign: 'right', marginTop: '8px', fontSize: '12px', fontWeight: 700, color: '#333' }}>
-                Zone Subtotal: ₹{formatCurrency(calculateZoneTotal(zIdx))}
-              </div>
-            </div>
-          );
-        })}
+        {/* Operational Cost */}
+        <div style={{ border: '1px solid #ddd', borderRadius: '8px', padding: '12px', marginBottom: '16px' }}>
+          <div style={{ fontSize: '13px', fontWeight: 700, color: '#EE2C3C', borderBottom: '1px solid #eee', paddingBottom: '8px', marginBottom: '8px' }}>
+            2. Year-wise Operational Cost
+          </div>
+          <table style={{ width: '100%', fontSize: '11px', borderCollapse: 'collapse' }}>
+            <thead>
+              <tr style={{ borderBottom: '1px solid #ccc' }}>
+                <th style={{ textAlign: 'left', paddingBottom: '6px', color: '#555' }}>Year</th>
+                <th style={{ textAlign: 'left', paddingBottom: '6px', color: '#555' }}>Workshops Cost</th>
+                <th style={{ textAlign: 'left', paddingBottom: '6px', color: '#555' }}>Instructor Cost</th>
+                <th style={{ textAlign: 'left', paddingBottom: '6px', color: '#555' }}>GST (18%)</th>
+                <th style={{ textAlign: 'right', paddingBottom: '6px', color: '#555' }}>Total Cost</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr style={{ borderBottom: '1px solid #f0f0f0' }}>
+                <td style={{ padding: '6px 0', color: '#333' }}>Year 1</td>
+                <td style={{ padding: '6px 0', color: '#333' }}>₹0 (Sponsored)</td>
+                <td style={{ padding: '6px 0', color: '#333' }}>₹2,40,000</td>
+                <td style={{ padding: '6px 0', color: '#333' }}>₹43,200</td>
+                <td style={{ padding: '6px 0', textAlign: 'right', fontWeight: 600 }}>₹2,83,200</td>
+              </tr>
+              <tr style={{ borderBottom: '1px solid #f0f0f0' }}>
+                <td style={{ padding: '6px 0', color: '#333' }}>Year 2</td>
+                <td style={{ padding: '6px 0', color: '#333' }}>₹60,000</td>
+                <td style={{ padding: '6px 0', color: '#333' }}>₹2,40,000</td>
+                <td style={{ padding: '6px 0', color: '#333' }}>₹54,000</td>
+                <td style={{ padding: '6px 0', textAlign: 'right', fontWeight: 600 }}>₹3,54,000</td>
+              </tr>
+              <tr style={{ borderBottom: '1px solid #f0f0f0' }}>
+                <td style={{ padding: '6px 0', color: '#333' }}>Year 3</td>
+                <td style={{ padding: '6px 0', color: '#333' }}>₹60,000</td>
+                <td style={{ padding: '6px 0', color: '#333' }}>₹2,40,000</td>
+                <td style={{ padding: '6px 0', color: '#333' }}>₹54,000</td>
+                <td style={{ padding: '6px 0', textAlign: 'right', fontWeight: 600 }}>₹3,54,000</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
 
         {/* Grand Total */}
-        <div style={{ marginTop: '24px', borderTop: '3px solid #EE2C3C', paddingTop: '20px', pageBreakInside: 'avoid' }}>
+        <div style={{ marginTop: '24px', borderTop: '3px solid #EE2C3C', paddingTop: '20px' }}>
           <table style={{ width: '100%', fontSize: '12px' }}>
             <tbody>
               <tr>
-                <td style={{ fontWeight: 700, fontSize: '16px', color: '#111' }}>GRAND TOTAL COST</td>
+                <td style={{ fontWeight: 700, fontSize: '16px', color: '#111' }}>3-YEAR PROJECT GRAND TOTAL</td>
                 <td style={{ textAlign: 'right', fontWeight: 900, fontSize: '28px', color: '#EE2C3C', letterSpacing: '-1px' }}>
-                  ₹{formatCurrency(calculateGrandTotal())}
+                  ₹{formatCurrency(1758200)}
                 </td>
               </tr>
             </tbody>
