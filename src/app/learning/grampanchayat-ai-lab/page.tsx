@@ -908,7 +908,7 @@ export default function GrampanchayatAILabPage() {
                   desc: "Focuses on rural digital literacy, youth skill development, and community welfare initiatives."
                 },
                 { 
-                  name: "SUNJA Bahuuddeshiya Sanstha", 
+                  name: "Sunjyot Bahuuddeshiya Sanstha", 
                   logo: "/logos/sanjyot_logo.png",
                   desc: "Supports elementary education assistance, social support programs, and rural vocational training." 
                 },
