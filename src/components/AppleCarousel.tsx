@@ -21,6 +21,7 @@ export default function AppleCarousel() {
     if (slug === "sant-tukaram-lab-showcase") return "/labs/sant-tukaram";
     if (slug === "koteshwar-vidyaly-lab-showcase") return "/labs/koteshwar-vidyaly";
     if (slug === "ss-nikam-lab-showcase") return "/labs/ss-nikam";
+    if (slug.startsWith("eon-")) return "/labs/eon-hub";
     return `/labs/${slug}`;
   };
 

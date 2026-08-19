@@ -406,6 +406,7 @@ export default function NewDesignContent() {
     if (slug === "sant-tukaram-lab-showcase") return "/labs/sant-tukaram";
     if (slug === "koteshwar-vidyaly-lab-showcase") return "/labs/koteshwar-vidyaly";
     if (slug === "ss-nikam-lab-showcase") return "/labs/ss-nikam";
+    if (slug.startsWith("eon-")) return "/labs/eon-hub";
     return `/labs/${slug}`;
   };
 
@@ -631,6 +632,19 @@ export default function NewDesignContent() {
 
   const heroLabImages = [
     "https://lab.airginternational.com/_next/image?url=%2Fextracted-images%2Feon%2Feon_4.jpeg&w=1920&q=75",
+    "/centres/gallery/photo-new-1.jpeg",
+    "/centres/gallery/photo-new-2.jpeg",
+    "/centres/gallery/photo-new-3.jpeg",
+    "/centres/gallery/photo-new-4.jpeg",
+    "/centres/gallery/photo-new-5.jpeg",
+    "/centres/gallery/photo-new-6.jpeg",
+    "/centres/gallery/photo-new-7.jpeg",
+    "/centres/gallery/photo-new-8.jpeg",
+    "/centres/gallery/photo-new-9.jpeg",
+    "/centres/gallery/photo-new-10.jpeg",
+    "/centres/gallery/photo-new-11.jpeg",
+    "/centres/gallery/photo-new-12.jpeg",
+    "/centres/gallery/photo-new-13.jpeg",
     "https://lab.airginternational.com/_next/image?url=%2Fcentres%2Frajendra%2FPHOTO-2026-07-14-21-26-47(1).jpg&w=1920&q=75",
     "https://lab.airginternational.com/_next/image?url=%2Fcentres%2Fss-nikam%2FPHOTO-2026-07-14-21-47-38.jpg&w=1920&q=75",
     "https://lab.airginternational.com/_next/image?url=%2Fcentres%2Fkoteshwar%2FPHOTO-2026-07-14-21-47-00.jpg&w=1920&q=75",
