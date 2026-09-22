@@ -29,14 +29,16 @@ export function Navbar() {
         { name: "Grampanchayat AI Lab", href: "/learning/grampanchayat-ai-lab" },
         { name: "AI Infrastructure", href: "/learning/ai-infrastructures" },
         { name: "Courses", href: "/#learning" },
-        { name: "Workshops", href: "/workshops" }
+        { name: "Workshops", href: "/workshops" },
+        { name: "Project Codes", href: "/project-codes" }
       ]
     },
     { name: "Store", href: "/#store" },
     { name: "Airg Labs", href: "/#labs" },
     { name: "AI Infra", href: "/learning/ai-infrastructures" },
     { name: "Global Centres", href: "/#centres" },
-    { name: "Careers", href: "/careers" }
+    { name: "Careers", href: "/careers" },
+    { name: "Lab Setup", href: "/lab-setup" }
   ];
 
   return (

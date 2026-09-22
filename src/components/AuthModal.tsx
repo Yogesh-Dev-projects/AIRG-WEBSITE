@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Mail, Lock, Loader2, AlertCircle, User } from "lucide-react";
+import { X, Mail, Lock, Loader2, AlertCircle, User, Eye, EyeOff } from "lucide-react";
 import { useAuth } from "@/context/auth-context";
 import { useAppContext } from "@/context/AppContext";
 
@@ -12,13 +12,63 @@ const AuthModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const handleQuickDemoLogin = async (demoEmail: string, demoPass: string) => {
+    setEmail(demoEmail);
+    setPassword(demoPass);
+    setIsLoading(true);
+    setError(null);
+    try {
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: demoEmail, password: demoPass })
+      });
+      const data = await res.json();
+      if (data.success && data.user) {
+        localStorage.setItem("airg_user_session", JSON.stringify(data.user));
+        window.dispatchEvent(new Event("airg_auth_change"));
+        addNotification(`Welcome back, ${data.user.name} (${data.user.role})!`);
+        onClose();
+        if (window.location.pathname === "/lab-setup") {
+          window.location.reload();
+        }
+      } else {
+        await login(demoEmail, demoPass);
+        onClose();
+      }
+    } catch (err: any) {
+      setError(err.message || "Failed to log in with demo account.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setError(null);
     try {
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password })
+      });
+      const data = await res.json();
+
+      if (data.success && data.user) {
+        localStorage.setItem("airg_user_session", JSON.stringify(data.user));
+        window.dispatchEvent(new Event("airg_auth_change"));
+        addNotification(`Welcome back, ${data.user.name} (${data.user.role})!`);
+        onClose();
+        if (window.location.pathname === "/lab-setup") {
+          window.location.reload();
+        }
+        return;
+      }
+
       if (isSignUp) {
         await signup(email, password, name);
         addNotification(`Welcome, ${name || 'User'}! Successfully signed up.`);
@@ -51,40 +101,39 @@ const AuthModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }
             animate={{ scale: 1, opacity: 1, y: 0 }}
             exit={{ scale: 0.95, opacity: 0, y: 20 }}
             transition={{ type: "spring", damping: 25, stiffness: 300 }}
-            className="relative w-full max-w-md bg-[#0F172A] rounded-[2rem] border border-white/5 p-10 shadow-[0_32px_64px_-12px_rgba(0,0,0,0.6)]"
+            className="relative w-full max-w-md bg-[#0F172A] rounded-[2rem] border border-white/10 p-8 shadow-[0_32px_64px_-12px_rgba(0,0,0,0.8)] text-white"
           >
             <button
               onClick={onClose}
-              className="absolute top-6 right-6 text-slate-500 hover:text-white transition-colors p-1 rounded-lg hover:bg-white/5"
+              className="absolute top-6 right-6 text-slate-400 hover:text-white transition-colors p-1 rounded-lg hover:bg-white/5"
             >
               <X size={20} />
             </button>
 
             {/* Header */}
-            <div className="mb-8 text-left">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-primary/20 bg-primary/5 mb-4">
+            <div className="mb-6 text-left">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-primary/20 bg-primary/5 mb-3">
                 <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-                <span className="text-xs font-semibold text-primary tracking-wide uppercase">AIR G Portal</span>
+                <span className="text-xs font-semibold text-primary tracking-wide uppercase">AIR G Portal Access</span>
               </div>
-              <h2 className="text-3xl font-heading font-bold mb-2 tracking-tight text-white">
-                {isSignUp ? "Create an Account" : "Welcome back"}
+              <h2 className="text-2xl font-bold mb-1 tracking-tight text-white">
+                {isSignUp ? "Create an Account" : "Sign In to AIR G Portal"}
               </h2>
-              <p className="text-slate-400 text-sm leading-relaxed">
-                {isSignUp ? "Sign up to join the AIR G ecosystem." : "Sign in to access the AIR G ecosystem."}
+              <p className="text-slate-400 text-xs leading-relaxed">
+                {isSignUp ? "Sign up to join the AIR G ecosystem." : "Sign in with your team role credentials."}
               </p>
             </div>
 
             {error && (
-              <div className="mb-6 p-4 bg-red-500/10 border border-red-500/20 text-red-400 rounded-xl text-xs flex items-center gap-3">
-                <AlertCircle size={16} className="shrink-0" />
+              <div className="mb-4 p-3 bg-red-500/10 border border-red-500/20 text-red-400 rounded-xl text-xs flex items-center gap-2">
+                <AlertCircle size={15} className="shrink-0" />
                 <span>{error}</span>
               </div>
             )}
 
-            <form onSubmit={handleSubmit} className="space-y-5">
-              {/* Full Name (Only for signup) */}
+            <form onSubmit={handleSubmit} className="space-y-4">
               {isSignUp && (
-                <div className="space-y-1.5">
+                <div className="space-y-1">
                   <label className="text-xs font-semibold text-slate-300 tracking-wide uppercase">Full Name</label>
                   <div className="relative">
                     <User size={15} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" />
@@ -93,16 +142,15 @@ const AuthModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }
                       required
                       value={name}
                       onChange={(e) => setName(e.target.value)}
-                      className="w-full bg-slate-900/60 border border-white/5 rounded-xl py-3.5 pl-11 pr-4 focus:outline-none focus:border-primary/60 focus:ring-1 focus:ring-primary/20 transition-all text-sm placeholder:text-slate-600 text-white"
+                      className="w-full bg-slate-900/80 border border-white/10 rounded-xl py-3 pl-11 pr-4 focus:outline-none focus:border-primary transition-all text-xs text-white"
                       placeholder="John Doe"
                     />
                   </div>
                 </div>
               )}
 
-              {/* Email */}
-              <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-slate-300 tracking-wide uppercase">Email</label>
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-slate-300 tracking-wide uppercase">Email Address</label>
                 <div className="relative">
                   <Mail size={15} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" />
                   <input
@@ -110,73 +158,104 @@ const AuthModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full bg-slate-900/60 border border-white/5 rounded-xl py-3.5 pl-11 pr-4 focus:outline-none focus:border-primary/60 focus:ring-1 focus:ring-primary/20 transition-all text-sm placeholder:text-slate-600 text-white"
-                    placeholder="you@example.com"
+                    className="w-full bg-slate-900/80 border border-white/10 rounded-xl py-3 pl-11 pr-4 focus:outline-none focus:border-primary transition-all text-xs text-white"
+                    placeholder="name@airginternational.com"
                   />
                 </div>
               </div>
 
-              {/* Password */}
-              <div className="space-y-1.5">
+              <div className="space-y-1">
                 <label className="text-xs font-semibold text-slate-300 tracking-wide uppercase">Password</label>
                 <div className="relative">
                   <Lock size={15} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" />
                   <input
-                    type="password"
+                    type={showPassword ? "text" : "password"}
                     required
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full bg-slate-900/60 border border-white/5 rounded-xl py-3.5 pl-11 pr-4 focus:outline-none focus:border-primary/60 focus:ring-1 focus:ring-primary/20 transition-all text-sm placeholder:text-slate-600 text-white"
+                    className="w-full bg-slate-900/80 border border-white/10 rounded-xl py-3 pl-11 pr-10 focus:outline-none focus:border-primary transition-all text-xs text-white"
                     placeholder="••••••••"
                   />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white transition-colors"
+                  >
+                    {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                  </button>
                 </div>
               </div>
 
-              {/* Options row (Only for login) */}
-              {!isSignUp && (
-                <div className="flex items-center justify-between text-xs font-medium pt-1">
-                  <label className="flex items-center gap-2 cursor-pointer text-slate-400 hover:text-slate-200 transition-colors">
-                    <input type="checkbox" className="accent-primary rounded" />
-                    Remember me
-                  </label>
-                  <button type="button" className="text-primary hover:text-blue-400 transition-colors">
-                    Forgot password?
-                  </button>
-                </div>
-              )}
-
-              {/* Submit */}
               <button
                 disabled={isLoading}
-                className="w-full py-4 bg-primary text-white font-bold rounded-xl flex items-center justify-center gap-3 transition-all hover:bg-blue-600 shadow-lg shadow-blue-500/10 disabled:opacity-50 mt-2"
+                className="w-full py-3.5 bg-primary text-white font-bold text-xs uppercase tracking-wider rounded-xl flex items-center justify-center gap-2 transition-all hover:bg-blue-600 shadow-lg shadow-blue-500/10 disabled:opacity-50 mt-2"
               >
                 {isLoading ? (
                   <>
-                    <Loader2 className="animate-spin" size={18} />
-                    <span>{isSignUp ? "Signing up…" : "Signing in…"}</span>
+                    <Loader2 className="animate-spin" size={16} />
+                    <span>Signing in…</span>
                   </>
                 ) : (
                   <span>{isSignUp ? "Sign Up" : "Sign In"}</span>
                 )}
               </button>
+            </form>
 
-              {/* Toggle Mode */}
-              <div className="text-center text-xs text-slate-400 mt-4">
-                <span>
-                  {isSignUp ? "Already have an account? " : "Don't have an account? "}
-                </span>
+            {/* Quick Demo Accounts Bar */}
+            <div className="border-t border-white/10 pt-4 mt-4 space-y-2 text-center">
+              <p className="text-[10px] font-mono text-slate-400 uppercase font-bold">Quick Role Login (1-Click Demo Accounts)</p>
+              <div className="grid grid-cols-2 gap-2 text-[10px]">
                 <button
                   type="button"
-                  onClick={() => {
-                    setIsSignUp(!isSignUp);
-                    setError(null);
-                  }}
-                  className="text-primary hover:text-blue-400 font-bold transition-colors ml-1"
+                  onClick={() => handleQuickDemoLogin("ceo@airginternational.com", "ceo123")}
+                  className="p-2 bg-amber-500/20 border border-amber-500/30 text-amber-300 font-bold rounded-lg hover:bg-amber-500/30 text-left"
                 >
-                  {isSignUp ? "Sign In" : "Sign Up"}
+                  👑 CEO Login
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleQuickDemoLogin("bd@airginternational.com", "bd123")}
+                  className="p-2 bg-blue-500/20 border border-blue-500/30 text-blue-300 font-bold rounded-lg hover:bg-blue-500/30 text-left"
+                >
+                  💼 BD Login
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleQuickDemoLogin("marketing@airginternational.com", "mkt123")}
+                  className="p-2 bg-purple-500/20 border border-purple-500/30 text-purple-300 font-bold rounded-lg hover:bg-purple-500/30 text-left"
+                >
+                  📢 Marketing Login
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleQuickDemoLogin("employee@airginternational.com", "emp123")}
+                  className="p-2 bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 font-bold rounded-lg hover:bg-emerald-500/30 text-left"
+                >
+                  👷 Employee Login
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleQuickDemoLogin("purchase@airginternational.com", "pur123")}
+                  className="p-2 bg-teal-500/20 border border-teal-500/30 text-teal-300 font-bold rounded-lg hover:bg-teal-500/30 text-left"
+                >
+                  🛒 Purchase Manager Login
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleQuickDemoLogin("coordinator@sunriseschool.edu.in", "coord123")}
+                  className="p-2 bg-sky-500/20 border border-sky-500/30 text-sky-300 font-bold rounded-lg hover:bg-sky-500/30 text-left"
+                >
+                  🏫 Coordinator Login
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleQuickDemoLogin("external_bd@airginternational.com", "extbd123")}
+                  className="p-2 col-span-2 bg-rose-500/20 border border-rose-500/30 text-rose-300 font-bold rounded-lg hover:bg-rose-500/30 text-center"
+                >
+                  🤝 External BD / Broker Login
                 </button>
               </div>
-            </form>
+            </div>
           </motion.div>
         </div>
       )}

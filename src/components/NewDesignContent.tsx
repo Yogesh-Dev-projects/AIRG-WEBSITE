@@ -1072,7 +1072,7 @@ export default function NewDesignContent() {
             <Logo />
           </div>
           <div className="hidden lg:flex flex-1 items-center justify-evenly px-6 xl:px-12">
-            {['hero', 'learning', 'store', 'labs', 'ai-infrastructures', 'centres', 'careers'].map((item) => {
+            {['hero', 'learning', 'store', 'labs', 'ai-infrastructures', 'centres', 'careers', 'lab-setup'].map((item) => {
               const labels: Record<string, string> = {
                 hero: 'Home',
                 learning: 'Labs',
@@ -1080,7 +1080,8 @@ export default function NewDesignContent() {
                 labs: 'Airg Labs',
                 'ai-infrastructures': 'AI Infra',
                 centres: 'Global Centres',
-                careers: 'Careers'
+                careers: 'Careers',
+                'lab-setup': 'Lab Setup'
               };
               
               if (item === 'learning') {
@@ -1134,6 +1135,12 @@ export default function NewDesignContent() {
                       >
                         Workshops
                       </button>
+                      <Link
+                        href="/project-codes"
+                        className="px-5 py-4 text-xs font-semibold uppercase tracking-widest text-[#1a1a2e]/60 hover:text-primary hover:bg-black/5 transition-colors whitespace-nowrap text-left block w-full"
+                      >
+                        Project Codes
+                      </Link>
                     </div>
                   </div>
                 );
@@ -1145,6 +1152,18 @@ export default function NewDesignContent() {
                     key={item}
                     href="/learning/ai-infrastructures"
                     className={`nav-link font-semibold transition-colors text-xs uppercase tracking-widest ${activeFace === item ? 'text-primary' : 'text-[#1a1a2e]/40 hover:text-[#1a1a2e]'}`}
+                  >
+                    {labels[item]}
+                  </Link>
+                );
+              }
+
+              if (item === 'lab-setup') {
+                return (
+                  <Link
+                    key={item}
+                    href="/lab-setup"
+                    className="nav-link font-semibold transition-colors text-xs uppercase tracking-widest text-[#1a1a2e]/40 hover:text-[#1a1a2e]"
                   >
                     {labels[item]}
                   </Link>
@@ -1257,12 +1276,12 @@ export default function NewDesignContent() {
             <motion.div 
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
+exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.2 }}
               className="absolute inset-x-0 top-20 z-[99] lg:hidden bg-white/95 backdrop-blur-lg border-b border-black/5 shadow-lg p-6 flex flex-col gap-6"
             >
               <div className="flex flex-col gap-4">
-                {['hero', 'learning', 'store', 'labs', 'ai-infrastructures', 'centres', 'careers'].map((item) => {
+                {['hero', 'learning', 'store', 'labs', 'ai-infrastructures', 'centres', 'careers', 'lab-setup'].map((item) => {
                   const labels: Record<string, string> = {
                     hero: 'Home',
                     learning: 'Labs',
@@ -1270,7 +1289,8 @@ export default function NewDesignContent() {
                     labs: 'Airg Labs',
                     'ai-infrastructures': 'AI Infra',
                     centres: 'Global Centres',
-                    careers: 'Careers'
+                    careers: 'Careers',
+                    'lab-setup': 'Lab Setup'
                   };
                   
                   if (item === 'learning') {
@@ -1334,6 +1354,13 @@ export default function NewDesignContent() {
                           >
                             Workshops
                           </button>
+                          <Link
+                            href="/project-codes"
+                            onClick={() => setIsMobileMenuOpen(false)}
+                            className="text-left py-2 text-xs font-bold uppercase tracking-widest text-[#1a1a2e]/50 hover:text-[#1a1a2e] block w-full"
+                          >
+                            Project Codes
+                          </Link>
                         </div>
                       </div>
                     );
@@ -1359,7 +1386,20 @@ export default function NewDesignContent() {
                       <Link
                         key={item}
                         href="/careers"
-                        className="text-left py-2 font-bold text-sm uppercase tracking-widest border-b border-black/5 transition-colors text-[#1a1a2e]/60 hover:text-[#1a1a2e]"
+                        className="text-[#1a1a2e]/60 hover:text-[#1a1a2e] text-left py-2 font-bold text-sm uppercase tracking-widest border-b border-black/5 transition-colors"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                      >
+                        {labels[item]}
+                      </Link>
+                    );
+                  }
+
+                  if (item === 'lab-setup') {
+                    return (
+                      <Link
+                        key={item}
+                        href="/lab-setup"
+                        className="text-[#1a1a2e]/60 hover:text-[#1a1a2e] text-left py-2 font-bold text-sm uppercase tracking-widest border-b border-black/5 transition-colors"
                         onClick={() => setIsMobileMenuOpen(false)}
                       >
                         {labels[item]}
