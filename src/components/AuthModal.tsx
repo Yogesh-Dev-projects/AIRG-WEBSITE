@@ -201,61 +201,7 @@ const AuthModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }
               </button>
             </form>
 
-            {/* Quick Demo Accounts Bar */}
-            <div className="border-t border-white/10 pt-4 mt-4 space-y-2 text-center">
-              <p className="text-[10px] font-mono text-slate-400 uppercase font-bold">Quick Role Login (1-Click Demo Accounts)</p>
-              <div className="grid grid-cols-2 gap-2 text-[10px]">
-                <button
-                  type="button"
-                  onClick={() => handleQuickDemoLogin("ceo@airginternational.com", "ceo123")}
-                  className="p-2 bg-amber-500/20 border border-amber-500/30 text-amber-300 font-bold rounded-lg hover:bg-amber-500/30 text-left"
-                >
-                  👑 CEO Login
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleQuickDemoLogin("bd@airginternational.com", "bd123")}
-                  className="p-2 bg-blue-500/20 border border-blue-500/30 text-blue-300 font-bold rounded-lg hover:bg-blue-500/30 text-left"
-                >
-                  💼 BD Login
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleQuickDemoLogin("marketing@airginternational.com", "mkt123")}
-                  className="p-2 bg-purple-500/20 border border-purple-500/30 text-purple-300 font-bold rounded-lg hover:bg-purple-500/30 text-left"
-                >
-                  📢 Marketing Login
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleQuickDemoLogin("employee@airginternational.com", "emp123")}
-                  className="p-2 bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 font-bold rounded-lg hover:bg-emerald-500/30 text-left"
-                >
-                  👷 Employee Login
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleQuickDemoLogin("purchase@airginternational.com", "pur123")}
-                  className="p-2 bg-teal-500/20 border border-teal-500/30 text-teal-300 font-bold rounded-lg hover:bg-teal-500/30 text-left"
-                >
-                  🛒 Purchase Manager Login
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleQuickDemoLogin("coordinator@sunriseschool.edu.in", "coord123")}
-                  className="p-2 bg-sky-500/20 border border-sky-500/30 text-sky-300 font-bold rounded-lg hover:bg-sky-500/30 text-left"
-                >
-                  🏫 Coordinator Login
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleQuickDemoLogin("external_bd@airginternational.com", "extbd123")}
-                  className="p-2 col-span-2 bg-rose-500/20 border border-rose-500/30 text-rose-300 font-bold rounded-lg hover:bg-rose-500/30 text-center"
-                >
-                  🤝 External BD / Broker Login
-                </button>
-              </div>
-            </div>
+
           </motion.div>
         </div>
       )}

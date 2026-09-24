@@ -41,13 +41,13 @@ const FALLBACK_USERS = [
     employee_id: 'EMP-OPS-04'
   },
   {
-    id: 'demo-ext-05',
-    name: 'Vikram Patil (Broker Partner)',
-    email: 'external_bd@airginternational.com',
-    password: 'extbd123',
+    id: 'ext-bd-01',
+    name: 'Devidas Babanrao Ghogare',
+    email: 'abhishekbuildcon22@gmail.com',
+    password: 'Devidas@AirG2026',
     role: 'EXTERNAL_BD',
     department: 'External Partner Network',
-    employee_id: 'EXT-BD-05'
+    employee_id: 'EXT-BD-01'
   },
   {
     id: 'demo-pur-07',

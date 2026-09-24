@@ -1775,9 +1775,28 @@ export default function LabSetupPage() {
                       Track your submitted lab inquiries, onboarding steps, and earn commission payouts upon deal conversion.
                     </p>
                   </div>
-                  <div className="bg-slate-950/80 border border-rose-500/40 px-5 py-3 rounded-2xl text-right font-mono">
-                    <span className="text-[10px] text-slate-400 uppercase font-bold block">Commission Standard</span>
-                    <span className="text-xl font-black text-emerald-400">5% per Converted Lab</span>
+                  {/* Commission Slab Card */}
+                  <div className="bg-slate-950/80 border border-rose-500/40 px-5 py-4 rounded-2xl font-mono min-w-[220px]">
+                    <span className="text-[10px] text-slate-400 uppercase font-bold block mb-2">📊 Commission Structure (Per School)</span>
+                    <div className="space-y-1 text-xs">
+                      <div className="flex justify-between gap-6">
+                        <span className="text-slate-400">300 students</span>
+                        <span className="text-emerald-400 font-black">5%</span>
+                      </div>
+                      <div className="flex justify-between gap-6">
+                        <span className="text-slate-400">500 students</span>
+                        <span className="text-emerald-400 font-black">7%</span>
+                      </div>
+                      <div className="flex justify-between gap-6">
+                        <span className="text-slate-400">900 students</span>
+                        <span className="text-emerald-400 font-black">9%</span>
+                      </div>
+                      <div className="flex justify-between gap-6 border-t border-white/10 pt-1 mt-1">
+                        <span className="text-slate-300 font-bold">Above 900</span>
+                        <span className="text-yellow-400 font-black">11% (Fixed)</span>
+                      </div>
+                    </div>
+                    <p className="text-[9px] text-slate-500 mt-2 italic">* One-time payout per converted school lab</p>
                   </div>
                 </div>
 

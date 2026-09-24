@@ -57,14 +57,14 @@ export const globalUserStore: MemoryUser[] = [
   },
   {
     _id: 'usr-5',
-    name: 'Vikram Patil (Broker Partner)',
-    email: 'external_bd@airginternational.com',
-    password: 'extbd123',
-    password_hash: 'extbd123',
+    name: 'Devidas Babanrao Ghogare',
+    email: 'abhishekbuildcon22@gmail.com',
+    password: 'Devidas@AirG2026',
+    password_hash: 'Devidas@AirG2026',
     role: 'EXTERNAL_BD',
     department: 'External Partner Network',
-    phone: '9765432109',
-    employee_id: 'EXT-BD-05'
+    phone: '9309857250',
+    employee_id: 'EXT-BD-01'
   },
   {
     _id: 'usr-6',
