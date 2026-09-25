@@ -7,10 +7,18 @@ export async function GET() {
   try {
     try {
       await connectDB();
-      const users = await User.find({}).select('-password_hash').sort({ createdAt: -1 }).exec();
-      if (users && users.length > 0) {
-        return NextResponse.json({ success: true, users });
+      const dbUsers = await User.find({}).select('-password_hash').sort({ createdAt: -1 }).lean().exec();
+      
+      const allUsers = [...globalUserStore];
+      if (dbUsers && dbUsers.length > 0) {
+        dbUsers.forEach((dbUser: any) => {
+          if (!allUsers.find(u => u.email.toLowerCase() === dbUser.email.toLowerCase())) {
+            allUsers.push(dbUser);
+          }
+        });
       }
+      
+      return NextResponse.json({ success: true, users: allUsers });
     } catch (dbErr) {
       console.warn('Using globalUserStore fallback:', dbErr);
     }
