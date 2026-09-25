@@ -2095,7 +2095,9 @@ export default function LabSetupPage() {
                           onChange={(e) => setSelectedAssignee(e.target.value)}
                           className="w-full bg-slate-900 border border-white/20 rounded-xl px-3 py-3 text-xs text-white focus:outline-none"
                         >
-                          {teamUsers.map((u, idx) => (
+                          {teamUsers
+                            .filter(u => u.name && ["BUSINESS_DEVELOPER", "MARKETING", "EMPLOYEE", "EXTERNAL_BD"].includes(u.role))
+                            .map((u, idx) => (
                             <option key={u._id || idx} value={u.name}>
                               {u.name} ({u.role} — {u.department})
                             </option>
