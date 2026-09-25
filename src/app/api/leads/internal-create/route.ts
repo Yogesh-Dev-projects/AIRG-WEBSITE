@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import Lead from '@/lib/models/Lead';
+import { globalLeadsStore } from '@/lib/leadsStore';
 
 async function generateNextLeadId() {
   const currentYear = new Date().getFullYear().toString().slice(-2);
@@ -73,7 +74,8 @@ export async function POST(request: Request) {
       duplicate_of_id = existingLead ? existingLead.lead_id : '';
       duplicate_status = existingLead ? 'SUSPECTED' : 'NONE';
 
-      const newLead = new Lead({
+      const memLead: any = {
+        _id: `mem-${Date.now()}`,
         lead_id,
         school_name: school_name.trim(),
         school_address: school_address.trim(),
@@ -114,8 +116,14 @@ export async function POST(request: Request) {
             details: `Internal lead registered by ${created_by_name} (${created_by_role}). Phone: ${created_by_phone || 'N/A'}. Category: ${creator_category}.`,
             timestamp: new Date()
           }
-        ]
-      });
+        ],
+        createdAt: new Date(),
+        updatedAt: new Date()
+      };
+
+      globalLeadsStore.unshift(memLead);
+
+      const newLead = new Lead(memLead);
 
       await newLead.save();
     } catch (dbErr) {
