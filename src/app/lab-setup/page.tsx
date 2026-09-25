@@ -2109,7 +2109,7 @@ export default function LabSetupPage() {
                       disabled={isAssigning}
                       className="w-full py-3 bg-[#EE2C3C] text-white font-bold text-xs uppercase tracking-widest rounded-xl hover:bg-[#d42332] transition-all disabled:opacity-50 shadow-lg"
                     >
-                      {isAssigning ? "ASSIGNING & NOTIFYING..." : `ASSIGN LEAD TO ${selectedAssignee.toUpperCase()}`}
+                      {isAssigning ? "ASSIGNING & NOTIFYING..." : `ASSIGN LEAD TO ${(selectedAssignee || 'TEAM MEMBER').toUpperCase()}`}
                     </button>
                   </div>
                 </div>
