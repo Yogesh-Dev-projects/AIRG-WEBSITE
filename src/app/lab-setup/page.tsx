@@ -1777,7 +1777,7 @@ export default function LabSetupPage() {
                   </div>
                   {/* Commission Slab Card */}
                   <div className="bg-slate-950/80 border border-rose-500/40 px-5 py-4 rounded-2xl font-mono min-w-[240px]">
-                    <span className="text-[10px] text-slate-400 uppercase font-bold block mb-2">📊 Commission Structure (Per School)</span>
+                    <span className="text-[10px] text-slate-400 uppercase font-bold block mb-2">📊 Commission Structure (Per School — One Time Only)</span>
                     <div className="space-y-1 text-xs">
                       <div className="flex justify-between gap-6">
                         <span className="text-slate-400">300 students</span>
