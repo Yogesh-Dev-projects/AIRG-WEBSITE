@@ -1776,7 +1776,7 @@ export default function LabSetupPage() {
                     </p>
                   </div>
                   {/* Commission Slab Card */}
-                  <div className="bg-slate-950/80 border border-rose-500/40 px-5 py-4 rounded-2xl font-mono min-w-[220px]">
+                  <div className="bg-slate-950/80 border border-rose-500/40 px-5 py-4 rounded-2xl font-mono min-w-[240px]">
                     <span className="text-[10px] text-slate-400 uppercase font-bold block mb-2">📊 Commission Structure (Per School)</span>
                     <div className="space-y-1 text-xs">
                       <div className="flex justify-between gap-6">
@@ -1796,7 +1796,15 @@ export default function LabSetupPage() {
                         <span className="text-yellow-400 font-black">11% (Fixed)</span>
                       </div>
                     </div>
-                    <p className="text-[9px] text-slate-500 mt-2 italic">* One-time payout per converted school lab</p>
+                    {/* One-time commission alert */}
+                    <div className="mt-3 bg-rose-950/70 border border-rose-500/60 rounded-xl px-3 py-2.5">
+                      <p className="text-[10px] text-rose-300 font-black uppercase tracking-wide flex items-center gap-1.5">
+                        ⚠️ ONE-TIME COMMISSION ONLY
+                      </p>
+                      <p className="text-[9px] text-rose-200/80 mt-1 leading-relaxed font-sans">
+                        Commission is paid <span className="font-black text-white">only once per school</span>. Once a school is converted and commission is paid out, <span className="font-black text-white">no further commission</span> will be applicable for the same school. Ensure every school you refer is a <span className="font-black text-white">new, unconverted school</span>.
+                      </p>
+                    </div>
                   </div>
                 </div>
 
