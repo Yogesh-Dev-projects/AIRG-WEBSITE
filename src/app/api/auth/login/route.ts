@@ -5,7 +5,7 @@ import { globalUserStore } from '@/lib/userStore';
 
 const FALLBACK_USERS = [
   {
-    id: 'demo-ceo-01',
+    id: 'usr-ceo',
     name: 'Pratap Pawar (CEO)',
     email: 'ceo@airginternational.com',
     password: 'ceo123',
@@ -14,49 +14,13 @@ const FALLBACK_USERS = [
     employee_id: 'EMP-CEO-01'
   },
   {
-    id: 'demo-mkt-02',
-    name: 'Rajesh Patil (Marketing)',
-    email: 'marketing@airginternational.com',
-    password: 'mkt123',
-    role: 'MARKETING',
-    department: 'Marketing & Outreach',
-    employee_id: 'EMP-MKT-02'
-  },
-  {
-    id: 'demo-bd-03',
-    name: 'Amit Kumar (BD)',
-    email: 'bd@airginternational.com',
-    password: 'bd123',
-    role: 'BUSINESS_DEVELOPER',
-    department: 'Business Development',
-    employee_id: 'EMP-BD-03'
-  },
-  {
-    id: 'demo-emp-04',
-    name: 'Rahul Sharma (Operations)',
-    email: 'employee@airginternational.com',
-    password: 'emp123',
-    role: 'EMPLOYEE',
-    department: 'Operations',
-    employee_id: 'EMP-OPS-04'
-  },
-  {
-    id: 'ext-bd-01',
+    id: 'usr-ext-bd',
     name: 'Devidas Babanrao Ghogare',
     email: 'abhishekbuildcon22@gmail.com',
     password: 'Devidas@AirG2026',
     role: 'EXTERNAL_BD',
     department: 'External Partner Network',
     employee_id: 'EXT-BD-01'
-  },
-  {
-    id: 'demo-pur-07',
-    name: 'Sujit Bhendarkar (Purchase Manager)',
-    email: 'purchase@airginternational.com',
-    password: 'pur123',
-    role: 'PURCHASE_MANAGER',
-    department: 'Procurement & Inventory Operations',
-    employee_id: 'EMP-PUR-07'
   }
 ];
 

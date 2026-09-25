@@ -70,13 +70,7 @@ export default function LabSetupPage() {
   const [viewDetailsLead, setViewDetailsLead] = useState<any | null>(null);
 
   // CEO Lead Assignment Modal State
-  const [teamUsers, setTeamUsers] = useState<any[]>([
-    { name: "Amit Kumar (BD)", role: "BUSINESS_DEVELOPER", department: "Business Development", email: "bd@airginternational.com" },
-    { name: "Priya Sharma (Marketing)", role: "MARKETING", department: "Marketing", email: "marketing@airginternational.com" },
-    { name: "Rahul Deshmukh (Employee)", role: "EMPLOYEE", department: "Field Operations", email: "employee@airginternational.com" },
-    { name: "Anjali Deshmukh (Coordinator)", role: "COORDINATOR", department: "School Coordinator", email: "coordinator@sunriseschool.edu.in" },
-    { name: "Sujit Bhendarkar (Purchase Manager)", role: "PURCHASE_MANAGER", department: "Procurement & Inventory Operations", email: "purchase@airginternational.com" }
-  ]);
+  const [teamUsers, setTeamUsers] = useState<any[]>([]);
   const [selectedAssignee, setSelectedAssignee] = useState("Amit Kumar (BD)");
   const [assignmentReason, setAssignmentReason] = useState("Management CEO Assignment");
   const [isAssigning, setIsAssigning] = useState(false);
