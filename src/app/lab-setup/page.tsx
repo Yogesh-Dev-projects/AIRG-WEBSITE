@@ -1236,8 +1236,14 @@ export default function LabSetupPage() {
               AIR G AI LAB SETUP & PHASE 2 CONVERSION PORTAL
             </div>
             <h1 className="text-3xl md:text-5xl font-black uppercase tracking-tight font-headline">
-              REGISTER YOUR SCHOOL FOR <span className="text-[#EE2C3C]">AI INNOVATION LAB</span>
+              REGISTER YOUR SCHOOL FOR <span className="text-[#EE2C3C]">SPONSORED AIRG AI INNOVATION LAB</span>
             </h1>
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-amber-500/10 border border-amber-500/30 rounded-lg mt-1">
+              <span className="text-amber-400 text-xs">🏢</span>
+              <p className="text-xs font-bold text-amber-300 uppercase tracking-wide">
+                Sponsored &amp; Fully Owned by <span className="text-white">Lab Guruji Pvt. Limited</span>
+              </p>
+            </div>
             <p className="text-xs md:text-sm text-slate-400 font-light max-w-2xl">
               Centralized platform for Lead Generation (Phase 1) and Lead Conversion (Phase 2). Every lead uses a permanent ID (`LD#LAB26A...`).
             </p>
