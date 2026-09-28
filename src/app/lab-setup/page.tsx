@@ -1777,36 +1777,44 @@ export default function LabSetupPage() {
                   </div>
                   {/* Commission Slab Card */}
                   <div className="bg-slate-950/80 border border-rose-500/40 px-5 py-4 rounded-2xl font-mono min-w-[240px]">
-                    <span className="text-[10px] text-slate-400 uppercase font-bold block mb-2">📊 Commission Structure (Per School — One Time Only)</span>
-                    <div className="space-y-2 text-xs mt-3">
-                      <div className="flex justify-between items-center gap-6 pb-1 border-b border-white/5">
-                        <span className="text-slate-400 font-bold">300 students</span>
-                        <div className="text-right">
-                          <span className="text-emerald-400 font-black text-sm">5%</span>
-                          <span className="block text-[9px] text-slate-500">(3% BD + 2% School)</span>
-                        </div>
-                      </div>
-                      <div className="flex justify-between items-center gap-6 pb-1 border-b border-white/5">
-                        <span className="text-slate-400 font-bold">600 students</span>
-                        <div className="text-right">
-                          <span className="text-emerald-400 font-black text-sm">8%</span>
-                          <span className="block text-[9px] text-slate-500">(5% BD + 3% School)</span>
-                        </div>
-                      </div>
-                      <div className="flex justify-between items-center gap-6 pb-1 border-b border-white/5">
-                        <span className="text-slate-400 font-bold">900 students</span>
-                        <div className="text-right">
-                          <span className="text-emerald-400 font-black text-sm">11%</span>
-                          <span className="block text-[9px] text-slate-500">(7% BD + 4% School)</span>
-                        </div>
-                      </div>
-                      <div className="flex justify-between items-center gap-6 pt-1">
-                        <span className="text-slate-300 font-bold">1200 & Above</span>
-                        <div className="text-right">
-                          <span className="text-yellow-400 font-black text-sm">14% (Fixed)</span>
-                          <span className="block text-[9px] text-yellow-500/70">(9% BD + 5% School)</span>
-                        </div>
-                      </div>
+                    <span className="text-[10px] text-slate-400 uppercase font-bold block mb-2">📊 Percentage Commission Chart (Per School — One Time Only)</span>
+                    <div className="mt-3 overflow-x-auto">
+                      <table className="w-full text-left text-xs text-slate-300">
+                        <thead className="text-[10px] uppercase bg-slate-900/50 text-slate-400 border-b border-white/10">
+                          <tr>
+                            <th className="px-3 py-2 border-r border-white/5">Mini. Std Count<br/><span className="text-[8px] font-normal">(Range Upto)</span></th>
+                            <th className="px-3 py-2 border-r border-white/5 text-center">Business<br/>Developer</th>
+                            <th className="px-3 py-2 border-r border-white/5 text-center">School</th>
+                            <th className="px-3 py-2 text-center text-emerald-400">Total Comm.</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-white/5 bg-slate-900/20">
+                          <tr>
+                            <td className="px-3 py-2 border-r border-white/5 font-bold">300</td>
+                            <td className="px-3 py-2 border-r border-white/5 text-center">3%</td>
+                            <td className="px-3 py-2 border-r border-white/5 text-center">2%</td>
+                            <td className="px-3 py-2 text-center font-black text-emerald-400">5%</td>
+                          </tr>
+                          <tr>
+                            <td className="px-3 py-2 border-r border-white/5 font-bold">600</td>
+                            <td className="px-3 py-2 border-r border-white/5 text-center">5%</td>
+                            <td className="px-3 py-2 border-r border-white/5 text-center">3%</td>
+                            <td className="px-3 py-2 text-center font-black text-emerald-400">8%</td>
+                          </tr>
+                          <tr>
+                            <td className="px-3 py-2 border-r border-white/5 font-bold">900</td>
+                            <td className="px-3 py-2 border-r border-white/5 text-center">7%</td>
+                            <td className="px-3 py-2 border-r border-white/5 text-center">4%</td>
+                            <td className="px-3 py-2 text-center font-black text-emerald-400">11%</td>
+                          </tr>
+                          <tr>
+                            <td className="px-3 py-2 border-r border-white/5 font-bold text-slate-200">1200 & Above</td>
+                            <td className="px-3 py-2 border-r border-white/5 text-center font-bold text-yellow-400/80">9%</td>
+                            <td className="px-3 py-2 border-r border-white/5 text-center font-bold text-yellow-400/80">5%</td>
+                            <td className="px-3 py-2 text-center font-black text-yellow-400">14%</td>
+                          </tr>
+                        </tbody>
+                      </table>
                     </div>
                     {/* One-time commission alert */}
                     <div className="mt-3 bg-rose-950/70 border border-rose-500/60 rounded-xl px-3 py-2.5">
