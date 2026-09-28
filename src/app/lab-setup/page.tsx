@@ -1778,22 +1778,34 @@ export default function LabSetupPage() {
                   {/* Commission Slab Card */}
                   <div className="bg-slate-950/80 border border-rose-500/40 px-5 py-4 rounded-2xl font-mono min-w-[240px]">
                     <span className="text-[10px] text-slate-400 uppercase font-bold block mb-2">📊 Commission Structure (Per School — One Time Only)</span>
-                    <div className="space-y-1 text-xs">
-                      <div className="flex justify-between gap-6">
-                        <span className="text-slate-400">300 students</span>
-                        <span className="text-emerald-400 font-black">5%</span>
+                    <div className="space-y-2 text-xs mt-3">
+                      <div className="flex justify-between items-center gap-6 pb-1 border-b border-white/5">
+                        <span className="text-slate-400 font-bold">300 students</span>
+                        <div className="text-right">
+                          <span className="text-emerald-400 font-black text-sm">5%</span>
+                          <span className="block text-[9px] text-slate-500">(3% BD + 2% School)</span>
+                        </div>
                       </div>
-                      <div className="flex justify-between gap-6">
-                        <span className="text-slate-400">500 students</span>
-                        <span className="text-emerald-400 font-black">7%</span>
+                      <div className="flex justify-between items-center gap-6 pb-1 border-b border-white/5">
+                        <span className="text-slate-400 font-bold">600 students</span>
+                        <div className="text-right">
+                          <span className="text-emerald-400 font-black text-sm">8%</span>
+                          <span className="block text-[9px] text-slate-500">(5% BD + 3% School)</span>
+                        </div>
                       </div>
-                      <div className="flex justify-between gap-6">
-                        <span className="text-slate-400">900 students</span>
-                        <span className="text-emerald-400 font-black">9%</span>
+                      <div className="flex justify-between items-center gap-6 pb-1 border-b border-white/5">
+                        <span className="text-slate-400 font-bold">900 students</span>
+                        <div className="text-right">
+                          <span className="text-emerald-400 font-black text-sm">11%</span>
+                          <span className="block text-[9px] text-slate-500">(7% BD + 4% School)</span>
+                        </div>
                       </div>
-                      <div className="flex justify-between gap-6 border-t border-white/10 pt-1 mt-1">
-                        <span className="text-slate-300 font-bold">Above 900</span>
-                        <span className="text-yellow-400 font-black">11% (Fixed)</span>
+                      <div className="flex justify-between items-center gap-6 pt-1">
+                        <span className="text-slate-300 font-bold">1200 & Above</span>
+                        <div className="text-right">
+                          <span className="text-yellow-400 font-black text-sm">14% (Fixed)</span>
+                          <span className="block text-[9px] text-yellow-500/70">(9% BD + 5% School)</span>
+                        </div>
                       </div>
                     </div>
                     {/* One-time commission alert */}
