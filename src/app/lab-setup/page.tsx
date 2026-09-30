@@ -1217,6 +1217,7 @@ export default function LabSetupPage() {
                       : `📋 My Created Leads (${leads.length})`}
                   </button>
 
+                {currentUser.role === "CEO" && (
                   <button
                     onClick={() => {
                       setActiveTab("records");
@@ -1230,7 +1231,8 @@ export default function LabSetupPage() {
                   >
                     📁 LEADS RECORD ROOM ({leads.length})
                   </button>
-                </>
+                )}
+              </>
             )}
 
             {(currentUser.role === "BUSINESS_DEVELOPER" || currentUser.role === "CEO" || currentUser.role === "COORDINATOR") && (
@@ -2203,7 +2205,7 @@ export default function LabSetupPage() {
         )}
 
         {/* ================= LEADS RECORD ROOM (DATE-WISE ARCHIVE) ================= */}
-        {currentUser && activeTab === "records" && (
+        {currentUser && currentUser.role === "CEO" && activeTab === "records" && (
           <div className="space-y-8 max-w-[1440px] mx-auto">
             {/* Header & Controls */}
             <div className="bg-slate-900/90 border border-purple-500/30 p-6 md:p-8 rounded-3xl space-y-6 shadow-2xl relative overflow-hidden">
