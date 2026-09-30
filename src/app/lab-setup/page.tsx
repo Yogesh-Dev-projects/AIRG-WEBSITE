@@ -21,7 +21,7 @@ export interface UserSession {
 export default function LabSetupPage() {
   // Session State
   const [currentUser, setCurrentUser] = useState<UserSession | null>(null);
-  const [activeTab, setActiveTab] = useState<"create" | "pool" | "phase2" | "phase3" | "phase4" | "purchase" | "users">("create");
+  const [activeTab, setActiveTab] = useState<"create" | "pool" | "phase2" | "phase3" | "phase4" | "purchase" | "users" | "records">("create");
 
   // Public Form State
   const [publicForm, setPublicForm] = useState({
@@ -57,7 +57,9 @@ export default function LabSetupPage() {
     lead_source_details: "",
     lead_provided_by_type: "Business Contact",
     lead_provided_by_name: "",
-    suggested_owner_name: ""
+    suggested_owner_name: "",
+    loi_document_url: "",
+    loi_file_name: ""
   });
   const [isSubmittingInternal, setIsSubmittingInternal] = useState(false);
   const [internalTicket, setInternalTicket] = useState<{ lead_id: string; is_duplicate: boolean } | null>(null);
@@ -69,6 +71,12 @@ export default function LabSetupPage() {
   const [selectedStatus, setSelectedStatus] = useState("ALL");
   const [selectedLead, setSelectedLead] = useState<any | null>(null);
   const [viewDetailsLead, setViewDetailsLead] = useState<any | null>(null);
+
+  // Leads Record Room State
+  const [recordsSearchQuery, setRecordsSearchQuery] = useState("");
+  const [recordsDateFilter, setRecordsDateFilter] = useState<"ALL" | "TODAY" | "WEEK" | "MONTH">("ALL");
+  const [recordsStatusFilter, setRecordsStatusFilter] = useState("ALL");
+  const [recordsCategoryFilter, setRecordsCategoryFilter] = useState("ALL");
 
   // CEO Lead Assignment Modal State
   const [teamUsers, setTeamUsers] = useState<any[]>([]);
@@ -912,7 +920,9 @@ export default function LabSetupPage() {
           created_by_role: currentUser.role,
           creator_category: "INTERNAL",
           suggested_owner_name: currentUser.role === "BUSINESS_DEVELOPER" ? currentUser.name : internalForm.suggested_owner_name,
-          lead_provided_by_name: currentUser.role === "EMPLOYEE" ? `${currentUser.name} (Employee)` : (internalForm.lead_provided_by_name || currentUser.name)
+          lead_provided_by_name: currentUser.role === "EMPLOYEE" ? `${currentUser.name} (Employee)` : (internalForm.lead_provided_by_name || currentUser.name),
+          loi_document_url: internalForm.loi_document_url || "",
+          loi_file_name: internalForm.loi_file_name || ""
         })
       });
       const data = await res.json();
@@ -934,7 +944,9 @@ export default function LabSetupPage() {
           lead_source_details: "",
           lead_provided_by_type: "Business Contact",
           lead_provided_by_name: "",
-          suggested_owner_name: ""
+          suggested_owner_name: "",
+          loi_document_url: "",
+          loi_file_name: ""
         });
         fetchLeads();
       } else {
@@ -1198,13 +1210,27 @@ export default function LabSetupPage() {
                     activeTab === "pool" ? "bg-[#EE2C3C] text-white border-[#EE2C3C]" : "bg-white/5 text-slate-300 border-white/10"
                   }`}
                 >
-                  {currentUser.role === "CEO"
-                    ? `👑 Master Lead Dictionary (ALL) (${leads.length})`
-                    : currentUser.role === "EXTERNAL_BD"
-                    ? `🤝 My Referred Leads & Commission (${leads.length})`
-                    : `📋 My Created Leads (${leads.length})`}
-                </button>
-              </>
+                    {currentUser.role === "CEO"
+                      ? `👑 Master Lead Dictionary (ALL) (${leads.length})`
+                      : currentUser.role === "EXTERNAL_BD"
+                      ? `🤝 My Referred Leads & Commission (${leads.length})`
+                      : `📋 My Created Leads (${leads.length})`}
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      setActiveTab("records");
+                      fetchLeads(currentUser);
+                    }}
+                    className={`px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all border ${
+                      activeTab === "records"
+                        ? "bg-purple-600 text-white border-purple-500 font-extrabold shadow-lg shadow-purple-500/20"
+                        : "bg-white/5 text-slate-300 border-white/10 hover:border-purple-500/40"
+                    }`}
+                  >
+                    📁 LEADS RECORD ROOM ({leads.length})
+                  </button>
+                </>
             )}
 
             {(currentUser.role === "BUSINESS_DEVELOPER" || currentUser.role === "CEO" || currentUser.role === "COORDINATOR") && (
@@ -1655,6 +1681,39 @@ export default function LabSetupPage() {
                       />
                     </div>
                   </div>
+
+                  <div className="space-y-2 pt-2 border-t border-white/10">
+                    <label className="text-xs font-mono uppercase text-slate-400 font-bold flex items-center justify-between">
+                      <span>📄 LETTER OF INTENT (LOI) DOCUMENT (PDF / DOC)</span>
+                      <span className="text-[10px] text-amber-400 font-semibold">(OPTIONAL / RECOMMENDED)</span>
+                    </label>
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+                      <input
+                        type="file"
+                        accept=".pdf,.doc,.docx,image/*"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                            const reader = new FileReader();
+                            reader.onload = () => {
+                              setInternalForm(prev => ({
+                                ...prev,
+                                loi_document_url: reader.result as string,
+                                loi_file_name: file.name
+                              }));
+                            };
+                            reader.readAsDataURL(file);
+                          }
+                        }}
+                        className="block w-full text-xs text-slate-400 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-white/10 file:text-white hover:file:bg-white/20 cursor-pointer bg-slate-950/80 border border-white/10 rounded-xl"
+                      />
+                    </div>
+                    {internalForm.loi_file_name && (
+                      <p className="text-xs text-emerald-400 font-mono font-bold pt-1">
+                        ✓ LOI Attached: {internalForm.loi_file_name}
+                      </p>
+                    )}
+                  </div>
                 </div>
 
                 <button
@@ -1835,6 +1894,18 @@ export default function LabSetupPage() {
                               {lead.lead_id} 🔍
                             </button>
                             {lead.is_duplicate && <span className="block text-[9px] text-amber-400 font-mono">⚠️ Duplicate</span>}
+                            {lead.loi_document_url && (
+                              <a
+                                href={lead.loi_document_url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                download={lead.loi_file_name || `LOI_${lead.lead_id}`}
+                                className="inline-flex items-center gap-1 px-1.5 py-0.5 mt-1 bg-emerald-500/20 hover:bg-emerald-500/40 border border-emerald-500/40 text-emerald-300 font-mono text-[9px] font-bold rounded transition-colors"
+                                title="Click to view/download LOI document"
+                              >
+                                📄 LOI
+                              </a>
+                            )}
                           </td>
 
                           {/* 2. School Name */}
@@ -2095,6 +2166,26 @@ export default function LabSetupPage() {
                       <span className="text-[10px] font-mono text-slate-500 uppercase block font-bold">Additional Message / Notes</span>
                       <p className="text-slate-300 italic">{viewDetailsLead.additional_message || "No additional message provided."}</p>
                     </div>
+
+                    <div className="bg-slate-950 p-4 rounded-xl space-y-2 col-span-1 md:col-span-2 border border-emerald-500/30">
+                      <span className="text-[10px] font-mono text-emerald-400 uppercase block font-bold">📄 Letter of Intent (LOI) Document</span>
+                      {viewDetailsLead.loi_document_url ? (
+                        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                          <span className="text-white text-xs font-mono font-bold truncate">{viewDetailsLead.loi_file_name || "LOI_Document.pdf"}</span>
+                          <a
+                            href={viewDetailsLead.loi_document_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            download={viewDetailsLead.loi_file_name || `LOI_${viewDetailsLead.lead_id}`}
+                            className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl shadow transition-colors flex items-center gap-2"
+                          >
+                            <span>📥 View / Download LOI</span>
+                          </a>
+                        </div>
+                      ) : (
+                        <p className="text-slate-400 text-xs italic">No LOI document attached to this lead record.</p>
+                      )}
+                    </div>
                   </div>
 
                   <div className="flex justify-end">
@@ -2108,6 +2199,245 @@ export default function LabSetupPage() {
                 </div>
               </div>
             )}
+          </div>
+        )}
+
+        {/* ================= LEADS RECORD ROOM (DATE-WISE ARCHIVE) ================= */}
+        {currentUser && activeTab === "records" && (
+          <div className="space-y-8 max-w-[1440px] mx-auto">
+            {/* Header & Controls */}
+            <div className="bg-slate-900/90 border border-purple-500/30 p-6 md:p-8 rounded-3xl space-y-6 shadow-2xl relative overflow-hidden">
+              <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div>
+                  <div className="inline-flex items-center gap-2 px-3 py-1 bg-purple-500/20 border border-purple-500/40 text-purple-300 text-[10px] font-mono font-bold uppercase rounded-md">
+                    <span>📁 CENTRAL LEADS RECORD ROOM</span>
+                    <span>• DATE-WISE ARCHIVE & FILTERS</span>
+                  </div>
+                  <h2 className="text-3xl font-black text-white uppercase tracking-tight font-headline mt-2">
+                    ALL LEADS RECORD ROOM <span className="text-purple-400">({leads.length})</span>
+                  </h2>
+                  <p className="text-xs text-slate-400 mt-1">
+                    Complete chronological database of all generated school leads with date filtering, search capabilities, and LOI document access.
+                  </p>
+                </div>
+
+                <button
+                  onClick={() => fetchLeads(currentUser)}
+                  className="px-4 py-2.5 bg-purple-600 hover:bg-purple-500 text-white text-xs font-mono font-bold rounded-xl uppercase transition-colors shadow-lg shadow-purple-600/30 flex items-center gap-2"
+                >
+                  <span>Refresh Database 🔄</span>
+                </button>
+              </div>
+
+              {/* Filter Bar */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 bg-slate-950/80 p-4 rounded-2xl border border-white/10">
+                {/* Search Input */}
+                <div className="space-y-1">
+                  <label className="text-[10px] font-mono uppercase text-slate-400 font-bold block">Search Leads</label>
+                  <input
+                    type="text"
+                    placeholder="Search ID, School, Phone, BD..."
+                    value={recordsSearchQuery}
+                    onChange={(e) => setRecordsSearchQuery(e.target.value)}
+                    className="w-full bg-slate-900 border border-white/10 rounded-xl px-3 py-2 text-xs text-white focus:border-purple-500 focus:outline-none"
+                  />
+                </div>
+
+                {/* Date Filter */}
+                <div className="space-y-1">
+                  <label className="text-[10px] font-mono uppercase text-slate-400 font-bold block">Date Range Filter</label>
+                  <select
+                    value={recordsDateFilter}
+                    onChange={(e: any) => setRecordsDateFilter(e.target.value)}
+                    className="w-full bg-slate-900 border border-white/10 rounded-xl px-3 py-2 text-xs text-white focus:border-purple-500 focus:outline-none"
+                  >
+                    <option value="ALL">All Dates (Chronological)</option>
+                    <option value="TODAY">Created Today</option>
+                    <option value="WEEK">Last 7 Days</option>
+                    <option value="MONTH">Last 30 Days</option>
+                  </select>
+                </div>
+
+                {/* Status Filter */}
+                <div className="space-y-1">
+                  <label className="text-[10px] font-mono uppercase text-slate-400 font-bold block">Status Filter</label>
+                  <select
+                    value={recordsStatusFilter}
+                    onChange={(e) => setRecordsStatusFilter(e.target.value)}
+                    className="w-full bg-slate-900 border border-white/10 rounded-xl px-3 py-2 text-xs text-white focus:border-purple-500 focus:outline-none"
+                  >
+                    <option value="ALL">All Statuses</option>
+                    <option value="NEW">NEW / UNASSIGNED</option>
+                    <option value="IN_PROCESS">IN_PROCESS</option>
+                    <option value="ACTIVATED">ACTIVATED</option>
+                    <option value="CONVERTED">CONVERTED</option>
+                    <option value="CANCELLED">CANCELLED</option>
+                  </select>
+                </div>
+
+                {/* Category Filter */}
+                <div className="space-y-1">
+                  <label className="text-[10px] font-mono uppercase text-slate-400 font-bold block">Creator Category</label>
+                  <select
+                    value={recordsCategoryFilter}
+                    onChange={(e) => setRecordsCategoryFilter(e.target.value)}
+                    className="w-full bg-slate-900 border border-white/10 rounded-xl px-3 py-2 text-xs text-white focus:border-purple-500 focus:outline-none"
+                  >
+                    <option value="ALL">All Creators</option>
+                    <option value="INTERNAL">Internal BD / Employee</option>
+                    <option value="EXTERNAL">External BD / School Referral</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            {/* Leads Date-Wise Record Cards List */}
+            <div className="space-y-4">
+              {(() => {
+                let filtered = [...leads];
+
+                // Search Filter
+                if (recordsSearchQuery.trim()) {
+                  const q = recordsSearchQuery.toLowerCase().trim();
+                  filtered = filtered.filter(l =>
+                    l.lead_id?.toLowerCase().includes(q) ||
+                    l.school_name?.toLowerCase().includes(q) ||
+                    l.contact_person?.toLowerCase().includes(q) ||
+                    l.contact_number?.includes(q) ||
+                    l.created_by_name?.toLowerCase().includes(q)
+                  );
+                }
+
+                // Status Filter
+                if (recordsStatusFilter !== "ALL") {
+                  filtered = filtered.filter(l => l.status === recordsStatusFilter);
+                }
+
+                // Category Filter
+                if (recordsCategoryFilter !== "ALL") {
+                  filtered = filtered.filter(l => l.creator_category === recordsCategoryFilter);
+                }
+
+                // Date Filter
+                if (recordsDateFilter !== "ALL") {
+                  const now = new Date();
+                  filtered = filtered.filter(l => {
+                    if (!l.createdAt) return true;
+                    const cDate = new Date(l.createdAt);
+                    if (recordsDateFilter === "TODAY") {
+                      return cDate.toDateString() === now.toDateString();
+                    } else if (recordsDateFilter === "WEEK") {
+                      const diffMs = now.getTime() - cDate.getTime();
+                      return diffMs <= 7 * 86400000;
+                    } else if (recordsDateFilter === "MONTH") {
+                      const diffMs = now.getTime() - cDate.getTime();
+                      return diffMs <= 30 * 86400000;
+                    }
+                    return true;
+                  });
+                }
+
+                // Sort Date-Wise (Newest First)
+                filtered.sort((a, b) => new Date(b.createdAt || Date.now()).getTime() - new Date(a.createdAt || Date.now()).getTime());
+
+                if (filtered.length === 0) {
+                  return (
+                    <div className="bg-slate-900/60 border border-white/10 p-12 text-center rounded-3xl font-mono text-slate-400 text-xs">
+                      No lead records match the selected record room filters.
+                    </div>
+                  );
+                }
+
+                return filtered.map((lead) => (
+                  <div
+                    key={lead._id || lead.lead_id}
+                    className="bg-slate-900/80 border border-white/10 hover:border-purple-500/40 p-5 md:p-6 rounded-2xl space-y-4 transition-all shadow-xl"
+                  >
+                    <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 border-b border-white/10 pb-3">
+                      <div className="flex items-center gap-3 flex-wrap">
+                        <span className="font-mono text-xs text-[#EE2C3C] font-bold uppercase bg-[#EE2C3C]/10 px-2.5 py-1 rounded-md border border-[#EE2C3C]/30">
+                          {lead.lead_id}
+                        </span>
+                        <span className="text-xs font-mono text-slate-400">
+                          📅 Created: {lead.createdAt ? new Date(lead.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : "N/A"}
+                        </span>
+                        <span className={`px-2 py-0.5 rounded font-mono text-[9px] font-bold uppercase ${
+                          lead.status === "NEW" ? "bg-amber-500/20 text-amber-400 border border-amber-500/30" :
+                          lead.status === "ACTIVATED" ? "bg-blue-500/20 text-blue-400 border border-blue-500/30" :
+                          lead.status === "CONVERTED" ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30" :
+                          "bg-purple-500/20 text-purple-400 border border-purple-500/30"
+                        }`}>
+                          Status: {lead.status.replace('_', ' ')}
+                        </span>
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        {lead.loi_document_url ? (
+                          <a
+                            href={lead.loi_document_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            download={lead.loi_file_name || `LOI_${lead.lead_id}`}
+                            className="px-3 py-1.5 bg-emerald-600/30 hover:bg-emerald-600/50 border border-emerald-500/50 text-emerald-300 text-xs font-mono font-bold rounded-xl transition-all flex items-center gap-1.5"
+                          >
+                            <span>📄 Download LOI Document</span>
+                          </a>
+                        ) : (
+                          <span className="text-[10px] font-mono text-slate-500 italic bg-white/5 px-2.5 py-1 rounded-lg">
+                            No LOI Attached
+                          </span>
+                        )}
+
+                        <button
+                          onClick={() => setViewDetailsLead(lead)}
+                          className="px-3 py-1.5 bg-white/10 hover:bg-white/20 text-white text-xs font-mono font-bold rounded-xl transition-all"
+                        >
+                          Full Details 🔍
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-xs">
+                      <div className="bg-slate-950/60 p-3.5 rounded-xl border border-white/5 space-y-1">
+                        <span className="text-[10px] font-mono text-slate-500 uppercase block font-bold">School Name</span>
+                        <p className="font-bold text-white text-sm">{lead.school_name}</p>
+                        <p className="text-slate-400 text-[11px]">{lead.school_address}</p>
+                      </div>
+
+                      <div className="bg-slate-950/60 p-3.5 rounded-xl border border-white/5 space-y-1">
+                        <span className="text-[10px] font-mono text-slate-500 uppercase block font-bold">School Contact Person</span>
+                        <p className="font-bold text-white">{lead.contact_person}</p>
+                        <p className="font-mono text-emerald-400 font-bold">{lead.contact_number}</p>
+                      </div>
+
+                      <div className="bg-slate-950/60 p-3.5 rounded-xl border border-white/5 space-y-1">
+                        <span className="text-[10px] font-mono text-slate-500 uppercase block font-bold">Created By (BD / User)</span>
+                        <p className="font-bold text-white">{lead.created_by_name}</p>
+                        <p className="font-mono text-slate-400 text-[11px]">{lead.created_by_role} ({lead.creator_category || "EXTERNAL"})</p>
+                      </div>
+
+                      <div className="bg-slate-950/60 p-3.5 rounded-xl border border-white/5 space-y-1">
+                        <span className="text-[10px] font-mono text-slate-500 uppercase block font-bold">Assigned Owner (CEO)</span>
+                        <p className="font-bold text-emerald-400">{lead.assigned_to_name || "UNASSIGNED"}</p>
+                        {currentUser.role === "CEO" && (
+                          <button
+                            onClick={() => {
+                              setSelectedLead(lead);
+                              if (teamUsers.length > 0) {
+                                setSelectedAssignee(teamUsers[0].name);
+                              }
+                            }}
+                            className="mt-1 px-2.5 py-1 bg-[#EE2C3C] text-white font-bold text-[10px] uppercase rounded-lg hover:bg-[#d42332] transition-colors"
+                          >
+                            {!lead.assigned_to_name || lead.assigned_to_name.toUpperCase() === "UNASSIGNED" ? "Assign Lead 👑" : "Reassign 👑"}
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ));
+              })()}
+            </div>
           </div>
         )}
 

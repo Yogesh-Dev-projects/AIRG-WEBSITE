@@ -47,7 +47,9 @@ export async function POST(request: Request) {
       created_by_role = 'Business Developer',
       created_by_id = 'INTERNAL_USER',
       creator_category = 'INTERNAL',
-      suggested_owner_name = ''
+      suggested_owner_name = '',
+      loi_document_url = '',
+      loi_file_name = ''
     } = body;
 
     if (!school_name || !school_address || !contact_person || !contact_number) {
@@ -96,6 +98,8 @@ export async function POST(request: Request) {
         creator_category: creator_category || 'INTERNAL',
         suggested_owner_id: suggested_owner_name ? 'SUGGESTED' : '',
         suggested_owner_name: suggested_owner_name || '',
+        loi_document_url: loi_document_url || '',
+        loi_file_name: loi_file_name || '',
         assigned_to_id: 'UNASSIGNED',
         assigned_to_name: 'UNASSIGNED',
         status: 'NEW',
