@@ -421,8 +421,8 @@ const LeadSchema = new Schema<ILead>(
   {
     lead_id: { type: String, required: true, unique: true, index: true },
     school_name: { type: String, required: true, index: true },
-    school_address: { type: String, required: true },
-    school_email: { type: String, required: true },
+    school_address: { type: String, default: '' },
+    school_email: { type: String, default: '' },
     contact_person: { type: String, required: true },
     contact_number: { type: String, required: true },
     inquiry_generated_by: { type: String, default: 'Principal' },
@@ -431,16 +431,16 @@ const LeadSchema = new Schema<ILead>(
     requirement: { type: String, default: 'AI Innovation Lab' },
     additional_message: { type: String, default: '' },
 
-    lead_source: { type: String, required: true, default: 'Website' },
+    lead_source: { type: String, default: 'Phone Call' },
     lead_source_details: { type: String, default: '' },
     lead_provided_by_type: { type: String, default: 'School' },
     lead_provided_by_name: { type: String, default: 'School Directly' },
     lead_provided_by_employee_id: { type: String, default: '' },
 
-    created_by_id: { type: String, required: true, default: 'SYSTEM' },
-    created_by_name: { type: String, required: true, default: 'Public Website' },
+    created_by_id: { type: String, default: 'SYSTEM' },
+    created_by_name: { type: String, default: 'Unknown' },
     created_by_phone: { type: String, default: '' },
-    created_by_role: { type: String, required: true, default: 'Public' },
+    created_by_role: { type: String, default: 'Public' },
     creator_category: { type: String, enum: ['INTERNAL', 'EXTERNAL'], default: 'EXTERNAL' },
 
     suggested_owner_id: { type: String, default: '' },
@@ -455,7 +455,7 @@ const LeadSchema = new Schema<ILead>(
 
     status: {
       type: String,
-      enum: ['NEW', 'IN_PROCESS', 'ACTIVATED', 'MEETING_SCHEDULED', 'CONVERSION_DRAFT', 'CONVERTED', 'CANCELLED'],
+      enum: ['NEW', 'IN_PROCESS', 'ACTIVATED', 'MEETING_SCHEDULED', 'CONVERSION_DRAFT', 'CONVERTED', 'CANCELLED', 'PHASE3_COMPLETE', 'COORDINATOR_NOMINATED', 'PHASE4_ACTIVE', 'PHASE4_SUBMITTED', 'PHASE4_APPROVED', 'PHASE4_REJECTED', 'PURCHASE_VERIFICATION', 'PURCHASE_COMPLETED'],
       default: 'NEW',
       index: true
     },

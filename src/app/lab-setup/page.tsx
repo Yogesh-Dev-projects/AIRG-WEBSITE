@@ -923,7 +923,7 @@ export default function LabSetupPage() {
           school_email: "",
           contact_person: "",
           contact_number: "",
-          created_by_phone: "9876543210",
+          created_by_phone: "",
           inquiry_generated_by: "School Management",
           inquiry_generator_name: "",
           inquiry_generator_phone: "",
@@ -937,10 +937,11 @@ export default function LabSetupPage() {
         });
         fetchLeads();
       } else {
-        alert(data.error || "Failed to create internal lead.");
+        alert("❌ Lead NOT saved!\n\nError: " + (data.error || "Unknown error. Please try again.") + "\n\nPlease contact support if this keeps happening.");
       }
-    } catch (err) {
-      alert("Error submitting lead.");
+    } catch (err: any) {
+      alert("❌ Network error submitting lead: " + (err.message || "Please check your internet connection and try again."));
+
     } finally {
       setIsSubmittingInternal(false);
     }
