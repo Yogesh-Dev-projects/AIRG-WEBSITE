@@ -952,19 +952,9 @@ export default function LabSetupPage() {
     setIsAssigning(true);
     try {
       const assignedUser = teamUsers.find(u => u.name === selectedAssignee);
-      const assigned_to_id = assignedUser ? (assignedUser.id || assignedUser._id || assignedUser.employee_id || assignedUser.email || selectedAssignee) : selectedAssignee;
-      
-      // Save local assignment into localStorage for instant and persistent client state
-      const localAssignments = JSON.parse(localStorage.getItem("airg_lead_assignments") || "{}");
-      localAssignments[selectedLead.lead_id] = {
-        lead_id: selectedLead.lead_id,
-        school_name: selectedLead.school_name,
-        assigned_to_name: selectedAssignee,
-        assigned_to_id: assigned_to_id,
-        assigned_to_role: assignedUser ? assignedUser.role : "BUSINESS_DEVELOPER",
-        status: "IN_PROCESS"
-      };
-      localStorage.setItem("airg_lead_assignments", JSON.stringify(localAssignments));
+      const assigned_to_id = assignedUser
+        ? (assignedUser.employee_id || assignedUser.id || assignedUser._id || assignedUser.email || selectedAssignee)
+        : selectedAssignee;
 
       const res = await fetch("/api/leads/assign", {
         method: "POST",
@@ -974,25 +964,13 @@ export default function LabSetupPage() {
           assigned_to_name: selectedAssignee,
           assigned_to_id: assigned_to_id,
           assigned_to_role: assignedUser ? assignedUser.role : "BUSINESS_DEVELOPER",
-          assigned_by_name: currentUser?.name || "CEO / Head",
+          assigned_by_name: currentUser?.name || "CEO",
           reason: assignmentReason
         })
       });
       const data = await res.json();
       if (data.success) {
-        alert(`Lead ${selectedLead.lead_id} assigned to ${selectedAssignee}! Notification recorded.`);
-        setLeads(prevLeads => prevLeads.map(l => {
-          if (l.lead_id.trim().toLowerCase() === selectedLead.lead_id.trim().toLowerCase()) {
-            return {
-              ...l,
-              assigned_to_name: selectedAssignee,
-              assigned_to_id: assigned_to_id,
-              assigned_to_role: assignedUser ? assignedUser.role : "BUSINESS_DEVELOPER",
-              status: "IN_PROCESS"
-            };
-          }
-          return l;
-        }));
+        alert(`✅ Lead ${selectedLead.lead_id} assigned to ${selectedAssignee}! They will see it in their dashboard.`);
         setSelectedLead(null);
         await fetchLeads(currentUser);
       } else {
@@ -1004,6 +982,7 @@ export default function LabSetupPage() {
       setIsAssigning(false);
     }
   };
+
 
   // Phase 2 Lead Activation
   const handleActivatePhase2Lead = async (leadToActivate: any) => {
