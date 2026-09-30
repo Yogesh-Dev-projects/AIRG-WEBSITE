@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import Lead from '@/lib/models/Lead';
-import { globalLeadsStore } from '@/lib/leadsStore';
 
 export async function GET(request: Request) {
   try {
@@ -10,8 +9,8 @@ export async function GET(request: Request) {
     const search = searchParams.get('search');
     const userRole = searchParams.get('userRole');
     const userName = searchParams.get('userName');
-    const userEmail = searchParams.get('userEmail');
     const userId = searchParams.get('userId');
+    const category = searchParams.get('category'); // For CEO filters: INTERNAL / EXTERNAL
 
     const isCeo = !userRole || userRole === 'CEO';
     const cleanName = (userName || '').replace(/\(.*\)/g, '').trim().toLowerCase();
@@ -22,38 +21,24 @@ export async function GET(request: Request) {
       await connectDB();
       const dbLeads = await Lead.find({}).sort({ createdAt: -1 }).lean().exec();
       if (dbLeads && dbLeads.length > 0) {
-        allLeads = dbLeads.map((d: any) => ({ ...d, _id: d._id ? d._id.toString() : `db-${Date.now()}` }));
+        allLeads = dbLeads.map((d: any) => ({ ...d, _id: d._id ? d._id.toString() : '' }));
       }
     } catch (dbErr) {
-      console.warn('MongoDB fetch fallback:', dbErr);
+      console.error('MongoDB fetch error:', dbErr);
+      return NextResponse.json({ success: false, leads: [], error: 'Database connection failed' }, { status: 500 });
     }
 
-    // Merge in memory leads (prefer memory version if updated more recently)
-    globalLeadsStore.forEach(memLead => {
-      const idx = allLeads.findIndex(l => l.lead_id && l.lead_id.trim().toLowerCase() === memLead.lead_id.trim().toLowerCase());
-      if (idx !== -1) {
-        // If memory lead has assignment or phase updates, merge them
-        const isMemAssigned = memLead.assigned_to_name && memLead.assigned_to_name.toUpperCase() !== 'UNASSIGNED';
-        allLeads[idx] = {
-          ...allLeads[idx],
-          ...memLead,
-          assigned_to_name: isMemAssigned ? memLead.assigned_to_name : allLeads[idx].assigned_to_name,
-          assigned_to_id: memLead.assigned_to_id || allLeads[idx].assigned_to_id,
-          status: memLead.status || allLeads[idx].status,
-          phase2: memLead.phase2 || allLeads[idx].phase2,
-          phase3: memLead.phase3 || allLeads[idx].phase3
-        };
-      } else {
-        allLeads.push(memLead);
-      }
-    });
+    // Filter by category (for CEO Lead Records tab)
+    if (category && category !== 'ALL') {
+      allLeads = allLeads.filter(l => (l.creator_category || '').toUpperCase() === category.toUpperCase());
+    }
 
-    // 1. Filter by Status
+    // Filter by status
     if (status && status !== 'ALL') {
       allLeads = allLeads.filter(l => l.status === status);
     }
 
-    // 2. Filter by Search Query
+    // Filter by search
     if (search) {
       const q = search.toLowerCase();
       allLeads = allLeads.filter(
@@ -61,39 +46,72 @@ export async function GET(request: Request) {
           (l.lead_id && l.lead_id.toLowerCase().includes(q)) ||
           (l.school_name && l.school_name.toLowerCase().includes(q)) ||
           (l.contact_person && l.contact_person.toLowerCase().includes(q)) ||
-          (l.inquiry_generator_name && l.inquiry_generator_name.toLowerCase().includes(q))
+          (l.created_by_name && l.created_by_name.toLowerCase().includes(q)) ||
+          (l.contact_number && l.contact_number.includes(q))
       );
     }
 
-    // 3. Role-based visibility isolation (Non-CEO sees created or assigned leads)
-    if (!isCeo && (cleanName || userId || userEmail)) {
-      const qId = userId || '';
+    // Role-based visibility: non-CEO users only see leads they created or are assigned to
+    if (!isCeo && (cleanName || userId)) {
+      const qId = (userId || '').toLowerCase();
       allLeads = allLeads.filter(l => {
         const creatorName = (l.created_by_name || '').replace(/\(.*\)/g, '').trim().toLowerCase();
-        const inquiryName = (l.inquiry_generator_name || '').replace(/\(.*\)/g, '').trim().toLowerCase();
         const providerName = (l.lead_provided_by_name || '').replace(/\(.*\)/g, '').trim().toLowerCase();
         const assignedName = (l.assigned_to_name || '').replace(/\(.*\)/g, '').trim().toLowerCase();
-        const assignedId = (l.assigned_to_id || '').toLowerCase();
+        const creatorId = (l.created_by_id || '').toLowerCase();
 
         const isCreator =
-          (creatorName && (creatorName.includes(cleanName) || cleanName.includes(creatorName))) ||
-          (l.created_by_id && l.created_by_id === qId) ||
-          (inquiryName && (inquiryName.includes(cleanName) || cleanName.includes(inquiryName))) ||
-          (providerName && (providerName.includes(cleanName) || cleanName.includes(providerName)));
+          (cleanName && (creatorName.includes(cleanName) || cleanName.includes(creatorName))) ||
+          (cleanName && (providerName.includes(cleanName) || cleanName.includes(providerName))) ||
+          (qId && creatorId && (creatorId === qId || creatorId.includes(qId)));
 
         const isAssigned =
-          (assignedName && assignedName !== 'unassigned' && (assignedName.includes(cleanName) || cleanName.includes(assignedName))) ||
-          (assignedId && (assignedId === qId.toLowerCase() || assignedId.includes(cleanName) || cleanName.includes(assignedId)));
+          (cleanName && assignedName && assignedName !== 'unassigned' &&
+            (assignedName.includes(cleanName) || cleanName.includes(assignedName))) ||
+          (qId && l.assigned_to_id && l.assigned_to_id.toLowerCase() === qId);
 
         return isCreator || isAssigned;
       });
     }
 
     // Sort newest first
-    allLeads.sort((a, b) => new Date(b.createdAt || Date.now()).getTime() - new Date(a.createdAt || Date.now()).getTime());
+    allLeads.sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime());
 
     return NextResponse.json({ success: true, leads: allLeads });
   } catch (error: any) {
-    return NextResponse.json({ success: true, leads: globalLeadsStore });
+    return NextResponse.json({ success: false, leads: [], error: error.message }, { status: 500 });
   }
 }
+
+export async function DELETE(request: Request) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const lead_id = searchParams.get('lead_id');
+    const requestedBy = searchParams.get('requestedBy') || '';
+
+    if (!lead_id) {
+      return NextResponse.json({ error: 'lead_id is required' }, { status: 400 });
+    }
+
+    await connectDB();
+
+    const lead = await Lead.findOne({ lead_id }).exec();
+
+    if (!lead) {
+      return NextResponse.json({ error: 'Lead not found' }, { status: 404 });
+    }
+
+    // If the lead is already assigned (not UNASSIGNED), only CEO can delete
+    const isAssigned = lead.assigned_to_id && lead.assigned_to_id.toUpperCase() !== 'UNASSIGNED';
+    if (isAssigned && requestedBy !== 'CEO') {
+      return NextResponse.json({ error: 'Cannot delete: Lead has already been assigned by CEO.' }, { status: 403 });
+    }
+
+    await Lead.deleteOne({ lead_id });
+
+    return NextResponse.json({ success: true, message: `Lead ${lead_id} deleted successfully.` });
+  } catch (error: any) {
+    return NextResponse.json({ error: error.message || 'Error deleting lead' }, { status: 500 });
+  }
+}
+

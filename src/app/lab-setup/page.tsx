@@ -762,87 +762,14 @@ export default function LabSetupPage() {
       
       const sessionUser = userSessionOverride !== undefined ? userSessionOverride : currentUser;
       if (sessionUser) {
-        url += `&userRole=${encodeURIComponent(sessionUser.role)}&userName=${encodeURIComponent(sessionUser.name)}&userEmail=${encodeURIComponent(sessionUser.email)}&userId=${encodeURIComponent(sessionUser.id || '')}`;
+        const userId = sessionUser.employee_id || sessionUser.id || sessionUser._id || sessionUser.email || '';
+        url += `&userRole=${encodeURIComponent(sessionUser.role)}&userName=${encodeURIComponent(sessionUser.name)}&userId=${encodeURIComponent(userId)}`;
       }
+
       const res = await fetch(url);
       const data = await res.json();
       if (data.leads) {
-        const localAssignments = JSON.parse(localStorage.getItem("airg_lead_assignments") || "{}");
-        const mergedLeads = data.leads.map((l: any) => {
-          const override = localAssignments[l.lead_id];
-          if (override) {
-            return {
-              ...l,
-              assigned_to_name: override.assigned_to_name || l.assigned_to_name,
-              assigned_to_id: override.assigned_to_id || l.assigned_to_id,
-              assigned_to_role: override.assigned_to_role || l.assigned_to_role,
-              status: l.status === "NEW" ? "IN_PROCESS" : l.status
-            };
-          }
-          return l;
-        });
-
-        if (sessionUser && sessionUser.role === "BUSINESS_DEVELOPER") {
-          const uClean = sessionUser.name.replace(/\(.*\)/g, '').trim().toLowerCase();
-          
-          Object.keys(localAssignments).forEach(leadId => {
-            const assign = localAssignments[leadId];
-            const aClean = (assign.assigned_to_name || '').replace(/\(.*\)/g, '').trim().toLowerCase();
-            if (aClean && (aClean.includes(uClean) || uClean.includes(aClean))) {
-              const exists = mergedLeads.some((l: any) => l.lead_id.trim().toLowerCase() === leadId.trim().toLowerCase());
-              if (!exists) {
-                mergedLeads.push({
-                  _id: `assigned-${leadId}`,
-                  lead_id: leadId,
-                  school_name: assign.school_name || 'Sunrise International School',
-                  school_address: assign.school_address || 'Pune-Bangalore Highway, Satara',
-                  school_email: 'info@sunriseschool.edu.in',
-                  contact_person: 'Mr. Patil (IT Head)',
-                  contact_number: '9890123456',
-                  inquiry_generated_by: 'Teacher',
-                  inquiry_generator_name: 'Suyash Patil',
-                  inquiry_generator_phone: '7820848915',
-                  requirement: 'Robotics & Drone Kit Setup',
-                  lead_source: 'Employee Referral',
-                  lead_provided_by_type: 'Employee',
-                  lead_provided_by_name: 'Rahul Sharma (Employee)',
-                  created_by_id: 'INTERNAL_USER',
-                  created_by_name: 'Rahul Sharma',
-                  created_by_phone: '9876543210',
-                  created_by_role: 'EMPLOYEE',
-                  creator_category: 'INTERNAL',
-                  assigned_to_id: assign.assigned_to_id || sessionUser.name,
-                  assigned_to_name: assign.assigned_to_name || sessionUser.name,
-                  assigned_to_role: 'BUSINESS_DEVELOPER',
-                  status: assign.status || 'IN_PROCESS',
-                  is_duplicate: false,
-                  notes: [],
-                  activity_history: []
-                });
-              }
-            }
-          });
-
-          const bdLeads = mergedLeads.filter((l: any) => {
-            const creatorName = (l.created_by_name || '').replace(/\(.*\)/g, '').trim().toLowerCase();
-            const inquiryName = (l.inquiry_generator_name || '').replace(/\(.*\)/g, '').trim().toLowerCase();
-            const providerName = (l.lead_provided_by_name || '').replace(/\(.*\)/g, '').trim().toLowerCase();
-            const assignedName = (l.assigned_to_name || '').replace(/\(.*\)/g, '').trim().toLowerCase();
-
-            const isCreator =
-              (creatorName && (creatorName.includes(uClean) || uClean.includes(creatorName))) ||
-              (inquiryName && (inquiryName.includes(uClean) || uClean.includes(inquiryName))) ||
-              (providerName && (providerName.includes(uClean) || uClean.includes(providerName)));
-
-            const isAssigned =
-              (assignedName && assignedName !== 'unassigned' && (assignedName.includes(uClean) || uClean.includes(assignedName)));
-
-            return isCreator || isAssigned;
-          });
-          setLeads(bdLeads);
-        } else {
-          setLeads(mergedLeads);
-        }
+        setLeads(data.leads);
       }
     } catch (err) {
       console.error("Fetch leads error:", err);
@@ -850,6 +777,9 @@ export default function LabSetupPage() {
       setIsLoadingLeads(false);
     }
   };
+
+
+
 
   const fetchUsers = async () => {
     try {
@@ -975,8 +905,9 @@ export default function LabSetupPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...internalForm,
+          created_by_id: currentUser.employee_id || currentUser.id || currentUser._id || currentUser.email,
           created_by_name: currentUser.name,
-          created_by_phone: internalForm.created_by_phone || currentUser.phone || "9876543210",
+          created_by_phone: internalForm.created_by_phone || currentUser.phone || "",
           created_by_role: currentUser.role,
           creator_category: "INTERNAL",
           suggested_owner_name: currentUser.role === "BUSINESS_DEVELOPER" ? currentUser.name : internalForm.suggested_owner_name,

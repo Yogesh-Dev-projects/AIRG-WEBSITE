@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import Lead from '@/lib/models/Lead';
-import { globalLeadsStore } from '@/lib/leadsStore';
 
 async function generateNextLeadId() {
   const currentYear = new Date().getFullYear().toString().slice(-2);
@@ -23,7 +22,7 @@ async function generateNextLeadId() {
     }
   } catch (e) {}
 
-  return `${prefix}101`;
+  return `${prefix}${Date.now().toString().slice(-4)}`;
 }
 
 export async function POST(request: Request) {
@@ -46,6 +45,7 @@ export async function POST(request: Request) {
       created_by_name = 'Internal User',
       created_by_phone = '',
       created_by_role = 'Business Developer',
+      created_by_id = 'INTERNAL_USER',
       creator_category = 'INTERNAL',
       suggested_owner_name = ''
     } = body;
@@ -57,15 +57,16 @@ export async function POST(request: Request) {
     let is_duplicate = false;
     let duplicate_of_id = '';
     let duplicate_status = 'NONE';
-    let lead_id = `LD#LAB${new Date().getFullYear().toString().slice(-2)}A101`;
+    let lead_id = `LD#LAB${new Date().getFullYear().toString().slice(-2)}A${Date.now().toString().slice(-4)}`;
 
     try {
       await connectDB();
 
+      const safeSchoolName = school_name.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
       const existingLead = await Lead.findOne({
         $or: [
           { contact_number: contact_number.trim() },
-          { school_name: { $regex: new RegExp(`^${school_name.trim()}$`, 'i') } }
+          { school_name: { $regex: new RegExp(`^${safeSchoolName}$`, 'i') } }
         ]
       }).exec();
 
@@ -74,8 +75,7 @@ export async function POST(request: Request) {
       duplicate_of_id = existingLead ? existingLead.lead_id : '';
       duplicate_status = existingLead ? 'SUSPECTED' : 'NONE';
 
-      const memLead: any = {
-        _id: `mem-${Date.now()}`,
+      const leadData: any = {
         lead_id,
         school_name: school_name.trim(),
         school_address: school_address.trim(),
@@ -85,49 +85,40 @@ export async function POST(request: Request) {
         inquiry_generated_by,
         requirement,
         additional_message,
-
         lead_source,
-        lead_source_details: lead_source_details || `Lead obtained via ${lead_source}`,
+        lead_source_details: lead_source_details || `Lead via ${lead_source}`,
         lead_provided_by_type,
-        lead_provided_by_name: lead_provided_by_name || 'Direct Contact',
-
-        created_by_id: 'INTERNAL_USER',
+        lead_provided_by_name: lead_provided_by_name || created_by_name,
+        created_by_id: created_by_id || 'INTERNAL_USER',
         created_by_name,
-        created_by_phone: created_by_phone || '9876543210',
+        created_by_phone: created_by_phone || '',
         created_by_role,
         creator_category: creator_category || 'INTERNAL',
-
         suggested_owner_id: suggested_owner_name ? 'SUGGESTED' : '',
         suggested_owner_name: suggested_owner_name || '',
-
         assigned_to_id: 'UNASSIGNED',
         assigned_to_name: 'UNASSIGNED',
-
         status: 'NEW',
-
         is_duplicate,
         duplicate_of_id,
         duplicate_status,
-
+        notes: [],
         activity_history: [
           {
             action: 'LEAD_CREATED_INTERNAL',
             performed_by: created_by_name,
-            details: `Internal lead registered by ${created_by_name} (${created_by_role}). Phone: ${created_by_phone || 'N/A'}. Category: ${creator_category}.`,
+            details: `Lead registered by ${created_by_name} (${created_by_role}). Category: ${creator_category}.`,
             timestamp: new Date()
           }
-        ],
-        createdAt: new Date(),
-        updatedAt: new Date()
+        ]
       };
 
-      globalLeadsStore.unshift(memLead);
-
-      const newLead = new Lead(memLead);
-
+      const newLead = new Lead(leadData);
       await newLead.save();
-    } catch (dbErr) {
-      console.warn('Internal lead DB connection fallback:', dbErr);
+
+    } catch (dbErr: any) {
+      console.error('Lead DB save error:', dbErr);
+      return NextResponse.json({ error: 'Database error: ' + (dbErr.message || 'Could not save lead.') }, { status: 500 });
     }
 
     return NextResponse.json({
@@ -135,9 +126,11 @@ export async function POST(request: Request) {
       lead_id,
       is_duplicate,
       duplicate_of_id,
-      message: 'Internal lead created successfully.'
+      message: 'Lead created and saved to database successfully.'
     });
+
   } catch (error: any) {
-    return NextResponse.json({ error: error.message || 'Server error creating internal lead' }, { status: 500 });
+    return NextResponse.json({ error: error.message || 'Server error' }, { status: 500 });
   }
 }
+
