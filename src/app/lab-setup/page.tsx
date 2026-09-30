@@ -9,6 +9,7 @@ import { PurchaseItemData, getDefaultPurchaseChecklist } from "@/data/purchaseIn
 
 export interface UserSession {
   id: string;
+  _id?: string;
   name: string;
   email: string;
   phone?: string;
