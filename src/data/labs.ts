@@ -231,11 +231,16 @@ export const labsData: Lab[] = [
     "status": "Active Lab Center",
     "img": "/extracted-images/holy_convent/holy_convent_1.jpeg",
     "images": [
-      "/extracted-images/holy_convent/holy_convent_1.jpeg",
-      "/extracted-images/holy_convent/holy_convent_2.jpeg",
-      "/extracted-images/holy_convent/holy_convent_3.jpeg",
-      "/extracted-images/holy_convent/holy_convent_4.jpeg"
-    ],
+        "/extracted-images/holy_convent/holy_convent_1.jpeg",
+        "/extracted-images/holy_convent/holy_convent_2.jpeg",
+        "/extracted-images/holy_convent/holy_convent_3.jpeg",
+        "/extracted-images/holy_convent/holy_convent_4.jpeg",
+        "/extracted-images/holy_convent/holy_convent_5.jpeg",
+        "/extracted-images/holy_convent/holy_convent_6.jpeg",
+        "/extracted-images/holy_convent/holy_convent_7.jpeg",
+        "/extracted-images/holy_convent/holy_convent_8.jpeg",
+        "/extracted-images/holy_convent/holy_convent_9.jpeg"
+      ],
     "techStack": [
       "Meta Quest VR Headsets",
       "Spatial WebXR Software",
