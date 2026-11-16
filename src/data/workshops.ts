@@ -285,5 +285,320 @@ export const workshopsData: Workshop[] = [
       "Used software to simulate airflow over wings and understand lift",
       "Conducted outdoor flight competitions testing range and stability"
     ]
+  },
+  {
+    slug: "eon-center-1",
+    title: "AIRG Eon Center Lab",
+    category: "School Lab",
+    desc: "A futuristic innovation centre empowering students with AI, Python programming, robotics, and interactive hardware.",
+    url: "/centres/gallery/photo-new-1.jpeg",
+    detailedDesc: "Eon Center focuses on hands-on computer science, robotics, and artificial intelligence. Students build intelligent algorithms, wire up microcontrollers, and develop deep-tech applications.",
+    location: "Maharashtra, India",
+    date: "Active Lab",
+    techStack: ["Python Programming", "AI Neural Kits", "Embedded Microcontrollers", "Robotics Sensors"],
+    stats: [
+      { label: "Students Certified", value: "300+ Students" },
+      { label: "Lab Projects", value: "50+ Built" },
+      { label: "Code Competitions", value: "12+ Hosted" }
+    ],
+    highlights: [
+      "Hands-on AI algorithms and computer vision workshops",
+      "Interactive breadboard wiring and robotic rover assembly",
+      "Real-world coding and problem-solving hackathons"
+    ]
+  },
+  {
+    slug: "eon-center-2",
+    title: "AIRG Eon Center Lab",
+    category: "School Lab",
+    desc: "A futuristic innovation centre empowering students with AI, Python programming, robotics, and interactive hardware.",
+    url: "/centres/gallery/photo-new-2.jpeg",
+    detailedDesc: "Eon Center focuses on hands-on computer science, robotics, and artificial intelligence. Students build intelligent algorithms, wire up microcontrollers, and develop deep-tech applications.",
+    location: "Maharashtra, India",
+    date: "Active Lab",
+    techStack: ["Python Programming", "AI Neural Kits", "Embedded Microcontrollers", "Robotics Sensors"],
+    stats: [
+      { label: "Students Certified", value: "300+ Students" },
+      { label: "Lab Projects", value: "50+ Built" },
+      { label: "Code Competitions", value: "12+ Hosted" }
+    ],
+    highlights: [
+      "Hands-on AI algorithms and computer vision workshops",
+      "Interactive breadboard wiring and robotic rover assembly",
+      "Real-world coding and problem-solving hackathons"
+    ]
+  },
+  {
+    slug: "eon-center-3",
+    title: "AIRG Eon Center Lab",
+    category: "School Lab",
+    desc: "A futuristic innovation centre empowering students with AI, Python programming, robotics, and interactive hardware.",
+    url: "/centres/gallery/photo-new-3.jpeg",
+    detailedDesc: "Eon Center focuses on hands-on computer science, robotics, and artificial intelligence. Students build intelligent algorithms, wire up microcontrollers, and develop deep-tech applications.",
+    location: "Maharashtra, India",
+    date: "Active Lab",
+    techStack: ["Python Programming", "AI Neural Kits", "Embedded Microcontrollers", "Robotics Sensors"],
+    stats: [
+      { label: "Students Certified", value: "300+ Students" },
+      { label: "Lab Projects", value: "50+ Built" },
+      { label: "Code Competitions", value: "12+ Hosted" }
+    ],
+    highlights: [
+      "Hands-on AI algorithms and computer vision workshops",
+      "Interactive breadboard wiring and robotic rover assembly",
+      "Real-world coding and problem-solving hackathons"
+    ]
+  },
+  {
+    slug: "eon-center-4",
+    title: "AIRG Eon Center Lab",
+    category: "School Lab",
+    desc: "A futuristic innovation centre empowering students with AI, Python programming, robotics, and interactive hardware.",
+    url: "/centres/gallery/photo-new-4.jpeg",
+    detailedDesc: "Eon Center focuses on hands-on computer science, robotics, and artificial intelligence. Students build intelligent algorithms, wire up microcontrollers, and develop deep-tech applications.",
+    location: "Maharashtra, India",
+    date: "Active Lab",
+    techStack: ["Python Programming", "AI Neural Kits", "Embedded Microcontrollers", "Robotics Sensors"],
+    stats: [
+      { label: "Students Certified", value: "300+ Students" },
+      { label: "Lab Projects", value: "50+ Built" },
+      { label: "Code Competitions", value: "12+ Hosted" }
+    ],
+    highlights: [
+      "Hands-on AI algorithms and computer vision workshops",
+      "Interactive breadboard wiring and robotic rover assembly",
+      "Real-world coding and problem-solving hackathons"
+    ]
+  },
+  {
+    slug: "eon-center-5",
+    title: "AIRG Eon Center Lab",
+    category: "School Lab",
+    desc: "A futuristic innovation centre empowering students with AI, Python programming, robotics, and interactive hardware.",
+    url: "/centres/gallery/photo-new-5.jpeg",
+    detailedDesc: "Eon Center focuses on hands-on computer science, robotics, and artificial intelligence. Students build intelligent algorithms, wire up microcontrollers, and develop deep-tech applications.",
+    location: "Maharashtra, India",
+    date: "Active Lab",
+    techStack: ["Python Programming", "AI Neural Kits", "Embedded Microcontrollers", "Robotics Sensors"],
+    stats: [
+      { label: "Students Certified", value: "300+ Students" },
+      { label: "Lab Projects", value: "50+ Built" },
+      { label: "Code Competitions", value: "12+ Hosted" }
+    ],
+    highlights: [
+      "Hands-on AI algorithms and computer vision workshops",
+      "Interactive breadboard wiring and robotic rover assembly",
+      "Real-world coding and problem-solving hackathons"
+    ]
+  },
+  {
+    slug: "eon-center-6",
+    title: "AIRG Eon Center Lab",
+    category: "School Lab",
+    desc: "A futuristic innovation centre empowering students with AI, Python programming, robotics, and interactive hardware.",
+    url: "/centres/gallery/photo-new-6.jpeg",
+    detailedDesc: "Eon Center focuses on hands-on computer science, robotics, and artificial intelligence. Students build intelligent algorithms, wire up microcontrollers, and develop deep-tech applications.",
+    location: "Maharashtra, India",
+    date: "Active Lab",
+    techStack: ["Python Programming", "AI Neural Kits", "Embedded Microcontrollers", "Robotics Sensors"],
+    stats: [
+      { label: "Students Certified", value: "300+ Students" },
+      { label: "Lab Projects", value: "50+ Built" },
+      { label: "Code Competitions", value: "12+ Hosted" }
+    ],
+    highlights: [
+      "Hands-on AI algorithms and computer vision workshops",
+      "Interactive breadboard wiring and robotic rover assembly",
+      "Real-world coding and problem-solving hackathons"
+    ]
+  },
+  {
+    slug: "eon-center-7",
+    title: "AIRG Eon Center Lab",
+    category: "School Lab",
+    desc: "A futuristic innovation centre empowering students with AI, Python programming, robotics, and interactive hardware.",
+    url: "/centres/gallery/photo-new-7.jpeg",
+    detailedDesc: "Eon Center focuses on hands-on computer science, robotics, and artificial intelligence. Students build intelligent algorithms, wire up microcontrollers, and develop deep-tech applications.",
+    location: "Maharashtra, India",
+    date: "Active Lab",
+    techStack: ["Python Programming", "AI Neural Kits", "Embedded Microcontrollers", "Robotics Sensors"],
+    stats: [
+      { label: "Students Certified", value: "300+ Students" },
+      { label: "Lab Projects", value: "50+ Built" },
+      { label: "Code Competitions", value: "12+ Hosted" }
+    ],
+    highlights: [
+      "Hands-on AI algorithms and computer vision workshops",
+      "Interactive breadboard wiring and robotic rover assembly",
+      "Real-world coding and problem-solving hackathons"
+    ]
+  },
+  {
+    slug: "eon-center-8",
+    title: "AIRG Eon Center Lab",
+    category: "School Lab",
+    desc: "A futuristic innovation centre empowering students with AI, Python programming, robotics, and interactive hardware.",
+    url: "/centres/gallery/photo-new-8.jpeg",
+    detailedDesc: "Eon Center focuses on hands-on computer science, robotics, and artificial intelligence. Students build intelligent algorithms, wire up microcontrollers, and develop deep-tech applications.",
+    location: "Maharashtra, India",
+    date: "Active Lab",
+    techStack: ["Python Programming", "AI Neural Kits", "Embedded Microcontrollers", "Robotics Sensors"],
+    stats: [
+      { label: "Students Certified", value: "300+ Students" },
+      { label: "Lab Projects", value: "50+ Built" },
+      { label: "Code Competitions", value: "12+ Hosted" }
+    ],
+    highlights: [
+      "Hands-on AI algorithms and computer vision workshops",
+      "Interactive breadboard wiring and robotic rover assembly",
+      "Real-world coding and problem-solving hackathons"
+    ]
+  },
+  {
+    slug: "eon-center-9",
+    title: "AIRG Eon Center Lab",
+    category: "School Lab",
+    desc: "A futuristic innovation centre empowering students with AI, Python programming, robotics, and interactive hardware.",
+    url: "/centres/gallery/photo-new-9.jpeg",
+    detailedDesc: "Eon Center focuses on hands-on computer science, robotics, and artificial intelligence. Students build intelligent algorithms, wire up microcontrollers, and develop deep-tech applications.",
+    location: "Maharashtra, India",
+    date: "Active Lab",
+    techStack: ["Python Programming", "AI Neural Kits", "Embedded Microcontrollers", "Robotics Sensors"],
+    stats: [
+      { label: "Students Certified", value: "300+ Students" },
+      { label: "Lab Projects", value: "50+ Built" },
+      { label: "Code Competitions", value: "12+ Hosted" }
+    ],
+    highlights: [
+      "Hands-on AI algorithms and computer vision workshops",
+      "Interactive breadboard wiring and robotic rover assembly",
+      "Real-world coding and problem-solving hackathons"
+    ]
+  },
+  {
+    slug: "eon-center-10",
+    title: "AIRG Eon Center Lab",
+    category: "School Lab",
+    desc: "A futuristic innovation centre empowering students with AI, Python programming, robotics, and interactive hardware.",
+    url: "/centres/gallery/photo-new-10.jpeg",
+    detailedDesc: "Eon Center focuses on hands-on computer science, robotics, and artificial intelligence. Students build intelligent algorithms, wire up microcontrollers, and develop deep-tech applications.",
+    location: "Maharashtra, India",
+    date: "Active Lab",
+    techStack: ["Python Programming", "AI Neural Kits", "Embedded Microcontrollers", "Robotics Sensors"],
+    stats: [
+      { label: "Students Certified", value: "300+ Students" },
+      { label: "Lab Projects", value: "50+ Built" },
+      { label: "Code Competitions", value: "12+ Hosted" }
+    ],
+    highlights: [
+      "Hands-on AI algorithms and computer vision workshops",
+      "Interactive breadboard wiring and robotic rover assembly",
+      "Real-world coding and problem-solving hackathons"
+    ]
+  },
+  {
+    slug: "eon-center-11",
+    title: "AIRG Eon Center Lab",
+    category: "School Lab",
+    desc: "A futuristic innovation centre empowering students with AI, Python programming, robotics, and interactive hardware.",
+    url: "/centres/gallery/photo-new-11.jpeg",
+    detailedDesc: "Eon Center focuses on hands-on computer science, robotics, and artificial intelligence. Students build intelligent algorithms, wire up microcontrollers, and develop deep-tech applications.",
+    location: "Maharashtra, India",
+    date: "Active Lab",
+    techStack: ["Python Programming", "AI Neural Kits", "Embedded Microcontrollers", "Robotics Sensors"],
+    stats: [
+      { label: "Students Certified", value: "300+ Students" },
+      { label: "Lab Projects", value: "50+ Built" },
+      { label: "Code Competitions", value: "12+ Hosted" }
+    ],
+    highlights: [
+      "Hands-on AI algorithms and computer vision workshops",
+      "Interactive breadboard wiring and robotic rover assembly",
+      "Real-world coding and problem-solving hackathons"
+    ]
+  },
+  {
+    slug: "eon-center-12",
+    title: "AIRG Eon Center Lab",
+    category: "School Lab",
+    desc: "A futuristic innovation centre empowering students with AI, Python programming, robotics, and interactive hardware.",
+    url: "/centres/gallery/photo-new-12.jpeg",
+    detailedDesc: "Eon Center focuses on hands-on computer science, robotics, and artificial intelligence. Students build intelligent algorithms, wire up microcontrollers, and develop deep-tech applications.",
+    location: "Maharashtra, India",
+    date: "Active Lab",
+    techStack: ["Python Programming", "AI Neural Kits", "Embedded Microcontrollers", "Robotics Sensors"],
+    stats: [
+      { label: "Students Certified", value: "300+ Students" },
+      { label: "Lab Projects", value: "50+ Built" },
+      { label: "Code Competitions", value: "12+ Hosted" }
+    ],
+    highlights: [
+      "Hands-on AI algorithms and computer vision workshops",
+      "Interactive breadboard wiring and robotic rover assembly",
+      "Real-world coding and problem-solving hackathons"
+    ]
+  },
+  {
+    slug: "eon-center-13",
+    title: "AIRG Eon Center Lab",
+    category: "School Lab",
+    desc: "A futuristic innovation centre empowering students with AI, Python programming, robotics, and interactive hardware.",
+    url: "/centres/gallery/photo-new-13.jpeg",
+    detailedDesc: "Eon Center focuses on hands-on computer science, robotics, and artificial intelligence. Students build intelligent algorithms, wire up microcontrollers, and develop deep-tech applications.",
+    location: "Maharashtra, India",
+    date: "Active Lab",
+    techStack: ["Python Programming", "AI Neural Kits", "Embedded Microcontrollers", "Robotics Sensors"],
+    stats: [
+      { label: "Students Certified", value: "300+ Students" },
+      { label: "Lab Projects", value: "50+ Built" },
+      { label: "Code Competitions", value: "12+ Hosted" }
+    ],
+    highlights: [
+      "Hands-on AI algorithms and computer vision workshops",
+      "Interactive breadboard wiring and robotic rover assembly",
+      "Real-world coding and problem-solving hackathons"
+    ]
+  },
+  {
+    slug: "eon-center-14",
+    title: "AIRG Eon Center Lab",
+    category: "School Lab",
+    desc: "Computational thinking and software engineering hub at Eon Center.",
+    url: "/extracted-images/eon/eon_0.jpeg",
+    detailedDesc: "Students learning logic architecture, debugging algorithms, and Python computing models at Eon Center.",
+    location: "Maharashtra, India",
+    date: "Active Lab",
+    techStack: ["Python 3", "Visual Logic Puzzles", "Algorithms Training", "Jupyter Notebooks"],
+    stats: [
+      { label: "Students Enrolled", value: "180+ Learners" },
+      { label: "Python Scripts", value: "90+ Completed" },
+      { label: "Code Battles", value: "6 Hosted" }
+    ],
+    highlights: [
+      "Helped every student code a basic command-line word puzzle game in Python",
+      "Programmed sorting algorithms showing visual arrays rearrange themselves",
+      "Conducted logic code battles that teach clean and efficient syntax"
+    ]
+  },
+  {
+    slug: "eon-center-15",
+    title: "AIRG Eon Center Lab",
+    category: "School Lab",
+    desc: "Computational thinking and software engineering hub at Eon Center.",
+    url: "/extracted-images/eon/eon_4.jpeg",
+    detailedDesc: "Students learning logic architecture, debugging algorithms, and Python computing models at Eon Center.",
+    location: "Maharashtra, India",
+    date: "Active Lab",
+    techStack: ["Python 3", "Visual Logic Puzzles", "Algorithms Training", "Jupyter Notebooks"],
+    stats: [
+      { label: "Students Enrolled", value: "180+ Learners" },
+      { label: "Python Scripts", value: "90+ Completed" },
+      { label: "Code Battles", value: "6 Hosted" }
+    ],
+    highlights: [
+      "Helped every student code a basic command-line word puzzle game in Python",
+      "Programmed sorting algorithms showing visual arrays rearrange themselves",
+      "Conducted logic code battles that teach clean and efficient syntax"
+    ]
   }
 ];

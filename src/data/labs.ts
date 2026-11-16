@@ -30,7 +30,20 @@ export const labsData: Lab[] = [
       "/centres/rajendra/PHOTO-2026-07-14-21-26-47.jpg",
       "/centres/rajendra/PHOTO-2026-07-14-21-26-47(1).jpg",
       "/centres/rajendra/PHOTO-2026-07-14-21-26-47(2).jpg",
-      "/centres/rajendra/PHOTO-2026-07-14-21-26-47(3).jpg"
+      "/centres/rajendra/PHOTO-2026-07-14-21-26-47(3).jpg",
+      "/centres/gallery/photo-new-1.jpeg",
+      "/centres/gallery/photo-new-2.jpeg",
+      "/centres/gallery/photo-new-3.jpeg",
+      "/centres/gallery/photo-new-4.jpeg",
+      "/centres/gallery/photo-new-5.jpeg",
+      "/centres/gallery/photo-new-6.jpeg",
+      "/centres/gallery/photo-new-7.jpeg",
+      "/centres/gallery/photo-new-8.jpeg",
+      "/centres/gallery/photo-new-9.jpeg",
+      "/centres/gallery/photo-new-10.jpeg",
+      "/centres/gallery/photo-new-11.jpeg",
+      "/centres/gallery/photo-new-12.jpeg",
+      "/centres/gallery/photo-new-13.jpeg"
     ],
     "techStack": [
       "Model Glider Kits",
@@ -167,7 +180,20 @@ export const labsData: Lab[] = [
       "/extracted-images/eon/eon_1.jpeg",
       "/extracted-images/eon/eon_2.jpeg",
       "/extracted-images/eon/eon_3.jpeg",
-      "/extracted-images/eon/eon_4.jpeg"
+      "/extracted-images/eon/eon_4.jpeg",
+      "/centres/gallery/photo-new-1.jpeg",
+      "/centres/gallery/photo-new-2.jpeg",
+      "/centres/gallery/photo-new-3.jpeg",
+      "/centres/gallery/photo-new-4.jpeg",
+      "/centres/gallery/photo-new-5.jpeg",
+      "/centres/gallery/photo-new-6.jpeg",
+      "/centres/gallery/photo-new-7.jpeg",
+      "/centres/gallery/photo-new-8.jpeg",
+      "/centres/gallery/photo-new-9.jpeg",
+      "/centres/gallery/photo-new-10.jpeg",
+      "/centres/gallery/photo-new-11.jpeg",
+      "/centres/gallery/photo-new-12.jpeg",
+      "/centres/gallery/photo-new-13.jpeg"
     ],
     "techStack": [
       "Python 3",
@@ -205,11 +231,16 @@ export const labsData: Lab[] = [
     "status": "Active Lab Center",
     "img": "/extracted-images/holy_convent/holy_convent_1.jpeg",
     "images": [
-      "/extracted-images/holy_convent/holy_convent_1.jpeg",
-      "/extracted-images/holy_convent/holy_convent_2.jpeg",
-      "/extracted-images/holy_convent/holy_convent_3.jpeg",
-      "/extracted-images/holy_convent/holy_convent_4.jpeg"
-    ],
+        "/extracted-images/holy_convent/holy_convent_1.jpeg",
+        "/extracted-images/holy_convent/holy_convent_2.jpeg",
+        "/extracted-images/holy_convent/holy_convent_3.jpeg",
+        "/extracted-images/holy_convent/holy_convent_4.jpeg",
+        "/extracted-images/holy_convent/holy_convent_5.jpeg",
+        "/extracted-images/holy_convent/holy_convent_6.jpeg",
+        "/extracted-images/holy_convent/holy_convent_7.jpeg",
+        "/extracted-images/holy_convent/holy_convent_8.jpeg",
+        "/extracted-images/holy_convent/holy_convent_9.jpeg"
+      ],
     "techStack": [
       "Meta Quest VR Headsets",
       "Spatial WebXR Software",
