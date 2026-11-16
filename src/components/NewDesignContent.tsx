@@ -406,6 +406,7 @@ export default function NewDesignContent() {
     if (slug === "sant-tukaram-lab-showcase") return "/labs/sant-tukaram";
     if (slug === "koteshwar-vidyaly-lab-showcase") return "/labs/koteshwar-vidyaly";
     if (slug === "ss-nikam-lab-showcase") return "/labs/ss-nikam";
+    if (slug.startsWith("eon-")) return "/labs/eon-hub";
     return `/labs/${slug}`;
   };
 
@@ -462,7 +463,7 @@ export default function NewDesignContent() {
 
   const [currentEmblemLetter, setCurrentEmblemLetter] = useState("A");
   const [isEmblemMirrored, setIsEmblemMirrored] = useState(false);
-  const [videoLang, setVideoLang] = useState<'en' | 'mr'>('en');
+  const [videoLang, setVideoLang] = useState<'en' | 'mr' | 'tour'>('tour');
   const tourVideoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
@@ -631,6 +632,19 @@ export default function NewDesignContent() {
 
   const heroLabImages = [
     "https://lab.airginternational.com/_next/image?url=%2Fextracted-images%2Feon%2Feon_4.jpeg&w=1920&q=75",
+    "/centres/gallery/photo-new-1.jpeg",
+    "/centres/gallery/photo-new-2.jpeg",
+    "/centres/gallery/photo-new-3.jpeg",
+    "/centres/gallery/photo-new-4.jpeg",
+    "/centres/gallery/photo-new-5.jpeg",
+    "/centres/gallery/photo-new-6.jpeg",
+    "/centres/gallery/photo-new-7.jpeg",
+    "/centres/gallery/photo-new-8.jpeg",
+    "/centres/gallery/photo-new-9.jpeg",
+    "/centres/gallery/photo-new-10.jpeg",
+    "/centres/gallery/photo-new-11.jpeg",
+    "/centres/gallery/photo-new-12.jpeg",
+    "/centres/gallery/photo-new-13.jpeg",
     "https://lab.airginternational.com/_next/image?url=%2Fcentres%2Frajendra%2FPHOTO-2026-07-14-21-26-47(1).jpg&w=1920&q=75",
     "https://lab.airginternational.com/_next/image?url=%2Fcentres%2Fss-nikam%2FPHOTO-2026-07-14-21-47-38.jpg&w=1920&q=75",
     "https://lab.airginternational.com/_next/image?url=%2Fcentres%2Fkoteshwar%2FPHOTO-2026-07-14-21-47-00.jpg&w=1920&q=75",
@@ -646,6 +660,21 @@ export default function NewDesignContent() {
     }, 3500);
     return () => clearInterval(interval);
   }, [heroLabImages.length]);
+
+  const globalPhotoList = [
+    "/global-centres/centre_photo_1.jpeg",
+    "/global-centres/centre_photo_2.jpeg",
+    "/global-centres/centre_photo_3.jpeg",
+    "/global-centres/centre_photo_4.jpeg"
+  ];
+  const [globalPhotoIndex, setGlobalPhotoIndex] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setGlobalPhotoIndex((prev) => (prev + 1) % globalPhotoList.length);
+    }, 3500);
+    return () => clearInterval(interval);
+  }, [globalPhotoList.length]);
 
   const getUpiDeepLink = (app?: string) => {
     const MERCHANT_UPI = "9860779172-5@ybl";
@@ -1043,14 +1072,16 @@ export default function NewDesignContent() {
             <Logo />
           </div>
           <div className="hidden lg:flex flex-1 items-center justify-evenly px-6 xl:px-12">
-            {['hero', 'learning', 'store', 'labs', 'ai-infrastructures', 'centres'].map((item) => {
+            {['hero', 'learning', 'store', 'labs', 'ai-infrastructures', 'centres', 'careers', 'lab-setup'].map((item) => {
               const labels: Record<string, string> = {
                 hero: 'Home',
                 learning: 'Labs',
                 store: 'Store',
                 labs: 'Airg Labs',
                 'ai-infrastructures': 'AI Infra',
-                centres: 'Global Centres'
+                centres: 'Global Centres',
+                careers: 'Careers',
+                'lab-setup': 'Lab Setup'
               };
               
               if (item === 'learning') {
@@ -1104,6 +1135,12 @@ export default function NewDesignContent() {
                       >
                         Workshops
                       </button>
+                      <Link
+                        href="/project-codes"
+                        className="px-5 py-4 text-xs font-semibold uppercase tracking-widest text-[#1a1a2e]/60 hover:text-primary hover:bg-black/5 transition-colors whitespace-nowrap text-left block w-full"
+                      >
+                        Project Codes
+                      </Link>
                     </div>
                   </div>
                 );
@@ -1115,6 +1152,30 @@ export default function NewDesignContent() {
                     key={item}
                     href="/learning/ai-infrastructures"
                     className={`nav-link font-semibold transition-colors text-xs uppercase tracking-widest ${activeFace === item ? 'text-primary' : 'text-[#1a1a2e]/40 hover:text-[#1a1a2e]'}`}
+                  >
+                    {labels[item]}
+                  </Link>
+                );
+              }
+
+              if (item === 'lab-setup') {
+                return (
+                  <Link
+                    key={item}
+                    href="/lab-setup"
+                    className="nav-link font-semibold transition-colors text-xs uppercase tracking-widest text-[#1a1a2e]/40 hover:text-[#1a1a2e]"
+                  >
+                    {labels[item]}
+                  </Link>
+                );
+              }
+
+              if (item === 'careers') {
+                return (
+                  <Link
+                    key={item}
+                    href="/careers"
+                    className="nav-link font-semibold transition-colors text-xs uppercase tracking-widest text-[#1a1a2e]/40 hover:text-[#1a1a2e]"
                   >
                     {labels[item]}
                   </Link>
@@ -1215,19 +1276,21 @@ export default function NewDesignContent() {
             <motion.div 
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
+exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.2 }}
               className="absolute inset-x-0 top-20 z-[99] lg:hidden bg-white/95 backdrop-blur-lg border-b border-black/5 shadow-lg p-6 flex flex-col gap-6"
             >
               <div className="flex flex-col gap-4">
-                {['hero', 'learning', 'store', 'labs', 'ai-infrastructures', 'centres'].map((item) => {
+                {['hero', 'learning', 'store', 'labs', 'ai-infrastructures', 'centres', 'careers', 'lab-setup'].map((item) => {
                   const labels: Record<string, string> = {
                     hero: 'Home',
                     learning: 'Labs',
                     store: 'Store',
                     labs: 'Airg Labs',
                     'ai-infrastructures': 'AI Infra',
-                    centres: 'Global Centres'
+                    centres: 'Global Centres',
+                    careers: 'Careers',
+                    'lab-setup': 'Lab Setup'
                   };
                   
                   if (item === 'learning') {
@@ -1291,6 +1354,13 @@ export default function NewDesignContent() {
                           >
                             Workshops
                           </button>
+                          <Link
+                            href="/project-codes"
+                            onClick={() => setIsMobileMenuOpen(false)}
+                            className="text-left py-2 text-xs font-bold uppercase tracking-widest text-[#1a1a2e]/50 hover:text-[#1a1a2e] block w-full"
+                          >
+                            Project Codes
+                          </Link>
                         </div>
                       </div>
                     );
@@ -1304,6 +1374,32 @@ export default function NewDesignContent() {
                         className={`text-left py-2 font-bold text-sm uppercase tracking-widest border-b border-black/5 transition-colors ${
                           activeFace === item ? 'text-primary' : 'text-[#1a1a2e]/60 hover:text-[#1a1a2e]'
                         }`}
+                        onClick={() => setIsMobileMenuOpen(false)}
+                      >
+                        {labels[item]}
+                      </Link>
+                    );
+                  }
+
+                  if (item === 'careers') {
+                    return (
+                      <Link
+                        key={item}
+                        href="/careers"
+                        className="text-[#1a1a2e]/60 hover:text-[#1a1a2e] text-left py-2 font-bold text-sm uppercase tracking-widest border-b border-black/5 transition-colors"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                      >
+                        {labels[item]}
+                      </Link>
+                    );
+                  }
+
+                  if (item === 'lab-setup') {
+                    return (
+                      <Link
+                        key={item}
+                        href="/lab-setup"
+                        className="text-[#1a1a2e]/60 hover:text-[#1a1a2e] text-left py-2 font-bold text-sm uppercase tracking-widest border-b border-black/5 transition-colors"
                         onClick={() => setIsMobileMenuOpen(false)}
                       >
                         {labels[item]}
@@ -2202,7 +2298,7 @@ export default function NewDesignContent() {
                             name: "Pravich Welfare Foundation", 
                             logo: "/logos/pravich_logo.png",
                             desc: "Focuses on rural digital literacy, youth skill development, and community welfare initiatives."
-                          }
+                          },
                           { 
                             name: "Suprabhat Mahila Mandal", 
                             logo: "/logos/suprabhat_logo.png",
@@ -3041,6 +3137,16 @@ export default function NewDesignContent() {
                 {/* Floating Language Selector */}
                 <div className="absolute top-4 right-4 z-30 flex items-center gap-1 bg-black/60 backdrop-blur-md p-1 rounded-full border border-white/10 select-none">
                   <button
+                    onClick={() => setVideoLang('tour')}
+                    className={`px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-wider transition-all duration-300 ${
+                      videoLang === 'tour'
+                        ? 'bg-[#EE2C3C] text-white shadow-lg'
+                        : 'text-white/60 hover:text-white hover:bg-white/5'
+                    }`}
+                  >
+                    Lab Tour
+                  </button>
+                  <button
                     onClick={() => setVideoLang('en')}
                     className={`px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-wider transition-all duration-300 ${
                       videoLang === 'en'
@@ -3063,7 +3169,13 @@ export default function NewDesignContent() {
                 </div>
                 <video
                   ref={tourVideoRef}
-                  src={videoLang === 'en' ? "/video/airg_labs_overview_compressed.mp4" : "/video/airg_labs_overview_marathi.mp4"}
+                  src={
+                    videoLang === 'tour'
+                      ? "/video/airg_labs_tour.mp4"
+                      : videoLang === 'en'
+                      ? "/video/airg_labs_overview_compressed.mp4"
+                      : "/video/airg_labs_overview_marathi.mp4"
+                  }
                   controls
                   poster="/attachments/thumbnail.png"
                   playsInline
@@ -3470,6 +3582,83 @@ export default function NewDesignContent() {
                 </div>
               </div>
 
+              {/* NEW SECTION: Global Infrastructure Gallery */}
+              <div className="mt-24 border-t border-black/5 pt-16 space-y-10">
+                <div className="text-center max-w-3xl mx-auto space-y-3">
+                  <span className="text-primary font-extrabold tracking-[0.2em] uppercase text-[10px] md:text-xs block font-mono">// VISUAL AUDIT</span>
+                  <h2 className="font-headline text-3xl md:text-5xl font-black text-[#1a1a2e] uppercase tracking-tighter leading-none">
+                    Global Hub <span className="text-primary text-glow-red">Gallery</span>
+                  </h2>
+                  <p className="text-sm md:text-base text-[#1a1a2e]/55 font-light leading-relaxed max-w-2xl mx-auto">
+                    Visual highlights showcasing classroom training, global certifications, and lab setup across our worldwide operational centres.
+                  </p>
+                </div>
+
+                {/* Rotating Slideshow */}
+                <div className="relative max-w-4xl mx-auto group/gallery">
+                  {/* Outer subtle Patriotic ambient glows */}
+                  <div className="absolute -inset-4 bg-gradient-to-tr from-[#EE2C3C]/10 via-[#0038A8]/5 to-transparent rounded-[2.5rem] blur-2xl opacity-75 pointer-events-none" />
+                  
+                  {/* Slideshow Card Container */}
+                  <div className="relative rounded-[2.5rem] overflow-hidden border-2 border-[#EE2C3C]/20 bg-slate-950 shadow-2xl">
+                    <div className="aspect-[16/10] md:aspect-[21/9] w-full relative">
+                      <AnimatePresence mode="wait">
+                        <motion.img 
+                          key={globalPhotoIndex}
+                          src={globalPhotoList[globalPhotoIndex]} 
+                          alt={`Global Centre Photo ${globalPhotoIndex + 1}`} 
+                          initial={{ opacity: 0, scale: 1.02 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          exit={{ opacity: 0, scale: 0.98 }}
+                          transition={{ duration: 0.5, ease: "easeInOut" }}
+                          className="w-full h-full object-cover opacity-95 select-none pointer-events-none"
+                        />
+                      </AnimatePresence>
+                      <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent opacity-80 pointer-events-none" />
+
+                      {/* Top-Left Hub Badge */}
+                      <div className="absolute top-6 left-6 z-20 bg-black/80 backdrop-blur-md px-3.5 py-1.5 rounded-xl border border-white/10 shadow-lg select-none">
+                        <span className="text-[10px] font-black uppercase tracking-[0.15em] text-[#EE2C3C] font-mono">GLOBAL HUBS</span>
+                      </div>
+
+                      {/* Carousel Arrow Controls */}
+                      <div className="absolute inset-y-0 left-4 right-4 flex items-center justify-between pointer-events-none z-20">
+                        <button 
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setGlobalPhotoIndex((prev) => (prev - 1 + globalPhotoList.length) % globalPhotoList.length);
+                          }}
+                          className="w-12 h-12 rounded-full bg-black/60 hover:bg-[#EE2C3C] text-white hover:text-white border border-white/10 flex items-center justify-center shadow-lg transition-all duration-300 pointer-events-auto cursor-pointer"
+                        >
+                          <span className="material-symbols-outlined text-xl">chevron_left</span>
+                        </button>
+                        <button 
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setGlobalPhotoIndex((prev) => (prev + 1) % globalPhotoList.length);
+                          }}
+                          className="w-12 h-12 rounded-full bg-black/60 hover:bg-[#EE2C3C] text-white hover:text-white border border-white/10 flex items-center justify-center shadow-lg transition-all duration-300 pointer-events-auto cursor-pointer"
+                        >
+                          <span className="material-symbols-outlined text-xl">chevron_right</span>
+                        </button>
+                      </div>
+
+                      {/* Sliding indicator dots */}
+                      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2 z-20">
+                        {globalPhotoList.map((_, idx) => (
+                          <button
+                            key={idx}
+                            onClick={() => setGlobalPhotoIndex(idx)}
+                            className={`h-2 rounded-full transition-all duration-300 ${
+                              globalPhotoIndex === idx ? "bg-[#EE2C3C] w-6 scale-110" : "bg-white/40 hover:bg-white/70 w-2"
+                            }`}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </section>
 
@@ -3480,7 +3669,7 @@ export default function NewDesignContent() {
                 <div className="absolute left-[-20px] top-0 h-full w-[1px] bg-black/5">
                   <div className="absolute top-0 left-[-4px] w-2 h-2 bg-primary rounded-full animate-pulse" />
                 </div>
-                <span className="text-primary font-bold uppercase tracking-[0.5em] text-[10px] mb-4 block font-mono">Operational Training</span>
+                <span className="text-primary font-extrabold tracking-[0.2em] uppercase text-[11px] md:text-xs mb-4 block font-sans">Operational Training</span>
                 <h2 className="font-headline tracking-tighter leading-[0.9]">
                   <span className="block text-4xl md:text-6xl font-black text-[#1a1a2e] uppercase">
                     Field
@@ -3601,7 +3790,7 @@ export default function NewDesignContent() {
                 <div className="absolute left-[-20px] top-0 h-full w-[1px] bg-black/5">
                   <div className="absolute top-0 left-[-4px] w-2 h-2 bg-primary rounded-full animate-pulse" />
                 </div>
-                <span className="text-primary font-bold tracking-[0.5em] uppercase text-[10px] mb-4 block font-mono">Official Merchandise</span>
+                <span className="text-primary font-extrabold tracking-[0.2em] uppercase text-[11px] md:text-xs mb-4 block font-sans">Official Merchandise</span>
                 <h2 className="font-headline tracking-tighter leading-[0.9]">
                   <span className="block text-4xl md:text-6xl font-black text-[#1a1a2e] uppercase">
                     AIR G
@@ -3739,7 +3928,7 @@ export default function NewDesignContent() {
                 <div className="absolute left-[-20px] top-0 h-full w-[1px] bg-black/5">
                   <div className="absolute top-0 left-[-4px] w-2 h-2 bg-primary rounded-full animate-pulse" />
                 </div>
-                <span className="text-primary font-bold tracking-[0.5em] uppercase text-[10px] mb-4 block font-mono">Academic & Innovation Portal</span>
+                <span className="text-primary font-extrabold tracking-[0.2em] uppercase text-[11px] md:text-xs mb-4 block font-sans">Academic & Innovation Portal</span>
                 <h2 className="font-headline tracking-tighter leading-[0.9]">
                   <span className="block text-4xl md:text-6xl font-black text-[#1a1a2e] uppercase">
                     Learning &
@@ -3751,6 +3940,87 @@ export default function NewDesignContent() {
                 <p className="text-[#1a1a2e]/40 mt-4 max-w-2xl text-base font-light border-l-2 border-primary/20 pl-6">
                   Register for state-level engineering challenges, track active student nodes, and synchronize your curriculums via the official AIR G Learning App.
                 </p>
+
+              {/* Python Bootcamp Section */}
+              <div id="python-course" className="space-y-6 mb-16 pt-6 relative scroll-mt-24">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-black/5 pb-4 relative z-10 mt-8">
+                  <h3 className="text-xl font-headline font-black text-[#1a1a2e] uppercase tracking-tight flex items-center gap-2">
+                    <span className="material-symbols-outlined text-primary text-xl">code</span>
+                    AIR G International Python Fundamentals Bootcamp
+                  </h3>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 relative z-10">
+                  <div className="glass-premium p-8 rounded-[2.5rem] border-2 border-primary/20 hover:border-primary/45 transition-all duration-300 relative overflow-hidden group shadow-md flex flex-col justify-between h-full bg-white/80 backdrop-blur-sm md:col-span-2">
+                    <div className="absolute top-0 right-0 px-4 py-1.5 bg-primary text-white rounded-bl-2xl text-[8px] font-black font-mono uppercase tracking-widest shadow-md">
+                      Live Online Training
+                    </div>
+                    <div className="flex flex-col md:flex-row gap-8 justify-between items-start md:items-end w-full mt-6">
+                      <div className="space-y-4 md:w-2/3">
+                        <div className="flex items-center gap-3">
+                          <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all duration-300 shrink-0">
+                            <span className="material-symbols-outlined text-2xl">terminal</span>
+                          </div>
+                          <div>
+                            <h4 className="text-lg font-headline font-black text-[#1a1a2e] uppercase tracking-tight">Python Fundamentals Bootcamp</h4>
+                            <span className="px-2.5 py-0.5 border border-primary/20 bg-primary/5 rounded-full text-[9px] font-black font-mono text-primary uppercase tracking-widest mt-1 inline-block">20-Hour Program</span>
+                          </div>
+                        </div>
+                        <p className="text-xs text-[#1a1a2e]/60 leading-relaxed font-light font-body pt-2 text-left">
+                          This premium, instructor-led bootcamp is meticulously designed for students and professionals looking to master Python from scratch. Get hands-on experience with real-world projects, industry-standard practices, and build a strong programming foundation. <strong className="text-primary font-medium">Unlock your potential and accelerate your tech career today!</strong>
+                        </p>
+                        
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4 text-xs font-medium text-[#1a1a2e]/80">
+                          <div className="flex items-center gap-2">
+                            <span className="material-symbols-outlined text-[16px] text-primary">calendar_month</span>
+                            Duration: 1 Month (20 Hours)
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="material-symbols-outlined text-[16px] text-primary">desktop_windows</span>
+                            Mode: Live Online
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="material-symbols-outlined text-[16px] text-primary">schedule</span>
+                            Sat (2 Hrs) & Sun (3 Hrs)
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="material-symbols-outlined text-[16px] text-primary">person</span>
+                            Trainer: Miss. Shravani Khanvilkar (Software Developer)
+                          </div>
+                        </div>
+
+                        <div className="pt-4 flex items-center justify-between md:justify-start gap-8">
+                          <div className="text-left">
+                            <div className="text-3xl font-black font-mono text-primary">₹3,000</div>
+                            <div className="text-[9px] font-mono text-[#1a1a2e]/30 uppercase tracking-widest mt-0.5">Course Fee</div>
+                          </div>
+                          <div className="flex items-center gap-2 bg-emerald-50 text-emerald-700 px-3 py-2 rounded-xl border border-emerald-100">
+                            <span className="material-symbols-outlined text-[18px]">workspace_premium</span>
+                            <div className="text-[10px] font-bold leading-tight text-left">AIR G International<br/>Certificate of Completion</div>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div className="pt-6 mt-8 border-t border-black/5 md:w-[30%] md:mt-0 md:pt-0 md:border-t-0 flex flex-col gap-3 shrink-0 w-full">
+                        <button 
+                          onClick={() => setIsCurriculumModalOpen(true)}
+                          className="w-full bg-white hover:bg-gray-50 text-[#1a1a2e] border-2 border-black/10 py-3.5 rounded-xl font-black uppercase tracking-widest text-xs transition-all flex items-center justify-center gap-2 cursor-pointer hover:border-black/30"
+                        >
+                          <span className="material-symbols-outlined text-sm">menu_book</span>
+                          View Full Curriculum
+                        </button>
+                        <button 
+                          onClick={() => setIsPythonModalOpen(true)}
+                          className="w-full bg-primary hover:bg-[#eb0028]/95 py-4 rounded-xl font-black uppercase tracking-widest text-xs text-white transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md hover:scale-[1.02] glow-red"
+                        >
+                          <span className="material-symbols-outlined text-sm">app_registration</span>
+                          Register Now
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
 
               {/* Premium Implant Training Program 2026 Section */}
               <div className="space-y-6 mb-16 pt-6 relative">
@@ -3913,87 +4183,6 @@ export default function NewDesignContent() {
                 </div>
               </div>
               
-              {/* Python Bootcamp Section */}
-              <div id="python-course" className="space-y-6 mb-16 pt-6 relative scroll-mt-24">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-black/5 pb-4 relative z-10 mt-8">
-                  <h3 className="text-xl font-headline font-black text-[#1a1a2e] uppercase tracking-tight flex items-center gap-2">
-                    <span className="material-symbols-outlined text-primary text-xl">code</span>
-                    AIR G International Python Fundamentals Bootcamp
-                  </h3>
-                </div>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 relative z-10">
-                  <div className="glass-premium p-8 rounded-[2.5rem] border-2 border-primary/20 hover:border-primary/45 transition-all duration-300 relative overflow-hidden group shadow-md flex flex-col justify-between h-full bg-white/80 backdrop-blur-sm md:col-span-2">
-                    <div className="absolute top-0 right-0 px-4 py-1.5 bg-primary text-white rounded-bl-2xl text-[8px] font-black font-mono uppercase tracking-widest shadow-md">
-                      Live Online Training
-                    </div>
-                    <div className="flex flex-col md:flex-row gap-8 justify-between items-start md:items-end w-full mt-6">
-                      <div className="space-y-4 md:w-2/3">
-                        <div className="flex items-center gap-3">
-                          <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all duration-300 shrink-0">
-                            <span className="material-symbols-outlined text-2xl">terminal</span>
-                          </div>
-                          <div>
-                            <h4 className="text-lg font-headline font-black text-[#1a1a2e] uppercase tracking-tight">Python Fundamentals Bootcamp</h4>
-                            <span className="px-2.5 py-0.5 border border-primary/20 bg-primary/5 rounded-full text-[9px] font-black font-mono text-primary uppercase tracking-widest mt-1 inline-block">20-Hour Program</span>
-                          </div>
-                        </div>
-                        <p className="text-xs text-[#1a1a2e]/60 leading-relaxed font-light font-body pt-2 text-left">
-                          This premium, instructor-led bootcamp is meticulously designed for students and professionals looking to master Python from scratch. Get hands-on experience with real-world projects, industry-standard practices, and build a strong programming foundation. <strong className="text-primary font-medium">Unlock your potential and accelerate your tech career today!</strong>
-                        </p>
-                        
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4 text-xs font-medium text-[#1a1a2e]/80">
-                          <div className="flex items-center gap-2">
-                            <span className="material-symbols-outlined text-[16px] text-primary">calendar_month</span>
-                            Duration: 1 Month (20 Hours)
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <span className="material-symbols-outlined text-[16px] text-primary">desktop_windows</span>
-                            Mode: Live Online
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <span className="material-symbols-outlined text-[16px] text-primary">schedule</span>
-                            Sat (2 Hrs) & Sun (3 Hrs)
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <span className="material-symbols-outlined text-[16px] text-primary">person</span>
-                            Trainer: Miss. Shravani Khanvilkar (Software Developer)
-                          </div>
-                        </div>
-
-                        <div className="pt-4 flex items-center justify-between md:justify-start gap-8">
-                          <div className="text-left">
-                            <div className="text-3xl font-black font-mono text-primary">₹3,000</div>
-                            <div className="text-[9px] font-mono text-[#1a1a2e]/30 uppercase tracking-widest mt-0.5">Course Fee</div>
-                          </div>
-                          <div className="flex items-center gap-2 bg-emerald-50 text-emerald-700 px-3 py-2 rounded-xl border border-emerald-100">
-                            <span className="material-symbols-outlined text-[18px]">workspace_premium</span>
-                            <div className="text-[10px] font-bold leading-tight text-left">AIR G International<br/>Certificate of Completion</div>
-                          </div>
-                        </div>
-                      </div>
-                      
-                      <div className="pt-6 mt-8 border-t border-black/5 md:w-[30%] md:mt-0 md:pt-0 md:border-t-0 flex flex-col gap-3 shrink-0 w-full">
-                        <button 
-                          onClick={() => setIsCurriculumModalOpen(true)}
-                          className="w-full bg-white hover:bg-gray-50 text-[#1a1a2e] border-2 border-black/10 py-3.5 rounded-xl font-black uppercase tracking-widest text-xs transition-all flex items-center justify-center gap-2 cursor-pointer hover:border-black/30"
-                        >
-                          <span className="material-symbols-outlined text-sm">menu_book</span>
-                          View Full Curriculum
-                        </button>
-                        <button 
-                          onClick={() => setIsPythonModalOpen(true)}
-                          className="w-full bg-primary hover:bg-[#eb0028]/95 py-4 rounded-xl font-black uppercase tracking-widest text-xs text-white transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md hover:scale-[1.02] glow-red"
-                        >
-                          <span className="material-symbols-outlined text-sm">app_registration</span>
-                          Register Now
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
                {/* Free Training Courses Section (Full Width, 4 columns) */}
                <div className="space-y-6 mb-16 pt-6">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-black/5 pb-4">

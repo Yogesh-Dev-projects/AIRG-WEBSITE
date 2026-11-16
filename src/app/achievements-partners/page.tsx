@@ -874,7 +874,7 @@ export default function AchievementsPartners() {
                   name: "Pravich Welfare Foundation", 
                   logo: "/logos/pravich_logo.png",
                   desc: "Focuses on rural digital literacy, youth skill development, and community welfare initiatives."
-                }
+                },
                 { 
                   name: "Suprabhat Mahila Mandal", 
                   logo: "/logos/suprabhat_logo.png",
