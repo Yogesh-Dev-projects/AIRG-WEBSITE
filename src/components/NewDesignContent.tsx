@@ -2202,21 +2202,11 @@ export default function NewDesignContent() {
                             name: "Pravich Welfare Foundation", 
                             logo: "/logos/pravich_logo.png",
                             desc: "Focuses on rural digital literacy, youth skill development, and community welfare initiatives."
-                          },
-                          { 
-                            name: "Sanjyot Bahuuddeshiya Sanstha", 
-                            logo: "/logos/sanjyot_logo.png",
-                            desc: "Supports elementary education assistance, social support programs, and rural vocational training." 
-                          },
+                          }
                           { 
                             name: "Suprabhat Mahila Mandal", 
                             logo: "/logos/suprabhat_logo.png",
                             desc: "Dedicated to empowering women, child welfare projects, and conducting rural health awareness camps."
-                          },
-                          { 
-                            name: "Yashwant Bahuuddeshiya Samajik Sanstha", 
-                            logo: "/logos/yashwant_logo.png",
-                            desc: "Promotes rural development, environmental preservation campaigns, and youth guidance seminars."
                           }
                         ].map((ngo, idx) => (
                           <div key={idx} className="group relative bg-white p-6 rounded-[2rem] border border-primary/20 hover:border-primary/50 hover:shadow-lg transition-all duration-500 flex flex-col items-center text-center">
