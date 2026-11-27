@@ -73,9 +73,25 @@ export async function POST(request: Request) {
 
     await CampusHiring.create(dbRecord);
 
-    // ─── Email Setup ───────────────────────────────────────────
-    const smtpUser = process.env.SMTP_USER || process.env.EMAIL_USER || "airglabdata@gmail.com";
-    const smtpPass = process.env.SMTP_PASS || process.env.EMAIL_PASS;
+    // ─── Base URL for Direct CV Download / Portal Links ────────
+    const reqUrl = new URL(request.url);
+    const forwardedHost = request.headers.get("x-forwarded-host");
+    const forwardedProto = request.headers.get("x-forwarded-proto") || "https";
+    const baseUrl = (
+      process.env.NEXT_PUBLIC_SITE_URL ||
+      (forwardedHost ? `${forwardedProto}://${forwardedHost}` : reqUrl.origin)
+    ).replace(/\/+$/, "");
+
+    const cvDownloadUrl = `${baseUrl}/api/campus-hiring/cv?application_id=${encodeURIComponent(application_id)}&mode=download`;
+    const cvViewUrl = `${baseUrl}/api/campus-hiring/cv?application_id=${encodeURIComponent(application_id)}&mode=view`;
+    const ceoPortalUrl = `${baseUrl}/lab-setup`;
+
+    // ─── Email Setup (Dedicated HR Mailer + Fallback) ──────────
+    const hrReceiverEmail = (process.env.HR_RECEIVER_EMAIL || "hr@gurujiair.com").trim();
+    const hrSmtpUser = (process.env.HR_SMTP_USER || process.env.HR_EMAIL_USER || "").trim();
+    const hrSmtpPass = process.env.HR_SMTP_PASS || process.env.HR_EMAIL_PASS || "";
+    const fallbackUser = (process.env.SMTP_USER || process.env.EMAIL_USER || "airglabdata@gmail.com").trim();
+    const fallbackPass = process.env.SMTP_PASS || process.env.EMAIL_PASS || "";
 
     const safeName = escapeHtml(dbRecord.full_name);
     const safeCollege = escapeHtml(dbRecord.college_name);
@@ -87,81 +103,119 @@ export async function POST(request: Request) {
     const safeSkills = escapeHtml(dbRecord.skills);
     const safeWhyHire = escapeHtml(dbRecord.why_hire);
     const safeCvLink = dbRecord.cv_link ? escapeHtml(dbRecord.cv_link) : "";
+    const appliedDateStr = new Date().toLocaleString("en-IN", {
+      day: "2-digit",
+      month: "long",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      timeZone: "Asia/Kolkata"
+    });
 
-    // Build CV section for admin email
+    // Build CV section & attachments for HR email
     let cvHTML = "";
     const attachments: any[] = [];
     if (cv_submit_method === "file" && cv_file?.base64) {
+      const isPdf = String(cv_file.name || "").toLowerCase().endsWith(".pdf");
       try {
         const base64Data = cv_file.base64.includes(",") ? cv_file.base64.split(",")[1] : cv_file.base64;
         if (base64Data) {
-          cvHTML = `<p><strong>CV/Resume:</strong> Attached (${escapeHtml(cv_file.name)})</p>`;
           attachments.push({
             filename: cv_file.name,
             content: Buffer.from(base64Data, "base64"),
             contentType: cv_file.type
           });
+          cvHTML = `
+            <div style="background: #f0f4ff; border: 1px solid #c7d2fe; border-radius: 10px; padding: 18px;">
+              <p style="margin: 0 0 8px 0; font-size: 13px; color: #1a1a2e;">
+                <strong>CV / Resume File:</strong> ${escapeHtml(cv_file.name)}
+                <span style="display: inline-block; background: #dcfce7; color: #166534; font-size: 11px; font-weight: bold; padding: 2px 8px; border-radius: 999px; margin-left: 6px;">Attached in Email</span>
+              </p>
+              <p style="margin: 0 0 14px 0; font-size: 12px; color: #475569;">
+                The full CV is attached to this email, or you can download it directly using the button below:
+              </p>
+              <div>
+                <a href="${cvDownloadUrl}" target="_blank" style="background-color: #4f46e5; color: #ffffff; padding: 10px 18px; text-decoration: none; border-radius: 8px; font-size: 12px; font-weight: bold; display: inline-block; margin-right: 8px;">⬇ Download Full CV</a>
+                ${isPdf ? `<a href="${cvViewUrl}" target="_blank" style="background-color: #1a1a2e; color: #ffffff; padding: 10px 18px; text-decoration: none; border-radius: 8px; font-size: 12px; font-weight: bold; display: inline-block;">👁 View CV Online</a>` : ""}
+              </div>
+            </div>
+          `;
         }
       } catch (attachErr) {
         console.error("Failed to attach CV:", attachErr);
-        cvHTML = `<p style="color:#EE2C3C;"><strong>CV attachment failed to parse (${escapeHtml(cv_file.name)})</strong></p>`;
+        cvHTML = `
+          <div style="background: #fef2f2; border: 1px solid #fecaca; border-radius: 10px; padding: 16px;">
+            <p style="color:#EE2C3C; margin: 0 0 10px 0;"><strong>CV attachment failed to parse (${escapeHtml(cv_file.name)})</strong></p>
+            <a href="${cvDownloadUrl}" target="_blank" style="background-color: #4f46e5; color: #ffffff; padding: 10px 18px; text-decoration: none; border-radius: 8px; font-size: 12px; font-weight: bold; display: inline-block;">⬇ Try Direct CV Download</a>
+          </div>
+        `;
       }
     } else if (cv_submit_method === "link" && safeCvLink) {
-      cvHTML = `<p><strong>CV Link:</strong> <a href="${safeCvLink}" style="color:#EB0028;">${safeCvLink}</a></p>`;
+      cvHTML = `
+        <div style="background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 10px; padding: 18px;">
+          <p style="margin: 0 0 10px 0; font-size: 13px; color: #1a1a2e;"><strong>CV / Resume Link Provided:</strong></p>
+          <a href="${safeCvLink}" target="_blank" style="background-color: #EB0028; color: #ffffff; padding: 10px 18px; text-decoration: none; border-radius: 8px; font-size: 12px; font-weight: bold; display: inline-block;">🔗 Open Candidate Resume</a>
+          <p style="font-size: 11px; color: #64748b; margin: 10px 0 0 0; word-break: break-all;">URL: <a href="${safeCvLink}" style="color: #2563eb;">${safeCvLink}</a></p>
+        </div>
+      `;
     } else {
       cvHTML = `<p style="color:#EE2C3C;"><strong>No CV provided</strong></p>`;
     }
 
-    // ─── Admin Notification Email ───────────────────────────────
-    const adminMailOptions = {
-      from: `"AIR G Campus Hiring" <${smtpUser}>`,
-      to: "gurujiairlab@gmail.com",
+    // ─── Build Mail Content Templates (Sender injected dynamically) ───
+    const buildHrMailOptions = (fromEmail: string) => ({
+      from: `"AIR G Campus Hiring" <${fromEmail}>`,
+      to: hrReceiverEmail,
       replyTo: cleanEmail,
-      subject: `🎓 New Campus Hiring Application [${application_id}]: ${finalPosition} — ${dbRecord.full_name} (${dbRecord.college_name})`,
+      subject: `🎓 New Campus Application [${application_id}]: ${finalPosition} — ${dbRecord.full_name} (${dbRecord.college_name})`,
       attachments,
       html: `
-        <div style="font-family: Arial, sans-serif; max-width: 650px; margin: 0 auto; border: 1px solid #eee; border-radius: 12px; overflow: hidden;">
-          <div style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); padding: 30px 30px 20px; text-align: center;">
-            <h1 style="color: #EE2C3C; margin: 0; font-size: 22px; text-transform: uppercase; letter-spacing: 2px;">Campus Hiring Application</h1>
-            <p style="color: #aaa; margin: 6px 0 0; font-size: 12px; text-transform: uppercase; letter-spacing: 1px;">Internship Program — AIR G International</p>
-            <div style="margin-top: 15px; background: rgba(238,44,60,0.15); border: 1px solid rgba(238,44,60,0.3); border-radius: 6px; padding: 8px 16px; display: inline-block;">
+        <div style="font-family: Arial, sans-serif; max-width: 650px; margin: 0 auto; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden; background: #ffffff;">
+          <div style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); padding: 30px 30px 22px; text-align: center;">
+            <h1 style="color: #EE2C3C; margin: 0; font-size: 22px; text-transform: uppercase; letter-spacing: 2px;">New Campus Hiring Application</h1>
+            <p style="color: #cbd5e1; margin: 6px 0 0; font-size: 12px; text-transform: uppercase; letter-spacing: 1px;">Internship Program — AIR G International</p>
+            <div style="margin-top: 14px; background: rgba(238,44,60,0.15); border: 1px solid rgba(238,44,60,0.35); border-radius: 6px; padding: 8px 16px; display: inline-block;">
               <span style="color: #EE2C3C; font-weight: bold; font-size: 13px; font-family: monospace;">${application_id}</span>
             </div>
           </div>
-          <div style="padding: 30px; background: #fff;">
-            <h3 style="color: #1a1a2e; border-bottom: 2px solid #EE2C3C; padding-bottom: 8px; margin-top: 0; font-size: 14px; text-transform: uppercase; letter-spacing: 1px;">Applicant Details</h3>
+          <div style="padding: 30px; background: #ffffff;">
+            <h3 style="color: #1a1a2e; border-bottom: 2px solid #EE2C3C; padding-bottom: 8px; margin-top: 0; font-size: 14px; text-transform: uppercase; letter-spacing: 1px;">Student Application Details</h3>
             <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 13px;">
-              <tr><td style="padding: 8px 0; color: #666; width: 160px; font-weight: bold;">Full Name</td><td style="padding: 8px 0; color: #1a1a2e; font-weight: 600;">${safeName}</td></tr>
-              <tr style="background:#f9f9f9;"><td style="padding: 8px 6px; color: #666; font-weight: bold;">College / Institute</td><td style="padding: 8px 6px; color: #1a1a2e;">${safeCollege}</td></tr>
-              <tr><td style="padding: 8px 0; color: #666; font-weight: bold;">Email</td><td style="padding: 8px 0;"><a href="mailto:${safeEmail}" style="color:#EE2C3C;">${safeEmail}</a></td></tr>
-              <tr style="background:#f9f9f9;"><td style="padding: 8px 6px; color: #666; font-weight: bold;">Contact Number</td><td style="padding: 8px 6px; color: #1a1a2e;">${safePhone}</td></tr>
-              <tr><td style="padding: 8px 0; color: #666; font-weight: bold;">Nationality</td><td style="padding: 8px 0; color: #1a1a2e;">${safeNationality}</td></tr>
-              <tr style="background:#f9f9f9;"><td style="padding: 8px 6px; color: #666; font-weight: bold;">Position Applied</td><td style="padding: 8px 6px;"><span style="background:#EE2C3C;color:#fff;padding:3px 10px;border-radius:4px;font-size:12px;font-weight:bold;">${safePosition}</span></td></tr>
-              <tr><td style="padding: 8px 0; color: #666; font-weight: bold;">Experience</td><td style="padding: 8px 0; color: #1a1a2e;">${safeExperience}</td></tr>
+              <tr><td style="padding: 9px 8px; color: #64748b; width: 165px; font-weight: bold;">Full Name</td><td style="padding: 9px 8px; color: #1a1a2e; font-weight: 700;">${safeName}</td></tr>
+              <tr style="background:#f8fafc;"><td style="padding: 9px 8px; color: #64748b; font-weight: bold;">College / Institute</td><td style="padding: 9px 8px; color: #1a1a2e; font-weight: 600;">${safeCollege}</td></tr>
+              <tr><td style="padding: 9px 8px; color: #64748b; font-weight: bold;">Email Address</td><td style="padding: 9px 8px;"><a href="mailto:${safeEmail}" style="color:#EE2C3C; font-weight: 600;">${safeEmail}</a></td></tr>
+              <tr style="background:#f8fafc;"><td style="padding: 9px 8px; color: #64748b; font-weight: bold;">Contact Number</td><td style="padding: 9px 8px; color: #1a1a2e; font-weight: 600;">${safePhone}</td></tr>
+              <tr><td style="padding: 9px 8px; color: #64748b; font-weight: bold;">Nationality</td><td style="padding: 9px 8px; color: #1a1a2e;">${safeNationality}</td></tr>
+              <tr style="background:#f8fafc;"><td style="padding: 9px 8px; color: #64748b; font-weight: bold;">Position Applied</td><td style="padding: 9px 8px;"><span style="background:#EE2C3C;color:#fff;padding:4px 10px;border-radius:4px;font-size:12px;font-weight:bold;">${safePosition}</span></td></tr>
+              <tr><td style="padding: 9px 8px; color: #64748b; font-weight: bold;">Experience</td><td style="padding: 9px 8px; color: #1a1a2e;">${safeExperience}</td></tr>
+              <tr style="background:#f8fafc;"><td style="padding: 9px 8px; color: #64748b; font-weight: bold;">Applied On</td><td style="padding: 9px 8px; color: #1a1a2e;">${escapeHtml(appliedDateStr)} IST</td></tr>
             </table>
             <div style="background:#f4f4f8; border-radius:8px; padding:16px; margin-bottom:16px;">
               <h4 style="margin:0 0 8px; color:#1a1a2e; font-size:12px; text-transform:uppercase; letter-spacing:1px;">Skills</h4>
-              <p style="margin:0; color:#444; font-size:13px; line-height:1.6;">${safeSkills}</p>
+              <p style="margin:0; color:#334155; font-size:13px; line-height:1.6;">${safeSkills}</p>
             </div>
-            <div style="background:#fff8f8; border-left: 4px solid #EE2C3C; border-radius:0 8px 8px 0; padding:16px; margin-bottom:16px;">
+            <div style="background:#fff8f8; border-left: 4px solid #EE2C3C; border-radius:0 8px 8px 0; padding:16px; margin-bottom:20px;">
               <h4 style="margin:0 0 8px; color:#1a1a2e; font-size:12px; text-transform:uppercase; letter-spacing:1px;">Why Should We Hire?</h4>
-              <p style="margin:0; color:#444; font-size:13px; line-height:1.6; white-space:pre-wrap;">${safeWhyHire}</p>
+              <p style="margin:0; color:#334155; font-size:13px; line-height:1.6; white-space:pre-wrap;">${safeWhyHire}</p>
             </div>
-            <div style="border-top: 1px solid #eee; padding-top: 16px;">
+            <div style="margin-bottom: 20px;">
               ${cvHTML}
             </div>
+            <div style="text-align: center; padding-top: 12px; border-top: 1px solid #e2e8f0;">
+              <a href="${ceoPortalUrl}" target="_blank" style="color: #4f46e5; font-size: 12px; font-weight: bold; text-decoration: none;">Open CEO Campus Hiring Dashboard →</a>
+            </div>
           </div>
-          <div style="background:#f9f9f9; padding:16px 30px; text-align:center; font-size:11px; color:#999;">
-            AIR G International — Campus Hiring Portal | Application ID: ${application_id}
+          <div style="background:#f8fafc; padding:16px 30px; text-align:center; font-size:11px; color:#94a3b8; border-top: 1px solid #e2e8f0;">
+            AIR G International — Campus Hiring Portal | Delivered to ${escapeHtml(hrReceiverEmail)} | ID: ${application_id}
           </div>
         </div>
       `
-    };
+    });
 
-    // ─── Applicant Confirmation Email ───────────────────────────
-    const applicantMailOptions = {
-      from: `"AIR G International" <${smtpUser}>`,
+    const buildApplicantMailOptions = (fromEmail: string) => ({
+      from: `"AIR G International — HR" <${fromEmail}>`,
       to: cleanEmail,
+      replyTo: hrReceiverEmail,
       subject: `✅ Thank You for Applying — AIR G Campus Internship Program [${application_id}]`,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #eee; border-radius: 12px; overflow: hidden;">
@@ -181,7 +235,7 @@ export async function POST(request: Request) {
                 <tr><td style="padding: 6px 0; color: #666; width: 150px;">Application ID</td><td style="color: #EE2C3C; font-weight: bold; font-family: monospace;">${application_id}</td></tr>
                 <tr><td style="padding: 6px 0; color: #666;">Position</td><td style="color: #1a1a2e;">${safePosition}</td></tr>
                 <tr><td style="padding: 6px 0; color: #666;">College</td><td style="color: #1a1a2e;">${safeCollege}</td></tr>
-                <tr><td style="padding: 6px 0; color: #666;">Applied On</td><td style="color: #1a1a2e;">${new Date().toLocaleDateString("en-IN", { day: "2-digit", month: "long", year: "numeric" })}</td></tr>
+                <tr><td style="padding: 6px 0; color: #666;">Applied On</td><td style="color: #1a1a2e;">${new Date().toLocaleDateString("en-IN", { day: "2-digit", month: "long", year: "numeric", timeZone: "Asia/Kolkata" })}</td></tr>
               </table>
             </div>
             <p style="color: #555; font-size: 14px; line-height: 1.7;">
@@ -189,7 +243,7 @@ export async function POST(request: Request) {
             </p>
             <p style="color: #555; font-size: 14px; line-height: 1.7;">
               For any queries, feel free to contact us at:<br/>
-              📧 <a href="mailto:hr@gurujiair.com" style="color:#EE2C3C;">hr@gurujiair.com</a><br/>
+              📧 <a href="mailto:${escapeHtml(hrReceiverEmail)}" style="color:#EE2C3C;">${escapeHtml(hrReceiverEmail)}</a><br/>
               📞 <a href="tel:+918446534087" style="color:#EE2C3C;">+91 8446534087</a>
             </p>
             <p style="color: #1a1a2e; font-size: 14px; margin-bottom: 0;">
@@ -204,35 +258,101 @@ export async function POST(request: Request) {
           </div>
         </div>
       `
+    });
+
+    const createTransporter = (user: string, pass: string, customHost?: string, customPort?: string) => {
+      const lower = user.toLowerCase();
+      const inferredHost = lower.endsWith("@gurujiair.com") ? "smtp.hostinger.com" : "smtp.gmail.com";
+      const host = (customHost || inferredHost).trim();
+      const port = Number(customPort || 465);
+      return nodemailer.createTransport({
+        host,
+        port,
+        secure: port === 465,
+        auth: { user, pass }
+      });
     };
 
     let adminEmailSent = false;
     let studentEmailSent = false;
+    let senderEmailUsed = "";
 
-    if (smtpPass) {
-      const transporter = nodemailer.createTransport({
-        host: "smtp.gmail.com",
-        port: 465,
-        secure: true,
-        auth: { user: smtpUser, pass: smtpPass }
-      });
+    const useHrMailer = Boolean(hrSmtpUser && hrSmtpPass);
 
-      const [adminResult, studentResult] = await Promise.allSettled([
-        transporter.sendMail(adminMailOptions),
-        transporter.sendMail(applicantMailOptions)
+    if (useHrMailer) {
+      const hrTransporter = createTransporter(
+        hrSmtpUser,
+        hrSmtpPass,
+        process.env.HR_SMTP_HOST,
+        process.env.HR_SMTP_PORT
+      );
+      const [hrResult, studentResult] = await Promise.allSettled([
+        hrTransporter.sendMail(buildHrMailOptions(hrSmtpUser)),
+        hrTransporter.sendMail(buildApplicantMailOptions(hrSmtpUser))
       ]);
 
-      adminEmailSent = adminResult.status === "fulfilled";
+      adminEmailSent = hrResult.status === "fulfilled";
       studentEmailSent = studentResult.status === "fulfilled";
+      if (adminEmailSent || studentEmailSent) senderEmailUsed = hrSmtpUser;
 
-      if (adminResult.status === "rejected") {
-        console.error("Failed to send Campus Hiring admin email:", adminResult.reason);
+      if (hrResult.status === "rejected") {
+        console.error("HR SMTP failed for HR notification:", hrResult.reason);
+      }
+      if (studentResult.status === "rejected") {
+        console.error("HR SMTP failed for student thank-you email:", studentResult.reason);
+      }
+
+      // Fallback for any failed email if general SMTP credentials are also configured
+      if ((!adminEmailSent || !studentEmailSent) && fallbackPass) {
+        const fbTransporter = createTransporter(
+          fallbackUser,
+          fallbackPass,
+          process.env.SMTP_HOST,
+          process.env.SMTP_PORT
+        );
+        if (!adminEmailSent) {
+          try {
+            await fbTransporter.sendMail(buildHrMailOptions(fallbackUser));
+            adminEmailSent = true;
+            if (!senderEmailUsed) senderEmailUsed = fallbackUser;
+          } catch (fbErr) {
+            console.error("Fallback SMTP also failed for HR notification:", fbErr);
+          }
+        }
+        if (!studentEmailSent) {
+          try {
+            await fbTransporter.sendMail(buildApplicantMailOptions(fallbackUser));
+            studentEmailSent = true;
+            if (!senderEmailUsed) senderEmailUsed = fallbackUser;
+          } catch (fbErr) {
+            console.error("Fallback SMTP also failed for student thank-you email:", fbErr);
+          }
+        }
+      }
+    } else if (fallbackPass) {
+      const fbTransporter = createTransporter(
+        fallbackUser,
+        fallbackPass,
+        process.env.SMTP_HOST,
+        process.env.SMTP_PORT
+      );
+      const [hrResult, studentResult] = await Promise.allSettled([
+        fbTransporter.sendMail(buildHrMailOptions(fallbackUser)),
+        fbTransporter.sendMail(buildApplicantMailOptions(fallbackUser))
+      ]);
+
+      adminEmailSent = hrResult.status === "fulfilled";
+      studentEmailSent = studentResult.status === "fulfilled";
+      senderEmailUsed = fallbackUser;
+
+      if (hrResult.status === "rejected") {
+        console.error("Failed to send Campus Hiring HR email:", hrResult.reason);
       }
       if (studentResult.status === "rejected") {
         console.error("Failed to send Campus Hiring student thank-you email:", studentResult.reason);
       }
     } else {
-      console.warn("Neither SMTP_PASS nor EMAIL_PASS is configured. Campus hiring logged to DB only.");
+      console.warn("No HR_SMTP_PASS, SMTP_PASS, or EMAIL_PASS configured. Campus hiring logged to DB only.");
     }
 
     return NextResponse.json({
@@ -240,6 +360,8 @@ export async function POST(request: Request) {
       application_id,
       studentEmailSent,
       adminEmailSent,
+      hrEmailTarget: hrReceiverEmail,
+      senderEmailUsed,
       message: "Application submitted successfully"
     });
   } catch (error: any) {
