@@ -820,16 +820,23 @@ export default function LabSetupPage() {
     } catch (err) {}
   };
 
-  const fetchCampusHiringApplications = async () => {
+  const fetchCampusHiringApplications = async (overrides?: {
+    college?: string;
+    position?: string;
+    status?: string;
+    dateRange?: string;
+    search?: string;
+    page?: number;
+  }) => {
     setCampusLoading(true);
     try {
       const params = new URLSearchParams({
-        college: campusCollegeFilter,
-        position: campusPositionFilter,
-        status: campusStatusFilter,
-        dateRange: campusDateFilter,
-        search: campusSearch,
-        page: campusPage.toString(),
+        college: overrides?.college ?? campusCollegeFilter,
+        position: overrides?.position ?? campusPositionFilter,
+        status: overrides?.status ?? campusStatusFilter,
+        dateRange: overrides?.dateRange ?? campusDateFilter,
+        search: overrides?.search ?? campusSearch,
+        page: String(overrides?.page ?? campusPage),
         limit: "20"
       });
       const res = await fetch(`/api/campus-hiring?${params}`);
@@ -4830,7 +4837,7 @@ export default function LabSetupPage() {
                     <div className="text-[9px] text-indigo-400 font-mono uppercase">Total Applications</div>
                   </div>
                   <button
-                    onClick={fetchCampusHiringApplications}
+                    onClick={() => fetchCampusHiringApplications()}
                     className="px-4 py-2.5 bg-indigo-600 text-white text-xs font-bold uppercase rounded-xl hover:bg-indigo-500 transition-colors"
                   >
                     🔄 Refresh
@@ -4850,7 +4857,12 @@ export default function LabSetupPage() {
                 />
                 <select
                   value={campusCollegeFilter}
-                  onChange={(e) => setCampusCollegeFilter(e.target.value)}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    setCampusCollegeFilter(val);
+                    setCampusPage(1);
+                    fetchCampusHiringApplications({ college: val, page: 1 });
+                  }}
                   className="bg-slate-950 border border-white/10 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-indigo-500/50"
                 >
                   <option value="ALL">🏫 All Colleges</option>
@@ -4858,7 +4870,12 @@ export default function LabSetupPage() {
                 </select>
                 <select
                   value={campusPositionFilter}
-                  onChange={(e) => setCampusPositionFilter(e.target.value)}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    setCampusPositionFilter(val);
+                    setCampusPage(1);
+                    fetchCampusHiringApplications({ position: val, page: 1 });
+                  }}
                   className="bg-slate-950 border border-white/10 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-indigo-500/50"
                 >
                   <option value="ALL">💼 All Positions</option>
@@ -4866,7 +4883,12 @@ export default function LabSetupPage() {
                 </select>
                 <select
                   value={campusStatusFilter}
-                  onChange={(e) => setCampusStatusFilter(e.target.value)}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    setCampusStatusFilter(val);
+                    setCampusPage(1);
+                    fetchCampusHiringApplications({ status: val, page: 1 });
+                  }}
                   className="bg-slate-950 border border-white/10 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-indigo-500/50"
                 >
                   <option value="ALL">📊 All Statuses</option>
@@ -4878,7 +4900,12 @@ export default function LabSetupPage() {
                 </select>
                 <select
                   value={campusDateFilter}
-                  onChange={(e) => setCampusDateFilter(e.target.value)}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    setCampusDateFilter(val);
+                    setCampusPage(1);
+                    fetchCampusHiringApplications({ dateRange: val, page: 1 });
+                  }}
                   className="bg-slate-950 border border-white/10 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-indigo-500/50"
                 >
                   <option value="ALL">📅 All Time</option>

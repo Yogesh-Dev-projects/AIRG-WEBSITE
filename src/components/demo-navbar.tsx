@@ -79,7 +79,7 @@ export function Navbar() {
                   )}
                 </Link>
                 {link.dropdown && (
-                  <div className="absolute left-0 top-full mt-0 hidden group-hover:flex flex-col bg-white/95 backdrop-blur-md shadow-[0_10px_40px_rgba(0,0,0,0.1)] rounded-xl border border-black/5 overflow-hidden w-56 z-50 transition-all">
+                  <div className="absolute left-0 top-full mt-0 hidden group-hover:flex flex-col bg-white/95 backdrop-blur-md shadow-[0_10px_40px_rgba(0,0,0,0.1)] rounded-xl border border-black/5 overflow-hidden min-w-56 w-max max-w-[calc(100vw-2rem)] z-50 transition-all">
                     {link.dropdown.map((sublink) => (
                       <Link
                         key={sublink.name}

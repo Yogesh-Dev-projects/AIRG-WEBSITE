@@ -28,7 +28,8 @@ const EXPERIENCE_OPTIONS = [
   "6 months – 1 year",
   "1 – 2 years",
   "2 – 3 years",
-  "3+ years"
+  "3+ years",
+  "Other"
 ];
 
 const NATIONALITY_OPTIONS = [
@@ -40,6 +41,8 @@ const NATIONALITY_OPTIONS = [
 export default function CampusHiringPage() {
   const [selectedPosition, setSelectedPosition] = useState<string>("");
   const [otherPosition, setOtherPosition] = useState("");
+  const [otherNationality, setOtherNationality] = useState("");
+  const [otherExperience, setOtherExperience] = useState("");
   const [formData, setFormData] = useState({
     full_name: "",
     college_name: "",
@@ -57,6 +60,8 @@ export default function CampusHiringPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<"idle" | "success" | "error">("idle");
   const [applicationId, setApplicationId] = useState("");
+  const [submittedEmail, setSubmittedEmail] = useState("");
+  const [studentEmailSent, setStudentEmailSent] = useState(true);
 
   const formRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -106,18 +111,30 @@ export default function CampusHiringPage() {
       alert("Please specify your position in the 'Other Position' field.");
       return;
     }
+    if (formData.nationality === "Other" && !otherNationality.trim()) {
+      alert("Please specify your nationality.");
+      return;
+    }
+    if (formData.experience === "Other" && !otherExperience.trim()) {
+      alert("Please specify your experience.");
+      return;
+    }
 
     setIsSubmitting(true);
     setSubmitStatus("idle");
 
     try {
+      const targetEmail = formData.email.trim();
       const payload = {
         ...formData,
+        email: targetEmail,
+        nationality: formData.nationality === "Other" ? otherNationality.trim() : formData.nationality,
+        experience: formData.experience === "Other" ? otherExperience.trim() : formData.experience,
         position_applied: selectedPosition,
-        other_position: selectedPosition === "Other" ? otherPosition : undefined,
+        other_position: selectedPosition === "Other" ? otherPosition.trim() : undefined,
         cv_submit_method: cvMethod,
         cv_file: cvMethod === "file" ? cvFile : null,
-        cv_link: cvMethod === "link" ? cvLink : ""
+        cv_link: cvMethod === "link" ? cvLink.trim() : ""
       };
 
       const res = await fetch("/api/campus-hiring", {
@@ -130,8 +147,13 @@ export default function CampusHiringPage() {
 
       if (res.ok && data.success) {
         setApplicationId(data.application_id);
+        setSubmittedEmail(targetEmail);
+        setStudentEmailSent(data.studentEmailSent !== false);
         setSubmitStatus("success");
         setFormData({ full_name: "", college_name: "", contact_number: "", email: "", nationality: "Indian", experience: "", skills: "", why_hire: "" });
+        setOtherPosition("");
+        setOtherNationality("");
+        setOtherExperience("");
         setCvFile(null);
         setCvLink("");
         setSelectedPosition("");
@@ -303,7 +325,15 @@ export default function CampusHiringPage() {
                       <span className="text-lg font-black font-mono text-primary">{applicationId}</span>
                     </div>
                     <p className="text-sm text-slate-600 max-w-md mx-auto font-light leading-relaxed">
-                      Thank you for applying! A confirmation email has been sent to your inbox. Our team will review your application and contact you within <strong>5–7 working days</strong>.
+                      {studentEmailSent ? (
+                        <>
+                          Thank you for applying! A confirmation email has been sent to <strong className="text-[#1a1a2e]">{submittedEmail}</strong>. Our team will review your application and contact you within <strong>5–7 working days</strong>.
+                        </>
+                      ) : (
+                        <>
+                          Thank you for applying! Your application has been saved successfully. Our team will review your application and contact you within <strong>5–7 working days</strong>.
+                        </>
+                      )}
                     </p>
                     <p className="text-xs text-slate-400 font-mono">Please save your Application ID for reference.</p>
                     <button
@@ -347,6 +377,7 @@ export default function CampusHiringPage() {
                           </label>
                           <input
                             type="text"
+                            required={selectedPosition === "Other"}
                             value={otherPosition}
                             onChange={(e) => setOtherPosition(e.target.value)}
                             placeholder="e.g. Marketing Intern, Data Analyst..."
@@ -419,12 +450,38 @@ export default function CampusHiringPage() {
                           </label>
                           <select
                             value={formData.nationality}
-                            onChange={(e) => setFormData({ ...formData, nationality: e.target.value })}
+                            onChange={(e) => {
+                              const val = e.target.value;
+                              setFormData({ ...formData, nationality: val });
+                              if (val !== "Other") setOtherNationality("");
+                            }}
                             required
                             className="w-full px-4 py-3.5 rounded-xl border border-black/5 bg-slate-50 text-sm focus:outline-none focus:border-primary/45 transition-colors"
                           >
                             {NATIONALITY_OPTIONS.map((n) => <option key={n} value={n}>{n}</option>)}
                           </select>
+                          <AnimatePresence>
+                            {formData.nationality === "Other" && (
+                              <motion.div
+                                initial={{ opacity: 0, height: 0 }}
+                                animate={{ opacity: 1, height: "auto" }}
+                                exit={{ opacity: 0, height: 0 }}
+                                className="pt-1 space-y-1.5"
+                              >
+                                <label className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#1a1a2e]/60 block">
+                                  Specify Your Nationality <span className="text-primary">*</span>
+                                </label>
+                                <input
+                                  type="text"
+                                  required={formData.nationality === "Other"}
+                                  value={otherNationality}
+                                  onChange={(e) => setOtherNationality(e.target.value)}
+                                  placeholder="e.g. Nepalese, American, Bangladeshi..."
+                                  className="w-full px-4 py-3 rounded-xl border border-primary/30 bg-primary/5 text-sm focus:outline-none focus:border-primary/60 transition-colors"
+                                />
+                              </motion.div>
+                            )}
+                          </AnimatePresence>
                         </div>
                         <div className="space-y-2">
                           <label className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#1a1a2e]/60">
@@ -432,13 +489,39 @@ export default function CampusHiringPage() {
                           </label>
                           <select
                             value={formData.experience}
-                            onChange={(e) => setFormData({ ...formData, experience: e.target.value })}
+                            onChange={(e) => {
+                              const val = e.target.value;
+                              setFormData({ ...formData, experience: val });
+                              if (val !== "Other") setOtherExperience("");
+                            }}
                             required
                             className="w-full px-4 py-3.5 rounded-xl border border-black/5 bg-slate-50 text-sm focus:outline-none focus:border-primary/45 transition-colors"
                           >
                             <option value="">— Select experience —</option>
                             {EXPERIENCE_OPTIONS.map((exp) => <option key={exp} value={exp}>{exp}</option>)}
                           </select>
+                          <AnimatePresence>
+                            {formData.experience === "Other" && (
+                              <motion.div
+                                initial={{ opacity: 0, height: 0 }}
+                                animate={{ opacity: 1, height: "auto" }}
+                                exit={{ opacity: 0, height: 0 }}
+                                className="pt-1 space-y-1.5"
+                              >
+                                <label className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#1a1a2e]/60 block">
+                                  Specify Your Experience <span className="text-primary">*</span>
+                                </label>
+                                <input
+                                  type="text"
+                                  required={formData.experience === "Other"}
+                                  value={otherExperience}
+                                  onChange={(e) => setOtherExperience(e.target.value)}
+                                  placeholder="e.g. 2 internships, Freelance projects..."
+                                  className="w-full px-4 py-3 rounded-xl border border-primary/30 bg-primary/5 text-sm focus:outline-none focus:border-primary/60 transition-colors"
+                                />
+                              </motion.div>
+                            )}
+                          </AnimatePresence>
                         </div>
                       </div>
 

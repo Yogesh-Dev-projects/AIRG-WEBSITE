@@ -9,6 +9,15 @@ function generateApplicationId() {
   return `CH-${ts}-${rand}`;
 }
 
+function escapeHtml(value: unknown): string {
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
 export async function POST(request: Request) {
   try {
     const body = await request.json();
@@ -19,8 +28,10 @@ export async function POST(request: Request) {
       cv_submit_method, cv_file, cv_link
     } = body;
 
+    const cleanEmail = String(email || "").trim();
+
     // Validation
-    if (!full_name || !college_name || !contact_number || !email || !nationality ||
+    if (!full_name || !college_name || !contact_number || !cleanEmail || !nationality ||
         !experience || !skills || !why_hire || !position_applied) {
       return NextResponse.json({ success: false, error: "Missing required fields" }, { status: 400 });
     }
@@ -28,14 +39,22 @@ export async function POST(request: Request) {
     await connectDB();
 
     const application_id = generateApplicationId();
-    const finalPosition = position_applied === "Other" ? (other_position || "Other") : position_applied;
+    const finalPosition = position_applied === "Other"
+      ? (String(other_position || "").trim() || "Other")
+      : String(position_applied).trim();
 
     // Build DB record (don't store full base64 if too large - store name/type only)
     const dbRecord: any = {
-      full_name, college_name, contact_number, email, nationality,
-      experience, skills, why_hire,
+      full_name: String(full_name).trim(),
+      college_name: String(college_name).trim(),
+      contact_number: String(contact_number).trim(),
+      email: cleanEmail,
+      nationality: String(nationality).trim(),
+      experience: String(experience).trim(),
+      skills: String(skills).trim(),
+      why_hire: String(why_hire).trim(),
       position_applied: finalPosition,
-      other_position: position_applied === "Other" ? other_position : undefined,
+      other_position: position_applied === "Other" ? String(other_position || "").trim() : undefined,
       cv_submit_method,
       application_id,
       status: "PENDING"
@@ -49,35 +68,46 @@ export async function POST(request: Request) {
         dbRecord.cv_file_base64 = cv_file.base64;
       }
     } else if (cv_submit_method === "link" && cv_link) {
-      dbRecord.cv_link = cv_link;
+      dbRecord.cv_link = String(cv_link).trim();
     }
 
     await CampusHiring.create(dbRecord);
 
     // ─── Email Setup ───────────────────────────────────────────
-    const smtpUser = process.env.SMTP_USER || "airgdatalab@gmail.com";
-    const smtpPass = process.env.SMTP_PASS;
+    const smtpUser = process.env.SMTP_USER || process.env.EMAIL_USER || "airglabdata@gmail.com";
+    const smtpPass = process.env.SMTP_PASS || process.env.EMAIL_PASS;
 
-    const transporter = nodemailer.createTransport({
-      host: "smtp.gmail.com",
-      port: 465,
-      secure: true,
-      auth: { user: smtpUser, pass: smtpPass }
-    });
+    const safeName = escapeHtml(dbRecord.full_name);
+    const safeCollege = escapeHtml(dbRecord.college_name);
+    const safeEmail = escapeHtml(cleanEmail);
+    const safePhone = escapeHtml(dbRecord.contact_number);
+    const safeNationality = escapeHtml(dbRecord.nationality);
+    const safePosition = escapeHtml(finalPosition);
+    const safeExperience = escapeHtml(dbRecord.experience);
+    const safeSkills = escapeHtml(dbRecord.skills);
+    const safeWhyHire = escapeHtml(dbRecord.why_hire);
+    const safeCvLink = dbRecord.cv_link ? escapeHtml(dbRecord.cv_link) : "";
 
     // Build CV section for admin email
     let cvHTML = "";
     const attachments: any[] = [];
     if (cv_submit_method === "file" && cv_file?.base64) {
-      const base64Data = cv_file.base64.split(",")[1];
-      cvHTML = `<p><strong>CV/Resume:</strong> Attached (${cv_file.name})</p>`;
-      attachments.push({
-        filename: cv_file.name,
-        content: Buffer.from(base64Data, "base64"),
-        contentType: cv_file.type
-      });
-    } else if (cv_submit_method === "link" && cv_link) {
-      cvHTML = `<p><strong>CV Link:</strong> <a href="${cv_link}" style="color:#EB0028;">${cv_link}</a></p>`;
+      try {
+        const base64Data = cv_file.base64.includes(",") ? cv_file.base64.split(",")[1] : cv_file.base64;
+        if (base64Data) {
+          cvHTML = `<p><strong>CV/Resume:</strong> Attached (${escapeHtml(cv_file.name)})</p>`;
+          attachments.push({
+            filename: cv_file.name,
+            content: Buffer.from(base64Data, "base64"),
+            contentType: cv_file.type
+          });
+        }
+      } catch (attachErr) {
+        console.error("Failed to attach CV:", attachErr);
+        cvHTML = `<p style="color:#EE2C3C;"><strong>CV attachment failed to parse (${escapeHtml(cv_file.name)})</strong></p>`;
+      }
+    } else if (cv_submit_method === "link" && safeCvLink) {
+      cvHTML = `<p><strong>CV Link:</strong> <a href="${safeCvLink}" style="color:#EB0028;">${safeCvLink}</a></p>`;
     } else {
       cvHTML = `<p style="color:#EE2C3C;"><strong>No CV provided</strong></p>`;
     }
@@ -86,8 +116,8 @@ export async function POST(request: Request) {
     const adminMailOptions = {
       from: `"AIR G Campus Hiring" <${smtpUser}>`,
       to: "gurujiairlab@gmail.com",
-      replyTo: email,
-      subject: `🎓 New Campus Hiring Application [${application_id}]: ${finalPosition} — ${full_name} (${college_name})`,
+      replyTo: cleanEmail,
+      subject: `🎓 New Campus Hiring Application [${application_id}]: ${finalPosition} — ${dbRecord.full_name} (${dbRecord.college_name})`,
       attachments,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 650px; margin: 0 auto; border: 1px solid #eee; border-radius: 12px; overflow: hidden;">
@@ -101,21 +131,21 @@ export async function POST(request: Request) {
           <div style="padding: 30px; background: #fff;">
             <h3 style="color: #1a1a2e; border-bottom: 2px solid #EE2C3C; padding-bottom: 8px; margin-top: 0; font-size: 14px; text-transform: uppercase; letter-spacing: 1px;">Applicant Details</h3>
             <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 13px;">
-              <tr><td style="padding: 8px 0; color: #666; width: 160px; font-weight: bold;">Full Name</td><td style="padding: 8px 0; color: #1a1a2e; font-weight: 600;">${full_name}</td></tr>
-              <tr style="background:#f9f9f9;"><td style="padding: 8px 6px; color: #666; font-weight: bold;">College / Institute</td><td style="padding: 8px 6px; color: #1a1a2e;">${college_name}</td></tr>
-              <tr><td style="padding: 8px 0; color: #666; font-weight: bold;">Email</td><td style="padding: 8px 0;"><a href="mailto:${email}" style="color:#EE2C3C;">${email}</a></td></tr>
-              <tr style="background:#f9f9f9;"><td style="padding: 8px 6px; color: #666; font-weight: bold;">Contact Number</td><td style="padding: 8px 6px; color: #1a1a2e;">${contact_number}</td></tr>
-              <tr><td style="padding: 8px 0; color: #666; font-weight: bold;">Nationality</td><td style="padding: 8px 0; color: #1a1a2e;">${nationality}</td></tr>
-              <tr style="background:#f9f9f9;"><td style="padding: 8px 6px; color: #666; font-weight: bold;">Position Applied</td><td style="padding: 8px 6px;"><span style="background:#EE2C3C;color:#fff;padding:3px 10px;border-radius:4px;font-size:12px;font-weight:bold;">${finalPosition}</span></td></tr>
-              <tr><td style="padding: 8px 0; color: #666; font-weight: bold;">Experience</td><td style="padding: 8px 0; color: #1a1a2e;">${experience}</td></tr>
+              <tr><td style="padding: 8px 0; color: #666; width: 160px; font-weight: bold;">Full Name</td><td style="padding: 8px 0; color: #1a1a2e; font-weight: 600;">${safeName}</td></tr>
+              <tr style="background:#f9f9f9;"><td style="padding: 8px 6px; color: #666; font-weight: bold;">College / Institute</td><td style="padding: 8px 6px; color: #1a1a2e;">${safeCollege}</td></tr>
+              <tr><td style="padding: 8px 0; color: #666; font-weight: bold;">Email</td><td style="padding: 8px 0;"><a href="mailto:${safeEmail}" style="color:#EE2C3C;">${safeEmail}</a></td></tr>
+              <tr style="background:#f9f9f9;"><td style="padding: 8px 6px; color: #666; font-weight: bold;">Contact Number</td><td style="padding: 8px 6px; color: #1a1a2e;">${safePhone}</td></tr>
+              <tr><td style="padding: 8px 0; color: #666; font-weight: bold;">Nationality</td><td style="padding: 8px 0; color: #1a1a2e;">${safeNationality}</td></tr>
+              <tr style="background:#f9f9f9;"><td style="padding: 8px 6px; color: #666; font-weight: bold;">Position Applied</td><td style="padding: 8px 6px;"><span style="background:#EE2C3C;color:#fff;padding:3px 10px;border-radius:4px;font-size:12px;font-weight:bold;">${safePosition}</span></td></tr>
+              <tr><td style="padding: 8px 0; color: #666; font-weight: bold;">Experience</td><td style="padding: 8px 0; color: #1a1a2e;">${safeExperience}</td></tr>
             </table>
             <div style="background:#f4f4f8; border-radius:8px; padding:16px; margin-bottom:16px;">
               <h4 style="margin:0 0 8px; color:#1a1a2e; font-size:12px; text-transform:uppercase; letter-spacing:1px;">Skills</h4>
-              <p style="margin:0; color:#444; font-size:13px; line-height:1.6;">${skills}</p>
+              <p style="margin:0; color:#444; font-size:13px; line-height:1.6;">${safeSkills}</p>
             </div>
             <div style="background:#fff8f8; border-left: 4px solid #EE2C3C; border-radius:0 8px 8px 0; padding:16px; margin-bottom:16px;">
               <h4 style="margin:0 0 8px; color:#1a1a2e; font-size:12px; text-transform:uppercase; letter-spacing:1px;">Why Should We Hire?</h4>
-              <p style="margin:0; color:#444; font-size:13px; line-height:1.6; white-space:pre-wrap;">${why_hire}</p>
+              <p style="margin:0; color:#444; font-size:13px; line-height:1.6; white-space:pre-wrap;">${safeWhyHire}</p>
             </div>
             <div style="border-top: 1px solid #eee; padding-top: 16px;">
               ${cvHTML}
@@ -131,26 +161,26 @@ export async function POST(request: Request) {
     // ─── Applicant Confirmation Email ───────────────────────────
     const applicantMailOptions = {
       from: `"AIR G International" <${smtpUser}>`,
-      to: email,
-      subject: `✅ Application Received — AIR G Campus Internship Program [${application_id}]`,
+      to: cleanEmail,
+      subject: `✅ Thank You for Applying — AIR G Campus Internship Program [${application_id}]`,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #eee; border-radius: 12px; overflow: hidden;">
           <div style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); padding: 40px 30px; text-align: center;">
-            <h1 style="color: #EE2C3C; margin: 0 0 8px; font-size: 24px; text-transform: uppercase; letter-spacing: 2px;">Application Received!</h1>
+            <h1 style="color: #EE2C3C; margin: 0 0 8px; font-size: 24px; text-transform: uppercase; letter-spacing: 2px;">Thank You for Applying!</h1>
             <p style="color: #ccc; margin: 0; font-size: 14px;">AIR G International — Campus Hiring (Internship Program)</p>
           </div>
           <div style="padding: 36px 30px; background: #fff;">
-            <p style="color: #1a1a2e; font-size: 15px; margin-top: 0;">Dear <strong>${full_name}</strong>,</p>
+            <p style="color: #1a1a2e; font-size: 15px; margin-top: 0;">Dear <strong>${safeName}</strong>,</p>
             <p style="color: #555; font-size: 14px; line-height: 1.7;">
               Thank you for applying to the <strong>AIR G Campus Internship Program</strong>! 🎉<br/>
-              We have successfully received your application for the position of <strong>${finalPosition}</strong>.
+              We have successfully received your application for the position of <strong>${safePosition}</strong>.
             </p>
             <div style="background: #f4f4f8; border-radius: 10px; padding: 20px; margin: 24px 0;">
               <p style="margin: 0 0 10px; color: #1a1a2e; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; font-weight: bold;">Application Summary</p>
               <table style="width: 100%; font-size: 13px; border-collapse: collapse;">
                 <tr><td style="padding: 6px 0; color: #666; width: 150px;">Application ID</td><td style="color: #EE2C3C; font-weight: bold; font-family: monospace;">${application_id}</td></tr>
-                <tr><td style="padding: 6px 0; color: #666;">Position</td><td style="color: #1a1a2e;">${finalPosition}</td></tr>
-                <tr><td style="padding: 6px 0; color: #666;">College</td><td style="color: #1a1a2e;">${college_name}</td></tr>
+                <tr><td style="padding: 6px 0; color: #666;">Position</td><td style="color: #1a1a2e;">${safePosition}</td></tr>
+                <tr><td style="padding: 6px 0; color: #666;">College</td><td style="color: #1a1a2e;">${safeCollege}</td></tr>
                 <tr><td style="padding: 6px 0; color: #666;">Applied On</td><td style="color: #1a1a2e;">${new Date().toLocaleDateString("en-IN", { day: "2-digit", month: "long", year: "numeric" })}</td></tr>
               </table>
             </div>
@@ -176,16 +206,42 @@ export async function POST(request: Request) {
       `
     };
 
+    let adminEmailSent = false;
+    let studentEmailSent = false;
+
     if (smtpPass) {
-      await Promise.all([
+      const transporter = nodemailer.createTransport({
+        host: "smtp.gmail.com",
+        port: 465,
+        secure: true,
+        auth: { user: smtpUser, pass: smtpPass }
+      });
+
+      const [adminResult, studentResult] = await Promise.allSettled([
         transporter.sendMail(adminMailOptions),
         transporter.sendMail(applicantMailOptions)
       ]);
+
+      adminEmailSent = adminResult.status === "fulfilled";
+      studentEmailSent = studentResult.status === "fulfilled";
+
+      if (adminResult.status === "rejected") {
+        console.error("Failed to send Campus Hiring admin email:", adminResult.reason);
+      }
+      if (studentResult.status === "rejected") {
+        console.error("Failed to send Campus Hiring student thank-you email:", studentResult.reason);
+      }
     } else {
-      console.warn("SMTP_PASS not set. Campus hiring logged to DB only.");
+      console.warn("Neither SMTP_PASS nor EMAIL_PASS is configured. Campus hiring logged to DB only.");
     }
 
-    return NextResponse.json({ success: true, application_id, message: "Application submitted successfully" });
+    return NextResponse.json({
+      success: true,
+      application_id,
+      studentEmailSent,
+      adminEmailSent,
+      message: "Application submitted successfully"
+    });
   } catch (error: any) {
     console.error("Campus Hiring POST error:", error);
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });

@@ -128,6 +128,7 @@ export default function CareersPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [expandedJobIndex, setExpandedJobIndex] = useState<number | null>(null);
   const [selectedJobForForm, setSelectedJobForForm] = useState("MBA HR Intern");
+  const [otherJobPosition, setOtherJobPosition] = useState("");
 
   // Form States
   const [formData, setFormData] = useState({
@@ -218,11 +219,16 @@ export default function CareersPage() {
     setSubmitStatus("idle");
 
     try {
+      const finalPosition =
+        selectedJobForForm === "Other (General Talent Pool)" && otherJobPosition.trim()
+          ? `Other (${otherJobPosition.trim()})`
+          : selectedJobForForm;
+
       const payload = {
         name: formData.name,
         email: formData.email,
         phone: formData.phone,
-        position: selectedJobForForm,
+        position: finalPosition,
         coverLetter: formData.coverLetter,
         resumeLink: resumeSubmitMethod === "link" ? formData.resumeLink : "",
         resumeFile: resumeSubmitMethod === "file" ? resumeFile : null
@@ -237,6 +243,7 @@ export default function CareersPage() {
       if (res.ok) {
         setSubmitStatus("success");
         setFormData({ name: "", email: "", phone: "", resumeLink: "", coverLetter: "" });
+        setOtherJobPosition("");
         setResumeFile(null);
       } else {
         setSubmitStatus("error");
@@ -590,7 +597,10 @@ export default function CareersPage() {
                         <label className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#1a1a2e]/60">Position Applied For</label>
                         <select
                           value={selectedJobForForm}
-                          onChange={(e) => setSelectedJobForForm(e.target.value)}
+                          onChange={(e) => {
+                            setSelectedJobForForm(e.target.value);
+                            if (e.target.value !== "Other (General Talent Pool)") setOtherJobPosition("");
+                          }}
                           className="w-full px-4 py-3.5 rounded-xl border border-black/5 bg-white text-sm focus:outline-none focus:border-primary/45 transition-colors"
                         >
                           <option value="MBA HR Intern">MBA HR Intern</option>
@@ -601,6 +611,22 @@ export default function CareersPage() {
                         </select>
                       </div>
                     </div>
+
+                    {selectedJobForForm === "Other (General Talent Pool)" && (
+                      <div className="space-y-2">
+                        <label className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#1a1a2e]/60">
+                          Specify Your Position <span className="text-primary">*</span>
+                        </label>
+                        <input
+                          type="text"
+                          required
+                          placeholder="e.g. Robotics Trainer, Content Strategist..."
+                          value={otherJobPosition}
+                          onChange={(e) => setOtherJobPosition(e.target.value)}
+                          className="w-full px-4 py-3.5 rounded-xl border border-primary/30 bg-primary/5 text-sm focus:outline-none focus:border-primary/60 transition-colors"
+                        />
+                      </div>
+                    )}
 
                     {/* Resume submit method tabs */}
                     <div className="space-y-2">

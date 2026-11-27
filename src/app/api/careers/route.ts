@@ -5,8 +5,8 @@ export async function POST(request: Request) {
   try {
     const { name, email, phone, position, resumeLink, resumeFile, coverLetter } = await request.json();
 
-    const smtpUser = process.env.SMTP_USER || "airgdatalab@gmail.com";
-    const smtpPass = process.env.SMTP_PASS;
+    const smtpUser = process.env.SMTP_USER || process.env.EMAIL_USER || "airglabdata@gmail.com";
+    const smtpPass = process.env.SMTP_PASS || process.env.EMAIL_PASS;
 
     const transporter = nodemailer.createTransport({
       host: "smtp.gmail.com",
