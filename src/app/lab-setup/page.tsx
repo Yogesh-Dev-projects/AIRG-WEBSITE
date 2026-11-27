@@ -21,7 +21,24 @@ export interface UserSession {
 export default function LabSetupPage() {
   // Session State
   const [currentUser, setCurrentUser] = useState<UserSession | null>(null);
-  const [activeTab, setActiveTab] = useState<"create" | "pool" | "phase2" | "phase3" | "phase4" | "purchase" | "users" | "records">("create");
+  const [activeTab, setActiveTab] = useState<"create" | "pool" | "phase2" | "phase3" | "phase4" | "purchase" | "users" | "records" | "campus_hiring">("create");
+
+  // ─── Campus Hiring State (CEO only) ──────────────────────────────────────
+  const [campusApplications, setCampusApplications] = useState<any[]>([]);
+  const [campusTotal, setCampusTotal] = useState(0);
+  const [campusLoading, setCampusLoading] = useState(false);
+  const [campusSearch, setCampusSearch] = useState("");
+  const [campusCollegeFilter, setCampusCollegeFilter] = useState("ALL");
+  const [campusPositionFilter, setCampusPositionFilter] = useState("ALL");
+  const [campusStatusFilter, setCampusStatusFilter] = useState("ALL");
+  const [campusDateFilter, setCampusDateFilter] = useState("ALL");
+  const [campusPage, setCampusPage] = useState(1);
+  const [campusColleges, setCampusColleges] = useState<string[]>([]);
+  const [campusPositions, setCampusPositions] = useState<string[]>([]);
+  const [selectedCampusApp, setSelectedCampusApp] = useState<any | null>(null);
+  const [campusUpdateStatus, setCampusUpdateStatus] = useState<string>("");
+  const [campusNotes, setCampusNotes] = useState<string>("");
+  const [isSavingCampusStatus, setIsSavingCampusStatus] = useState(false);
 
   // Public Form State
   const [publicForm, setPublicForm] = useState({
@@ -803,6 +820,57 @@ export default function LabSetupPage() {
     } catch (err) {}
   };
 
+  const fetchCampusHiringApplications = async () => {
+    setCampusLoading(true);
+    try {
+      const params = new URLSearchParams({
+        college: campusCollegeFilter,
+        position: campusPositionFilter,
+        status: campusStatusFilter,
+        dateRange: campusDateFilter,
+        search: campusSearch,
+        page: campusPage.toString(),
+        limit: "20"
+      });
+      const res = await fetch(`/api/campus-hiring?${params}`);
+      const data = await res.json();
+      if (data.success) {
+        setCampusApplications(data.applications);
+        setCampusTotal(data.total);
+        setCampusColleges(data.colleges || []);
+        setCampusPositions(data.positions || []);
+      }
+    } catch (err) {
+      console.error("Failed to fetch campus hiring applications", err);
+    } finally {
+      setCampusLoading(false);
+    }
+  };
+
+  const handleUpdateCampusStatus = async (appId: string) => {
+    setIsSavingCampusStatus(true);
+    try {
+      const res = await fetch("/api/campus-hiring", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ application_id: appId, status: campusUpdateStatus, ceo_notes: campusNotes })
+      });
+      const data = await res.json();
+      if (data.success) {
+        // Update in local state
+        setCampusApplications(prev => prev.map(a => a.application_id === appId ? { ...a, status: campusUpdateStatus, ceo_notes: campusNotes } : a));
+        if (selectedCampusApp?.application_id === appId) {
+          setSelectedCampusApp((prev: any) => prev ? { ...prev, status: campusUpdateStatus, ceo_notes: campusNotes } : prev);
+        }
+        alert("✅ Application status updated successfully!");
+      }
+    } catch (err) {
+      alert("Failed to update status. Please try again.");
+    } finally {
+      setIsSavingCampusStatus(false);
+    }
+  };
+
   const loadUserSession = () => {
     const saved = localStorage.getItem("airg_user_session");
     if (saved) {
@@ -1272,6 +1340,20 @@ export default function LabSetupPage() {
                 }`}
               >
                 🛒 Phase 5 — Purchase Checklist
+              </button>
+            )}
+
+            {currentUser.role === "CEO" && (
+              <button
+                onClick={() => {
+                  setActiveTab("campus_hiring" as any);
+                  fetchCampusHiringApplications();
+                }}
+                className={`px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all border ${
+                  (activeTab as any) === "campus_hiring" ? "bg-indigo-600 text-white border-indigo-500 font-extrabold shadow-lg shadow-indigo-500/20" : "bg-white/5 text-slate-300 border-white/10 hover:border-indigo-500/40"
+                }`}
+              >
+                🎓 Campus Hiring (Internship Program)
               </button>
             )}
 
@@ -4727,6 +4809,248 @@ export default function LabSetupPage() {
                 })()}
               </div>
             )}
+          </div>
+        )}
+
+        {currentUser && currentUser.role === "CEO" && (activeTab as any) === "campus_hiring" && (
+          <div className="space-y-8">
+            {/* Header */}
+            <div className="bg-gradient-to-r from-indigo-950/80 to-slate-900/90 border border-indigo-500/30 p-6 md:p-8 rounded-3xl">
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+                <div>
+                  <div className="inline-block px-3 py-1 bg-indigo-500/20 border border-indigo-500/30 text-indigo-300 text-[10px] font-mono font-bold uppercase tracking-widest rounded-full mb-2">
+                    CEO PORTAL — CAMPUS HIRING
+                  </div>
+                  <h2 className="text-2xl font-black text-white uppercase">Campus Hiring (Internship Program)</h2>
+                  <p className="text-slate-400 text-xs mt-1">Manage and review all campus internship applications. Filter by college, position, or status.</p>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="bg-indigo-500/10 border border-indigo-500/20 rounded-2xl px-5 py-3 text-center">
+                    <div className="text-2xl font-black text-indigo-300">{campusTotal}</div>
+                    <div className="text-[9px] text-indigo-400 font-mono uppercase">Total Applications</div>
+                  </div>
+                  <button
+                    onClick={fetchCampusHiringApplications}
+                    className="px-4 py-2.5 bg-indigo-600 text-white text-xs font-bold uppercase rounded-xl hover:bg-indigo-500 transition-colors"
+                  >
+                    🔄 Refresh
+                  </button>
+                </div>
+              </div>
+
+              {/* Filters */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+                <input
+                  type="text"
+                  placeholder="🔍 Search name, email, ID..."
+                  value={campusSearch}
+                  onChange={(e) => setCampusSearch(e.target.value)}
+                  onKeyDown={(e) => { if (e.key === "Enter") fetchCampusHiringApplications(); }}
+                  className="bg-slate-950 border border-white/10 rounded-xl px-4 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500/50"
+                />
+                <select
+                  value={campusCollegeFilter}
+                  onChange={(e) => setCampusCollegeFilter(e.target.value)}
+                  className="bg-slate-950 border border-white/10 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-indigo-500/50"
+                >
+                  <option value="ALL">🏫 All Colleges</option>
+                  {campusColleges.map(c => <option key={c} value={c}>{c}</option>)}
+                </select>
+                <select
+                  value={campusPositionFilter}
+                  onChange={(e) => setCampusPositionFilter(e.target.value)}
+                  className="bg-slate-950 border border-white/10 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-indigo-500/50"
+                >
+                  <option value="ALL">💼 All Positions</option>
+                  {campusPositions.map(p => <option key={p} value={p}>{p}</option>)}
+                </select>
+                <select
+                  value={campusStatusFilter}
+                  onChange={(e) => setCampusStatusFilter(e.target.value)}
+                  className="bg-slate-950 border border-white/10 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-indigo-500/50"
+                >
+                  <option value="ALL">📊 All Statuses</option>
+                  <option value="PENDING">⏳ Pending</option>
+                  <option value="REVIEWED">👀 Reviewed</option>
+                  <option value="SHORTLISTED">⭐ Shortlisted</option>
+                  <option value="SELECTED">✅ Selected</option>
+                  <option value="REJECTED">❌ Rejected</option>
+                </select>
+                <select
+                  value={campusDateFilter}
+                  onChange={(e) => setCampusDateFilter(e.target.value)}
+                  className="bg-slate-950 border border-white/10 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-indigo-500/50"
+                >
+                  <option value="ALL">📅 All Time</option>
+                  <option value="TODAY">Today</option>
+                  <option value="WEEK">Last 7 Days</option>
+                  <option value="MONTH">Last 30 Days</option>
+                </select>
+              </div>
+              <button
+                onClick={() => { setCampusPage(1); fetchCampusHiringApplications(); }}
+                className="mt-3 px-6 py-2.5 bg-indigo-600 text-white text-xs font-bold uppercase rounded-xl hover:bg-indigo-500 transition-colors"
+              >
+                Apply Filters
+              </button>
+            </div>
+
+            {/* Stats Row */}
+            <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+              {[
+                { label: "Total", count: campusApplications.length, color: "text-white bg-slate-800 border-white/10" },
+                { label: "Pending", count: campusApplications.filter(a => a.status === "PENDING").length, color: "text-yellow-300 bg-yellow-900/30 border-yellow-500/20" },
+                { label: "Reviewed", count: campusApplications.filter(a => a.status === "REVIEWED").length, color: "text-blue-300 bg-blue-900/30 border-blue-500/20" },
+                { label: "Shortlisted", count: campusApplications.filter(a => a.status === "SHORTLISTED").length, color: "text-indigo-300 bg-indigo-900/30 border-indigo-500/20" },
+                { label: "Selected", count: campusApplications.filter(a => a.status === "SELECTED").length, color: "text-emerald-300 bg-emerald-900/30 border-emerald-500/20" },
+              ].map(stat => (
+                <div key={stat.label} className={`${stat.color} border rounded-2xl p-4 text-center`}>
+                  <div className="text-2xl font-black">{stat.count}</div>
+                  <div className="text-[10px] font-mono uppercase tracking-widest mt-1 opacity-70">{stat.label}</div>
+                </div>
+              ))}
+            </div>
+
+            <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+              {/* Applications List */}
+              <div className="xl:col-span-2 space-y-3">
+                {campusLoading ? (
+                  <div className="text-center py-16 text-slate-400">
+                    <div className="w-8 h-8 border-2 border-indigo-500/30 border-t-indigo-400 rounded-full animate-spin mx-auto mb-3" />
+                    Loading applications...
+                  </div>
+                ) : campusApplications.length === 0 ? (
+                  <div className="text-center py-16 bg-slate-900/50 border border-white/5 rounded-3xl text-slate-400">
+                    <div className="text-4xl mb-3">🎓</div>
+                    <p className="font-bold text-white">No applications found</p>
+                    <p className="text-xs mt-1">Try adjusting your filters or click Refresh.</p>
+                  </div>
+                ) : (
+                  campusApplications.map((app) => {
+                    const statusColors: Record<string, string> = {
+                      PENDING: "bg-yellow-500/20 text-yellow-300 border-yellow-500/30",
+                      REVIEWED: "bg-blue-500/20 text-blue-300 border-blue-500/30",
+                      SHORTLISTED: "bg-indigo-500/20 text-indigo-300 border-indigo-500/30",
+                      SELECTED: "bg-emerald-500/20 text-emerald-300 border-emerald-500/30",
+                      REJECTED: "bg-red-500/20 text-red-300 border-red-500/30",
+                    };
+                    const isActive = selectedCampusApp?.application_id === app.application_id;
+                    return (
+                      <div
+                        key={app.application_id}
+                        onClick={() => {
+                          setSelectedCampusApp(app);
+                          setCampusUpdateStatus(app.status);
+                          setCampusNotes(app.ceo_notes || "");
+                        }}
+                        className={`bg-slate-900/60 border rounded-2xl p-5 cursor-pointer transition-all hover:border-indigo-500/40 ${isActive ? "border-indigo-500/60 ring-1 ring-indigo-500/20" : "border-white/5"}`}
+                      >
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 flex-wrap mb-1">
+                              <span className={`px-2 py-0.5 rounded-full text-[9px] font-mono font-bold border ${statusColors[app.status] || statusColors.PENDING}`}>
+                                {app.status}
+                              </span>
+                              <span className="text-[9px] font-mono text-indigo-400">{app.application_id}</span>
+                            </div>
+                            <h4 className="text-sm font-black text-white truncate">{app.full_name}</h4>
+                            <p className="text-xs text-indigo-300 font-medium truncate">{app.position_applied}</p>
+                            <div className="flex items-center gap-3 mt-2 text-[10px] text-slate-400 font-mono flex-wrap">
+                              <span>🏫 {app.college_name}</span>
+                              <span>📧 {app.email}</span>
+                            </div>
+                          </div>
+                          <div className="text-right shrink-0">
+                            <div className="text-[9px] text-slate-500 font-mono">
+                              {new Date(app.applied_at).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })
+                )}
+              </div>
+
+              {/* Detail Panel */}
+              <div className="xl:col-span-1">
+                {selectedCampusApp ? (
+                  <div className="bg-slate-900/60 border border-indigo-500/20 rounded-3xl p-6 space-y-5 sticky top-28">
+                    <div>
+                      <div className="text-[9px] font-mono text-indigo-400 uppercase tracking-widest mb-1">{selectedCampusApp.application_id}</div>
+                      <h3 className="text-lg font-black text-white">{selectedCampusApp.full_name}</h3>
+                      <div className="text-xs text-indigo-300 font-medium">{selectedCampusApp.position_applied}</div>
+                    </div>
+
+                    <div className="space-y-2 text-xs font-mono text-slate-300">
+                      <div className="flex items-center gap-2"><span className="text-slate-500 w-20">College:</span><span className="text-white font-bold">{selectedCampusApp.college_name}</span></div>
+                      <div className="flex items-center gap-2"><span className="text-slate-500 w-20">Email:</span><span>{selectedCampusApp.email}</span></div>
+                      <div className="flex items-center gap-2"><span className="text-slate-500 w-20">Phone:</span><span>{selectedCampusApp.contact_number}</span></div>
+                      <div className="flex items-center gap-2"><span className="text-slate-500 w-20">Nationality:</span><span>{selectedCampusApp.nationality}</span></div>
+                      <div className="flex items-center gap-2"><span className="text-slate-500 w-20">Experience:</span><span>{selectedCampusApp.experience}</span></div>
+                    </div>
+
+                    <div className="bg-slate-800/60 rounded-2xl p-4 space-y-3">
+                      <div>
+                        <div className="text-[9px] font-mono text-slate-400 uppercase tracking-widest mb-1">Skills</div>
+                        <p className="text-xs text-slate-300 leading-relaxed">{selectedCampusApp.skills}</p>
+                      </div>
+                      <div>
+                        <div className="text-[9px] font-mono text-slate-400 uppercase tracking-widest mb-1">Why Should We Hire?</div>
+                        <p className="text-xs text-slate-300 leading-relaxed">{selectedCampusApp.why_hire}</p>
+                      </div>
+                    </div>
+
+                    {selectedCampusApp.cv_link && (
+                      <a href={selectedCampusApp.cv_link} target="_blank" rel="noopener noreferrer"
+                        className="flex items-center gap-2 px-4 py-2.5 bg-indigo-600/20 border border-indigo-500/30 rounded-xl text-xs text-indigo-300 font-bold hover:bg-indigo-600/30 transition-colors">
+                        📄 View CV / Resume
+                      </a>
+                    )}
+                    {selectedCampusApp.cv_file_name && !selectedCampusApp.cv_link && (
+                      <div className="flex items-center gap-2 px-4 py-2.5 bg-slate-800/60 border border-white/10 rounded-xl text-xs text-slate-300">
+                        📎 CV: {selectedCampusApp.cv_file_name} (attached in email)
+                      </div>
+                    )}
+
+                    {/* CEO Actions */}
+                    <div className="border-t border-white/5 pt-4 space-y-3">
+                      <div className="text-[9px] font-mono text-slate-400 uppercase tracking-widest">CEO Actions</div>
+                      <select
+                        value={campusUpdateStatus}
+                        onChange={(e) => setCampusUpdateStatus(e.target.value)}
+                        className="w-full bg-slate-950 border border-white/10 rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none focus:border-indigo-500/50"
+                      >
+                        <option value="PENDING">⏳ Pending</option>
+                        <option value="REVIEWED">👀 Reviewed</option>
+                        <option value="SHORTLISTED">⭐ Shortlisted</option>
+                        <option value="SELECTED">✅ Selected</option>
+                        <option value="REJECTED">❌ Rejected</option>
+                      </select>
+                      <textarea
+                        rows={3}
+                        placeholder="CEO notes / feedback..."
+                        value={campusNotes}
+                        onChange={(e) => setCampusNotes(e.target.value)}
+                        className="w-full bg-slate-950 border border-white/10 rounded-xl px-3 py-2.5 text-xs text-white placeholder-slate-600 focus:outline-none focus:border-indigo-500/50 resize-none"
+                      />
+                      <button
+                        disabled={isSavingCampusStatus}
+                        onClick={() => handleUpdateCampusStatus(selectedCampusApp.application_id)}
+                        className="w-full py-2.5 bg-indigo-600 text-white text-xs font-bold uppercase rounded-xl hover:bg-indigo-500 transition-colors disabled:opacity-50"
+                      >
+                        {isSavingCampusStatus ? "Saving..." : "Save Status & Notes"}
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="bg-slate-900/40 border border-white/5 rounded-3xl p-8 text-center text-slate-500 sticky top-28">
+                    <div className="text-4xl mb-3">👈</div>
+                    <p className="text-xs font-mono">Select an application to view details</p>
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
         )}
 

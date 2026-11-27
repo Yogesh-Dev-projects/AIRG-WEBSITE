@@ -37,7 +37,14 @@ export function Navbar() {
     { name: "Airg Labs", href: "/#labs" },
     { name: "AI Infra", href: "/learning/ai-infrastructures" },
     { name: "Global Centres", href: "/#centres" },
-    { name: "Careers", href: "/careers" },
+    { 
+      name: "Careers", 
+      href: "/careers",
+      dropdown: [
+        { name: "Open Roles", href: "/careers" },
+        { name: "Campus Hiring (Internship Program)", href: "/careers/campus-hiring" }
+      ]
+    },
     { name: "Lab Setup", href: "/lab-setup" }
   ];
 
