@@ -2,7 +2,12 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Eye, EyeOff } from "lucide-react";
+import {
+  Eye, EyeOff, Download, ExternalLink, Search, Building2, Briefcase, Users,
+  CheckCircle2, Clock, Star, XCircle, FileText, Mail, Phone, Globe,
+  RotateCcw, ChevronLeft, ChevronRight, X, LayoutGrid, List, GraduationCap,
+  RefreshCw, FileSpreadsheet, MessageSquare
+} from "lucide-react";
 import { Navbar } from "@/components/demo-navbar";
 import { Footer } from "@/components/demo-footer";
 import { PurchaseItemData, getDefaultPurchaseChecklist } from "@/data/purchaseInventoryData";
@@ -26,19 +31,32 @@ export default function LabSetupPage() {
   // ─── Campus Hiring State (CEO only) ──────────────────────────────────────
   const [campusApplications, setCampusApplications] = useState<any[]>([]);
   const [campusTotal, setCampusTotal] = useState(0);
+  const [campusStats, setCampusStats] = useState({
+    total: 0, pending: 0, reviewed: 0, shortlisted: 0, selected: 0, rejected: 0, collegesCount: 0
+  });
+  const [campusCollegeDist, setCampusCollegeDist] = useState<any[]>([]);
+  const [campusPositionDist, setCampusPositionDist] = useState<any[]>([]);
   const [campusLoading, setCampusLoading] = useState(false);
   const [campusSearch, setCampusSearch] = useState("");
   const [campusCollegeFilter, setCampusCollegeFilter] = useState("ALL");
   const [campusPositionFilter, setCampusPositionFilter] = useState("ALL");
   const [campusStatusFilter, setCampusStatusFilter] = useState("ALL");
+  const [campusExperienceFilter, setCampusExperienceFilter] = useState("ALL");
+  const [campusNationalityFilter, setCampusNationalityFilter] = useState("ALL");
   const [campusDateFilter, setCampusDateFilter] = useState("ALL");
+  const [campusSort, setCampusSort] = useState("newest");
   const [campusPage, setCampusPage] = useState(1);
   const [campusColleges, setCampusColleges] = useState<string[]>([]);
   const [campusPositions, setCampusPositions] = useState<string[]>([]);
+  const [campusExperiences, setCampusExperiences] = useState<string[]>([]);
+  const [campusNationalities, setCampusNationalities] = useState<string[]>([]);
+  const [campusViewMode, setCampusViewMode] = useState<"cards" | "table">("cards");
   const [selectedCampusApp, setSelectedCampusApp] = useState<any | null>(null);
   const [campusUpdateStatus, setCampusUpdateStatus] = useState<string>("");
   const [campusNotes, setCampusNotes] = useState<string>("");
   const [isSavingCampusStatus, setIsSavingCampusStatus] = useState(false);
+  const [campusSaveFeedback, setCampusSaveFeedback] = useState<"idle" | "saved" | "error">("idle");
+  const [previewCvApp, setPreviewCvApp] = useState<any | null>(null);
 
   // Public Form State
   const [publicForm, setPublicForm] = useState({
@@ -824,8 +842,11 @@ export default function LabSetupPage() {
     college?: string;
     position?: string;
     status?: string;
+    experience?: string;
+    nationality?: string;
     dateRange?: string;
     search?: string;
+    sort?: string;
     page?: number;
   }) => {
     setCampusLoading(true);
@@ -834,18 +855,39 @@ export default function LabSetupPage() {
         college: overrides?.college ?? campusCollegeFilter,
         position: overrides?.position ?? campusPositionFilter,
         status: overrides?.status ?? campusStatusFilter,
+        experience: overrides?.experience ?? campusExperienceFilter,
+        nationality: overrides?.nationality ?? campusNationalityFilter,
         dateRange: overrides?.dateRange ?? campusDateFilter,
         search: overrides?.search ?? campusSearch,
+        sort: overrides?.sort ?? campusSort,
         page: String(overrides?.page ?? campusPage),
         limit: "20"
       });
       const res = await fetch(`/api/campus-hiring?${params}`);
       const data = await res.json();
       if (data.success) {
-        setCampusApplications(data.applications);
-        setCampusTotal(data.total);
+        const list = data.applications || [];
+        setCampusApplications(list);
+        setCampusTotal(data.total || 0);
+        if (data.stats) setCampusStats(data.stats);
+        setCampusCollegeDist(data.collegeDistribution || []);
+        setCampusPositionDist(data.positionDistribution || []);
         setCampusColleges(data.colleges || []);
         setCampusPositions(data.positions || []);
+        setCampusExperiences(data.experiences || []);
+        setCampusNationalities(data.nationalities || []);
+
+        if (list.length > 0) {
+          setSelectedCampusApp((prev: any) => {
+            const match = prev ? list.find((a: any) => a.application_id === prev.application_id) : null;
+            const chosen = match || list[0];
+            setCampusUpdateStatus(chosen.status);
+            setCampusNotes(chosen.ceo_notes || "");
+            return chosen;
+          });
+        } else {
+          setSelectedCampusApp(null);
+        }
       }
     } catch (err) {
       console.error("Failed to fetch campus hiring applications", err);
@@ -854,8 +896,47 @@ export default function LabSetupPage() {
     }
   };
 
+  const resetCampusFilters = () => {
+    setCampusSearch("");
+    setCampusCollegeFilter("ALL");
+    setCampusPositionFilter("ALL");
+    setCampusStatusFilter("ALL");
+    setCampusExperienceFilter("ALL");
+    setCampusNationalityFilter("ALL");
+    setCampusDateFilter("ALL");
+    setCampusSort("newest");
+    setCampusPage(1);
+    fetchCampusHiringApplications({
+      college: "ALL",
+      position: "ALL",
+      status: "ALL",
+      experience: "ALL",
+      nationality: "ALL",
+      dateRange: "ALL",
+      search: "",
+      sort: "newest",
+      page: 1,
+    });
+  };
+
+  const handleExportCampusCsv = () => {
+    const params = new URLSearchParams({
+      college: campusCollegeFilter,
+      position: campusPositionFilter,
+      status: campusStatusFilter,
+      experience: campusExperienceFilter,
+      nationality: campusNationalityFilter,
+      dateRange: campusDateFilter,
+      search: campusSearch,
+      sort: campusSort,
+      export: "csv",
+    });
+    window.open(`/api/campus-hiring?${params.toString()}`, "_blank");
+  };
+
   const handleUpdateCampusStatus = async (appId: string) => {
     setIsSavingCampusStatus(true);
+    setCampusSaveFeedback("idle");
     try {
       const res = await fetch("/api/campus-hiring", {
         method: "PATCH",
@@ -864,15 +945,18 @@ export default function LabSetupPage() {
       });
       const data = await res.json();
       if (data.success) {
-        // Update in local state
         setCampusApplications(prev => prev.map(a => a.application_id === appId ? { ...a, status: campusUpdateStatus, ceo_notes: campusNotes } : a));
         if (selectedCampusApp?.application_id === appId) {
           setSelectedCampusApp((prev: any) => prev ? { ...prev, status: campusUpdateStatus, ceo_notes: campusNotes } : prev);
         }
-        alert("✅ Application status updated successfully!");
+        setCampusSaveFeedback("saved");
+        fetchCampusHiringApplications();
+        setTimeout(() => setCampusSaveFeedback("idle"), 3000);
+      } else {
+        setCampusSaveFeedback("error");
       }
     } catch (err) {
-      alert("Failed to update status. Please try again.");
+      setCampusSaveFeedback("error");
     } finally {
       setIsSavingCampusStatus(false);
     }
@@ -4819,267 +4903,939 @@ export default function LabSetupPage() {
           </div>
         )}
 
-        {currentUser && currentUser.role === "CEO" && (activeTab as any) === "campus_hiring" && (
-          <div className="space-y-8">
-            {/* Header */}
-            <div className="bg-gradient-to-r from-indigo-950/80 to-slate-900/90 border border-indigo-500/30 p-6 md:p-8 rounded-3xl">
-              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
-                <div>
-                  <div className="inline-block px-3 py-1 bg-indigo-500/20 border border-indigo-500/30 text-indigo-300 text-[10px] font-mono font-bold uppercase tracking-widest rounded-full mb-2">
-                    CEO PORTAL — CAMPUS HIRING
-                  </div>
-                  <h2 className="text-2xl font-black text-white uppercase">Campus Hiring (Internship Program)</h2>
-                  <p className="text-slate-400 text-xs mt-1">Manage and review all campus internship applications. Filter by college, position, or status.</p>
-                </div>
-                <div className="flex items-center gap-3">
-                  <div className="bg-indigo-500/10 border border-indigo-500/20 rounded-2xl px-5 py-3 text-center">
-                    <div className="text-2xl font-black text-indigo-300">{campusTotal}</div>
-                    <div className="text-[9px] text-indigo-400 font-mono uppercase">Total Applications</div>
-                  </div>
-                  <button
-                    onClick={() => fetchCampusHiringApplications()}
-                    className="px-4 py-2.5 bg-indigo-600 text-white text-xs font-bold uppercase rounded-xl hover:bg-indigo-500 transition-colors"
-                  >
-                    🔄 Refresh
-                  </button>
-                </div>
-              </div>
+        {currentUser && currentUser.role === "CEO" && (activeTab as any) === "campus_hiring" && (() => {
+          const statusMeta: Record<string, { label: string; badge: string; dot: string }> = {
+            PENDING: { label: "Pending", badge: "bg-amber-500/15 text-amber-300 border-amber-500/30", dot: "bg-amber-400" },
+            REVIEWED: { label: "Reviewed", badge: "bg-sky-500/15 text-sky-300 border-sky-500/30", dot: "bg-sky-400" },
+            SHORTLISTED: { label: "Shortlisted", badge: "bg-indigo-500/15 text-indigo-300 border-indigo-500/30", dot: "bg-indigo-400" },
+            SELECTED: { label: "Selected", badge: "bg-emerald-500/15 text-emerald-300 border-emerald-500/30", dot: "bg-emerald-400" },
+            REJECTED: { label: "Rejected", badge: "bg-rose-500/15 text-rose-300 border-rose-500/30", dot: "bg-rose-400" },
+          };
+          const hasActiveFilters =
+            campusSearch.trim() !== "" ||
+            campusCollegeFilter !== "ALL" ||
+            campusPositionFilter !== "ALL" ||
+            campusStatusFilter !== "ALL" ||
+            campusExperienceFilter !== "ALL" ||
+            campusNationalityFilter !== "ALL" ||
+            campusDateFilter !== "ALL" ||
+            campusSort !== "newest";
+          const totalPages = Math.max(1, Math.ceil(campusTotal / 20));
+          const getInitials = (name: string) =>
+            (name || "ST")
+              .split(" ")
+              .filter(Boolean)
+              .slice(0, 2)
+              .map((p) => p[0]?.toUpperCase() || "")
+              .join("");
+          const getCvDownloadUrl = (appId: string) =>
+            `/api/campus-hiring/cv?application_id=${encodeURIComponent(appId)}&mode=download`;
+          const getCvViewUrl = (appId: string) =>
+            `/api/campus-hiring/cv?application_id=${encodeURIComponent(appId)}&mode=view`;
+          const isPdfName = (name?: string) => (name || "").toLowerCase().endsWith(".pdf");
 
-              {/* Filters */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
-                <input
-                  type="text"
-                  placeholder="🔍 Search name, email, ID..."
-                  value={campusSearch}
-                  onChange={(e) => setCampusSearch(e.target.value)}
-                  onKeyDown={(e) => { if (e.key === "Enter") fetchCampusHiringApplications(); }}
-                  className="bg-slate-950 border border-white/10 rounded-xl px-4 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500/50"
-                />
-                <select
-                  value={campusCollegeFilter}
-                  onChange={(e) => {
-                    const val = e.target.value;
-                    setCampusCollegeFilter(val);
-                    setCampusPage(1);
-                    fetchCampusHiringApplications({ college: val, page: 1 });
-                  }}
-                  className="bg-slate-950 border border-white/10 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-indigo-500/50"
-                >
-                  <option value="ALL">🏫 All Colleges</option>
-                  {campusColleges.map(c => <option key={c} value={c}>{c}</option>)}
-                </select>
-                <select
-                  value={campusPositionFilter}
-                  onChange={(e) => {
-                    const val = e.target.value;
-                    setCampusPositionFilter(val);
-                    setCampusPage(1);
-                    fetchCampusHiringApplications({ position: val, page: 1 });
-                  }}
-                  className="bg-slate-950 border border-white/10 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-indigo-500/50"
-                >
-                  <option value="ALL">💼 All Positions</option>
-                  {campusPositions.map(p => <option key={p} value={p}>{p}</option>)}
-                </select>
-                <select
-                  value={campusStatusFilter}
-                  onChange={(e) => {
-                    const val = e.target.value;
-                    setCampusStatusFilter(val);
-                    setCampusPage(1);
-                    fetchCampusHiringApplications({ status: val, page: 1 });
-                  }}
-                  className="bg-slate-950 border border-white/10 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-indigo-500/50"
-                >
-                  <option value="ALL">📊 All Statuses</option>
-                  <option value="PENDING">⏳ Pending</option>
-                  <option value="REVIEWED">👀 Reviewed</option>
-                  <option value="SHORTLISTED">⭐ Shortlisted</option>
-                  <option value="SELECTED">✅ Selected</option>
-                  <option value="REJECTED">❌ Rejected</option>
-                </select>
-                <select
-                  value={campusDateFilter}
-                  onChange={(e) => {
-                    const val = e.target.value;
-                    setCampusDateFilter(val);
-                    setCampusPage(1);
-                    fetchCampusHiringApplications({ dateRange: val, page: 1 });
-                  }}
-                  className="bg-slate-950 border border-white/10 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-indigo-500/50"
-                >
-                  <option value="ALL">📅 All Time</option>
-                  <option value="TODAY">Today</option>
-                  <option value="WEEK">Last 7 Days</option>
-                  <option value="MONTH">Last 30 Days</option>
-                </select>
-              </div>
-              <button
-                onClick={() => { setCampusPage(1); fetchCampusHiringApplications(); }}
-                className="mt-3 px-6 py-2.5 bg-indigo-600 text-white text-xs font-bold uppercase rounded-xl hover:bg-indigo-500 transition-colors"
-              >
-                Apply Filters
-              </button>
-            </div>
-
-            {/* Stats Row */}
-            <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
-              {[
-                { label: "Total", count: campusApplications.length, color: "text-white bg-slate-800 border-white/10" },
-                { label: "Pending", count: campusApplications.filter(a => a.status === "PENDING").length, color: "text-yellow-300 bg-yellow-900/30 border-yellow-500/20" },
-                { label: "Reviewed", count: campusApplications.filter(a => a.status === "REVIEWED").length, color: "text-blue-300 bg-blue-900/30 border-blue-500/20" },
-                { label: "Shortlisted", count: campusApplications.filter(a => a.status === "SHORTLISTED").length, color: "text-indigo-300 bg-indigo-900/30 border-indigo-500/20" },
-                { label: "Selected", count: campusApplications.filter(a => a.status === "SELECTED").length, color: "text-emerald-300 bg-emerald-900/30 border-emerald-500/20" },
-              ].map(stat => (
-                <div key={stat.label} className={`${stat.color} border rounded-2xl p-4 text-center`}>
-                  <div className="text-2xl font-black">{stat.count}</div>
-                  <div className="text-[10px] font-mono uppercase tracking-widest mt-1 opacity-70">{stat.label}</div>
+          return (
+            <div className="space-y-6">
+              {/* Executive Header */}
+              <div className="bg-gradient-to-br from-slate-900 via-[#12162e] to-indigo-950/70 border border-indigo-500/25 p-6 md:p-8 rounded-3xl shadow-2xl">
+                <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-5">
+                  <div>
+                    <div className="inline-flex items-center gap-2 px-3 py-1 bg-indigo-500/15 border border-indigo-400/30 text-indigo-300 text-[10px] font-mono font-bold uppercase tracking-widest rounded-full mb-3">
+                      <GraduationCap className="w-3.5 h-3.5" />
+                      CEO Recruitment Suite — Campus Hiring
+                    </div>
+                    <h2 className="text-2xl md:text-3xl font-black text-white tracking-tight uppercase">
+                      Campus Hiring (Internship Program)
+                    </h2>
+                    <p className="text-slate-400 text-xs md:text-sm mt-1 max-w-2xl">
+                      Review student applications, analyze college-wise distribution, preview or download CVs, and manage hiring decisions.
+                    </p>
+                  </div>
+                  <div className="flex flex-wrap items-center gap-3">
+                    <button
+                      onClick={handleExportCampusCsv}
+                      className="inline-flex items-center gap-2 px-4 py-2.5 bg-emerald-600/20 border border-emerald-500/40 text-emerald-300 text-xs font-bold uppercase tracking-wider rounded-xl hover:bg-emerald-600/30 transition-colors cursor-pointer"
+                    >
+                      <FileSpreadsheet className="w-4 h-4" />
+                      Export CSV
+                    </button>
+                    <button
+                      onClick={() => fetchCampusHiringApplications()}
+                      disabled={campusLoading}
+                      className="inline-flex items-center gap-2 px-4 py-2.5 bg-indigo-600 text-white text-xs font-bold uppercase tracking-wider rounded-xl hover:bg-indigo-500 transition-colors disabled:opacity-50 cursor-pointer shadow-lg shadow-indigo-600/20"
+                    >
+                      <RefreshCw className={`w-4 h-4 ${campusLoading ? "animate-spin" : ""}`} />
+                      Refresh
+                    </button>
+                  </div>
                 </div>
-              ))}
-            </div>
 
-            <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-              {/* Applications List */}
-              <div className="xl:col-span-2 space-y-3">
-                {campusLoading ? (
-                  <div className="text-center py-16 text-slate-400">
-                    <div className="w-8 h-8 border-2 border-indigo-500/30 border-t-indigo-400 rounded-full animate-spin mx-auto mb-3" />
-                    Loading applications...
-                  </div>
-                ) : campusApplications.length === 0 ? (
-                  <div className="text-center py-16 bg-slate-900/50 border border-white/5 rounded-3xl text-slate-400">
-                    <div className="text-4xl mb-3">🎓</div>
-                    <p className="font-bold text-white">No applications found</p>
-                    <p className="text-xs mt-1">Try adjusting your filters or click Refresh.</p>
-                  </div>
-                ) : (
-                  campusApplications.map((app) => {
-                    const statusColors: Record<string, string> = {
-                      PENDING: "bg-yellow-500/20 text-yellow-300 border-yellow-500/30",
-                      REVIEWED: "bg-blue-500/20 text-blue-300 border-blue-500/30",
-                      SHORTLISTED: "bg-indigo-500/20 text-indigo-300 border-indigo-500/30",
-                      SELECTED: "bg-emerald-500/20 text-emerald-300 border-emerald-500/30",
-                      REJECTED: "bg-red-500/20 text-red-300 border-red-500/30",
-                    };
-                    const isActive = selectedCampusApp?.application_id === app.application_id;
+                {/* Executive KPI Cards */}
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mt-6">
+                  {[
+                    { key: "ALL", label: "Total Applicants", count: campusStats.total, icon: Users, color: "from-slate-800/80 to-slate-900/90 border-white/10 text-white", activeRing: "ring-white/30" },
+                    { key: "COLLEGES", label: "Colleges Reached", count: campusStats.collegesCount, icon: Building2, color: "from-purple-950/60 to-slate-900/90 border-purple-500/25 text-purple-300", activeRing: "" },
+                    { key: "PENDING", label: "Pending Review", count: campusStats.pending, icon: Clock, color: "from-amber-950/50 to-slate-900/90 border-amber-500/25 text-amber-300", activeRing: "ring-amber-400/50" },
+                    { key: "REVIEWED", label: "Reviewed", count: campusStats.reviewed, icon: Eye, color: "from-sky-950/50 to-slate-900/90 border-sky-500/25 text-sky-300", activeRing: "ring-sky-400/50" },
+                    { key: "SHORTLISTED", label: "Shortlisted", count: campusStats.shortlisted, icon: Star, color: "from-indigo-950/60 to-slate-900/90 border-indigo-500/30 text-indigo-300", activeRing: "ring-indigo-400/50" },
+                    { key: "SELECTED", label: "Selected", count: campusStats.selected, icon: CheckCircle2, color: "from-emerald-950/50 to-slate-900/90 border-emerald-500/25 text-emerald-300", activeRing: "ring-emerald-400/50" },
+                  ].map((kpi) => {
+                    const Icon = kpi.icon;
+                    const clickable = kpi.key !== "COLLEGES";
+                    const isActive = clickable && campusStatusFilter === kpi.key && kpi.key !== "ALL";
                     return (
-                      <div
-                        key={app.application_id}
+                      <button
+                        key={kpi.label}
+                        type="button"
                         onClick={() => {
-                          setSelectedCampusApp(app);
-                          setCampusUpdateStatus(app.status);
-                          setCampusNotes(app.ceo_notes || "");
+                          if (!clickable) return;
+                          setCampusStatusFilter(kpi.key);
+                          setCampusPage(1);
+                          fetchCampusHiringApplications({ status: kpi.key, page: 1 });
                         }}
-                        className={`bg-slate-900/60 border rounded-2xl p-5 cursor-pointer transition-all hover:border-indigo-500/40 ${isActive ? "border-indigo-500/60 ring-1 ring-indigo-500/20" : "border-white/5"}`}
+                        className={`text-left bg-gradient-to-br ${kpi.color} border rounded-2xl p-4 transition-all ${
+                          clickable ? "cursor-pointer hover:scale-[1.02]" : "cursor-default"
+                        } ${isActive ? `ring-2 ${kpi.activeRing}` : ""}`}
                       >
-                        <div className="flex items-start justify-between gap-3">
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-2 flex-wrap mb-1">
-                              <span className={`px-2 py-0.5 rounded-full text-[9px] font-mono font-bold border ${statusColors[app.status] || statusColors.PENDING}`}>
-                                {app.status}
-                              </span>
-                              <span className="text-[9px] font-mono text-indigo-400">{app.application_id}</span>
-                            </div>
-                            <h4 className="text-sm font-black text-white truncate">{app.full_name}</h4>
-                            <p className="text-xs text-indigo-300 font-medium truncate">{app.position_applied}</p>
-                            <div className="flex items-center gap-3 mt-2 text-[10px] text-slate-400 font-mono flex-wrap">
-                              <span>🏫 {app.college_name}</span>
-                              <span>📧 {app.email}</span>
-                            </div>
-                          </div>
-                          <div className="text-right shrink-0">
-                            <div className="text-[9px] text-slate-500 font-mono">
-                              {new Date(app.applied_at).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })}
-                            </div>
-                          </div>
+                        <div className="flex items-center justify-between mb-2">
+                          <Icon className="w-4 h-4 opacity-80" />
+                          {isActive && <span className="text-[9px] font-mono uppercase px-1.5 py-0.5 rounded bg-white/10">Filtered</span>}
                         </div>
-                      </div>
+                        <div className="text-2xl font-black text-white">{kpi.count}</div>
+                        <div className="text-[10px] font-mono uppercase tracking-wider opacity-75 mt-0.5">{kpi.label}</div>
+                      </button>
                     );
-                  })
-                )}
+                  })}
+                </div>
               </div>
 
-              {/* Detail Panel */}
-              <div className="xl:col-span-1">
-                {selectedCampusApp ? (
-                  <div className="bg-slate-900/60 border border-indigo-500/20 rounded-3xl p-6 space-y-5 sticky top-28">
-                    <div>
-                      <div className="text-[9px] font-mono text-indigo-400 uppercase tracking-widest mb-1">{selectedCampusApp.application_id}</div>
-                      <h3 className="text-lg font-black text-white">{selectedCampusApp.full_name}</h3>
-                      <div className="text-xs text-indigo-300 font-medium">{selectedCampusApp.position_applied}</div>
-                    </div>
-
-                    <div className="space-y-2 text-xs font-mono text-slate-300">
-                      <div className="flex items-center gap-2"><span className="text-slate-500 w-20">College:</span><span className="text-white font-bold">{selectedCampusApp.college_name}</span></div>
-                      <div className="flex items-center gap-2"><span className="text-slate-500 w-20">Email:</span><span>{selectedCampusApp.email}</span></div>
-                      <div className="flex items-center gap-2"><span className="text-slate-500 w-20">Phone:</span><span>{selectedCampusApp.contact_number}</span></div>
-                      <div className="flex items-center gap-2"><span className="text-slate-500 w-20">Nationality:</span><span>{selectedCampusApp.nationality}</span></div>
-                      <div className="flex items-center gap-2"><span className="text-slate-500 w-20">Experience:</span><span>{selectedCampusApp.experience}</span></div>
-                    </div>
-
-                    <div className="bg-slate-800/60 rounded-2xl p-4 space-y-3">
+              {/* College-Wise Student Distribution & Position Breakdown */}
+              {(campusCollegeDist.length > 0 || campusPositionDist.length > 0) && (
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
+                  {/* College-Wise Distribution */}
+                  <div className="lg:col-span-7 bg-slate-900/70 border border-white/10 rounded-3xl p-5 md:p-6">
+                    <div className="flex items-center justify-between gap-3 mb-4">
                       <div>
-                        <div className="text-[9px] font-mono text-slate-400 uppercase tracking-widest mb-1">Skills</div>
-                        <p className="text-xs text-slate-300 leading-relaxed">{selectedCampusApp.skills}</p>
+                        <h3 className="text-sm font-black text-white uppercase tracking-wider flex items-center gap-2">
+                          <Building2 className="w-4 h-4 text-indigo-400" />
+                          College-Wise Student Distribution
+                        </h3>
+                        <p className="text-[11px] text-slate-400 mt-0.5">Click any college to filter its student applications.</p>
                       </div>
-                      <div>
-                        <div className="text-[9px] font-mono text-slate-400 uppercase tracking-widest mb-1">Why Should We Hire?</div>
-                        <p className="text-xs text-slate-300 leading-relaxed">{selectedCampusApp.why_hire}</p>
-                      </div>
+                      {campusCollegeFilter !== "ALL" && (
+                        <button
+                          onClick={() => {
+                            setCampusCollegeFilter("ALL");
+                            setCampusPage(1);
+                            fetchCampusHiringApplications({ college: "ALL", page: 1 });
+                          }}
+                          className="text-[10px] font-mono uppercase px-2.5 py-1 rounded-lg bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 hover:bg-indigo-500/30"
+                        >
+                          Show All Colleges
+                        </button>
+                      )}
                     </div>
+                    <div className="space-y-2.5 max-h-60 overflow-y-auto pr-1">
+                      {campusCollegeDist.map((col) => {
+                        const pct = campusStats.total > 0 ? Math.round((col.total / campusStats.total) * 100) : 0;
+                        const isSelected = campusCollegeFilter === col.college;
+                        return (
+                          <button
+                            key={col.college}
+                            type="button"
+                            onClick={() => {
+                              const next = isSelected ? "ALL" : col.college;
+                              setCampusCollegeFilter(next);
+                              setCampusPage(1);
+                              fetchCampusHiringApplications({ college: next, page: 1 });
+                            }}
+                            className={`w-full text-left p-3 rounded-2xl border transition-all cursor-pointer ${
+                              isSelected
+                                ? "bg-indigo-600/20 border-indigo-400/60"
+                                : "bg-slate-950/60 border-white/5 hover:border-indigo-500/30"
+                            }`}
+                          >
+                            <div className="flex items-center justify-between gap-3 mb-1.5">
+                              <span className="text-xs font-bold text-white truncate">{col.college}</span>
+                              <div className="flex items-center gap-2 shrink-0 text-[10px] font-mono">
+                                {col.shortlisted > 0 && (
+                                  <span className="px-1.5 py-0.5 rounded bg-indigo-500/20 text-indigo-300">{col.shortlisted} shortlisted</span>
+                                )}
+                                {col.selected > 0 && (
+                                  <span className="px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300">{col.selected} selected</span>
+                                )}
+                                <span className="text-white font-bold">{col.total} {col.total === 1 ? "student" : "students"} ({pct}%)</span>
+                              </div>
+                            </div>
+                            <div className="h-1.5 w-full bg-slate-800 rounded-full overflow-hidden">
+                              <div
+                                className="h-full bg-gradient-to-r from-indigo-500 to-cyan-400 rounded-full transition-all"
+                                style={{ width: `${Math.max(4, pct)}%` }}
+                              />
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
 
-                    {selectedCampusApp.cv_link && (
-                      <a href={selectedCampusApp.cv_link} target="_blank" rel="noopener noreferrer"
-                        className="flex items-center gap-2 px-4 py-2.5 bg-indigo-600/20 border border-indigo-500/30 rounded-xl text-xs text-indigo-300 font-bold hover:bg-indigo-600/30 transition-colors">
-                        📄 View CV / Resume
-                      </a>
-                    )}
-                    {selectedCampusApp.cv_file_name && !selectedCampusApp.cv_link && (
-                      <div className="flex items-center gap-2 px-4 py-2.5 bg-slate-800/60 border border-white/10 rounded-xl text-xs text-slate-300">
-                        📎 CV: {selectedCampusApp.cv_file_name} (attached in email)
+                  {/* Position-Wise Breakdown */}
+                  <div className="lg:col-span-5 bg-slate-900/70 border border-white/10 rounded-3xl p-5 md:p-6">
+                    <div className="flex items-center justify-between gap-3 mb-4">
+                      <div>
+                        <h3 className="text-sm font-black text-white uppercase tracking-wider flex items-center gap-2">
+                          <Briefcase className="w-4 h-4 text-cyan-400" />
+                          Role-Wise Applications
+                        </h3>
+                        <p className="text-[11px] text-slate-400 mt-0.5">Click a role to filter candidates.</p>
                       </div>
-                    )}
+                      {campusPositionFilter !== "ALL" && (
+                        <button
+                          onClick={() => {
+                            setCampusPositionFilter("ALL");
+                            setCampusPage(1);
+                            fetchCampusHiringApplications({ position: "ALL", page: 1 });
+                          }}
+                          className="text-[10px] font-mono uppercase px-2.5 py-1 rounded-lg bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 hover:bg-cyan-500/30"
+                        >
+                          All Roles
+                        </button>
+                      )}
+                    </div>
+                    <div className="flex flex-wrap gap-2 max-h-60 overflow-y-auto">
+                      {campusPositionDist.map((pos) => {
+                        const isSelected = campusPositionFilter === pos.position;
+                        return (
+                          <button
+                            key={pos.position}
+                            type="button"
+                            onClick={() => {
+                              const next = isSelected ? "ALL" : pos.position;
+                              setCampusPositionFilter(next);
+                              setCampusPage(1);
+                              fetchCampusHiringApplications({ position: next, page: 1 });
+                            }}
+                            className={`inline-flex items-center gap-2 px-3 py-2 rounded-xl border text-xs transition-all cursor-pointer ${
+                              isSelected
+                                ? "bg-cyan-500/20 border-cyan-400/60 text-white font-bold"
+                                : "bg-slate-950/60 border-white/10 text-slate-300 hover:border-cyan-500/40"
+                            }`}
+                          >
+                            <span>{pos.position}</span>
+                            <span className="px-1.5 py-0.5 rounded-md bg-white/10 text-[10px] font-mono font-bold text-cyan-300">
+                              {pos.count}
+                            </span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+              )}
 
-                    {/* CEO Actions */}
-                    <div className="border-t border-white/5 pt-4 space-y-3">
-                      <div className="text-[9px] font-mono text-slate-400 uppercase tracking-widest">CEO Actions</div>
-                      <select
-                        value={campusUpdateStatus}
-                        onChange={(e) => setCampusUpdateStatus(e.target.value)}
-                        className="w-full bg-slate-950 border border-white/10 rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none focus:border-indigo-500/50"
-                      >
-                        <option value="PENDING">⏳ Pending</option>
-                        <option value="REVIEWED">👀 Reviewed</option>
-                        <option value="SHORTLISTED">⭐ Shortlisted</option>
-                        <option value="SELECTED">✅ Selected</option>
-                        <option value="REJECTED">❌ Rejected</option>
-                      </select>
-                      <textarea
-                        rows={3}
-                        placeholder="CEO notes / feedback..."
-                        value={campusNotes}
-                        onChange={(e) => setCampusNotes(e.target.value)}
-                        className="w-full bg-slate-950 border border-white/10 rounded-xl px-3 py-2.5 text-xs text-white placeholder-slate-600 focus:outline-none focus:border-indigo-500/50 resize-none"
-                      />
+              {/* Search, Filters & View Controls */}
+              <div className="bg-slate-900/70 border border-white/10 rounded-3xl p-5 space-y-3">
+                <div className="grid grid-cols-1 md:grid-cols-12 gap-3">
+                  <div className="md:col-span-5 relative">
+                    <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                    <input
+                      type="text"
+                      placeholder="Search name, college, skills, email, phone, or ID..."
+                      value={campusSearch}
+                      onChange={(e) => setCampusSearch(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          setCampusPage(1);
+                          fetchCampusHiringApplications({ page: 1 });
+                        }
+                      }}
+                      className="w-full bg-slate-950 border border-white/10 rounded-xl pl-10 pr-4 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500/60"
+                    />
+                  </div>
+                  <div className="md:col-span-7 grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                    <select
+                      value={campusCollegeFilter}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        setCampusCollegeFilter(val);
+                        setCampusPage(1);
+                        fetchCampusHiringApplications({ college: val, page: 1 });
+                      }}
+                      className="bg-slate-950 border border-white/10 rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none focus:border-indigo-500/50"
+                    >
+                      <option value="ALL">All Colleges</option>
+                      {campusColleges.map(c => <option key={c} value={c}>{c}</option>)}
+                    </select>
+                    <select
+                      value={campusPositionFilter}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        setCampusPositionFilter(val);
+                        setCampusPage(1);
+                        fetchCampusHiringApplications({ position: val, page: 1 });
+                      }}
+                      className="bg-slate-950 border border-white/10 rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none focus:border-indigo-500/50"
+                    >
+                      <option value="ALL">All Positions</option>
+                      {campusPositions.map(p => <option key={p} value={p}>{p}</option>)}
+                    </select>
+                    <select
+                      value={campusStatusFilter}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        setCampusStatusFilter(val);
+                        setCampusPage(1);
+                        fetchCampusHiringApplications({ status: val, page: 1 });
+                      }}
+                      className="bg-slate-950 border border-white/10 rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none focus:border-indigo-500/50"
+                    >
+                      <option value="ALL">All Statuses</option>
+                      <option value="PENDING">Pending</option>
+                      <option value="REVIEWED">Reviewed</option>
+                      <option value="SHORTLISTED">Shortlisted</option>
+                      <option value="SELECTED">Selected</option>
+                      <option value="REJECTED">Rejected</option>
+                    </select>
+                    <select
+                      value={campusDateFilter}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        setCampusDateFilter(val);
+                        setCampusPage(1);
+                        fetchCampusHiringApplications({ dateRange: val, page: 1 });
+                      }}
+                      className="bg-slate-950 border border-white/10 rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none focus:border-indigo-500/50"
+                    >
+                      <option value="ALL">All Time</option>
+                      <option value="TODAY">Today</option>
+                      <option value="WEEK">Last 7 Days</option>
+                      <option value="MONTH">Last 30 Days</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
+                  <div className="flex flex-wrap items-center gap-2.5">
+                    <select
+                      value={campusExperienceFilter}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        setCampusExperienceFilter(val);
+                        setCampusPage(1);
+                        fetchCampusHiringApplications({ experience: val, page: 1 });
+                      }}
+                      className="bg-slate-950 border border-white/10 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-indigo-500/50"
+                    >
+                      <option value="ALL">All Experience</option>
+                      {campusExperiences.map(exp => <option key={exp} value={exp}>{exp}</option>)}
+                    </select>
+                    <select
+                      value={campusNationalityFilter}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        setCampusNationalityFilter(val);
+                        setCampusPage(1);
+                        fetchCampusHiringApplications({ nationality: val, page: 1 });
+                      }}
+                      className="bg-slate-950 border border-white/10 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-indigo-500/50"
+                    >
+                      <option value="ALL">All Nationalities</option>
+                      {campusNationalities.map(nat => <option key={nat} value={nat}>{nat}</option>)}
+                    </select>
+                    <select
+                      value={campusSort}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        setCampusSort(val);
+                        setCampusPage(1);
+                        fetchCampusHiringApplications({ sort: val, page: 1 });
+                      }}
+                      className="bg-slate-950 border border-white/10 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-indigo-500/50"
+                    >
+                      <option value="newest">Sort: Newest First</option>
+                      <option value="oldest">Sort: Oldest First</option>
+                      <option value="college_asc">Sort: College (A–Z)</option>
+                      <option value="name_asc">Sort: Name (A–Z)</option>
+                    </select>
+                    <button
+                      onClick={() => { setCampusPage(1); fetchCampusHiringApplications({ page: 1 }); }}
+                      className="px-4 py-2 bg-indigo-600 text-white text-xs font-bold uppercase rounded-xl hover:bg-indigo-500 transition-colors cursor-pointer"
+                    >
+                      Search / Apply
+                    </button>
+                    {hasActiveFilters && (
                       <button
-                        disabled={isSavingCampusStatus}
-                        onClick={() => handleUpdateCampusStatus(selectedCampusApp.application_id)}
-                        className="w-full py-2.5 bg-indigo-600 text-white text-xs font-bold uppercase rounded-xl hover:bg-indigo-500 transition-colors disabled:opacity-50"
+                        onClick={resetCampusFilters}
+                        className="inline-flex items-center gap-1.5 px-3 py-2 bg-white/5 border border-white/10 text-slate-300 text-xs font-semibold rounded-xl hover:bg-white/10 transition-colors cursor-pointer"
                       >
-                        {isSavingCampusStatus ? "Saving..." : "Save Status & Notes"}
+                        <RotateCcw className="w-3.5 h-3.5" />
+                        Clear
+                      </button>
+                    )}
+                  </div>
+
+                  {/* View Mode & Count */}
+                  <div className="flex items-center gap-3">
+                    <span className="text-[11px] font-mono text-slate-400">
+                      Showing <strong className="text-white">{campusApplications.length}</strong> of <strong className="text-white">{campusTotal}</strong>
+                    </span>
+                    <div className="inline-flex bg-slate-950 border border-white/10 rounded-xl p-1">
+                      <button
+                        type="button"
+                        onClick={() => setCampusViewMode("cards")}
+                        className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-semibold transition-colors cursor-pointer ${
+                          campusViewMode === "cards" ? "bg-indigo-600 text-white" : "text-slate-400 hover:text-white"
+                        }`}
+                      >
+                        <LayoutGrid className="w-3.5 h-3.5" />
+                        Cards
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setCampusViewMode("table")}
+                        className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-semibold transition-colors cursor-pointer ${
+                          campusViewMode === "table" ? "bg-indigo-600 text-white" : "text-slate-400 hover:text-white"
+                        }`}
+                      >
+                        <List className="w-3.5 h-3.5" />
+                        Table
                       </button>
                     </div>
                   </div>
-                ) : (
-                  <div className="bg-slate-900/40 border border-white/5 rounded-3xl p-8 text-center text-slate-500 sticky top-28">
-                    <div className="text-4xl mb-3">👈</div>
-                    <p className="text-xs font-mono">Select an application to view details</p>
-                  </div>
-                )}
+                </div>
               </div>
+
+              {/* Candidate Directory + Candidate Dossier */}
+              <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
+                {/* Directory */}
+                <div className="xl:col-span-7 space-y-3">
+                  {campusLoading ? (
+                    <div className="bg-slate-900/60 border border-white/10 rounded-3xl text-center py-20 text-slate-400">
+                      <div className="w-8 h-8 border-2 border-indigo-500/30 border-t-indigo-400 rounded-full animate-spin mx-auto mb-3" />
+                      <p className="text-xs font-mono uppercase tracking-wider">Loading student applications...</p>
+                    </div>
+                  ) : campusApplications.length === 0 ? (
+                    <div className="text-center py-20 bg-slate-900/60 border border-white/10 rounded-3xl text-slate-400">
+                      <GraduationCap className="w-10 h-10 text-slate-500 mx-auto mb-3" />
+                      <p className="font-bold text-white text-base">No matching applications found</p>
+                      <p className="text-xs mt-1">Try clearing filters or refreshing the list.</p>
+                    </div>
+                  ) : campusViewMode === "table" ? (
+                    <div className="bg-slate-900/70 border border-white/10 rounded-3xl overflow-hidden">
+                      <div className="overflow-x-auto">
+                        <table className="w-full text-left border-collapse">
+                          <thead>
+                            <tr className="border-b border-white/10 bg-slate-950/70 text-[10px] font-mono uppercase tracking-wider text-slate-400">
+                              <th className="py-3.5 px-4">Student</th>
+                              <th className="py-3.5 px-4">College</th>
+                              <th className="py-3.5 px-4">Position</th>
+                              <th className="py-3.5 px-4">Status</th>
+                              <th className="py-3.5 px-4 text-right">CV</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-white/5 text-xs">
+                            {campusApplications.map((app) => {
+                              const meta = statusMeta[app.status] || statusMeta.PENDING;
+                              const isActive = selectedCampusApp?.application_id === app.application_id;
+                              return (
+                                <tr
+                                  key={app.application_id}
+                                  onClick={() => {
+                                    setSelectedCampusApp(app);
+                                    setCampusUpdateStatus(app.status);
+                                    setCampusNotes(app.ceo_notes || "");
+                                    setCampusSaveFeedback("idle");
+                                  }}
+                                  className={`cursor-pointer transition-colors ${
+                                    isActive ? "bg-indigo-600/15" : "hover:bg-white/[0.03]"
+                                  }`}
+                                >
+                                  <td className="py-3.5 px-4">
+                                    <div className="font-bold text-white">{app.full_name}</div>
+                                    <div className="text-[10px] font-mono text-slate-400">{app.application_id}</div>
+                                  </td>
+                                  <td className="py-3.5 px-4 text-slate-200 font-medium">{app.college_name}</td>
+                                  <td className="py-3.5 px-4 text-indigo-300 font-medium">{app.position_applied}</td>
+                                  <td className="py-3.5 px-4">
+                                    <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold border ${meta.badge}`}>
+                                      <span className={`w-1.5 h-1.5 rounded-full ${meta.dot}`} />
+                                      {meta.label}
+                                    </span>
+                                  </td>
+                                  <td className="py-3.5 px-4 text-right" onClick={(e) => e.stopPropagation()}>
+                                    {app.has_cv_file ? (
+                                      <a
+                                        href={getCvDownloadUrl(app.application_id)}
+                                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-indigo-600/20 border border-indigo-500/40 text-indigo-300 hover:bg-indigo-600 hover:text-white text-[11px] font-bold transition-colors"
+                                      >
+                                        <Download className="w-3.5 h-3.5" />
+                                        Download
+                                      </a>
+                                    ) : app.cv_link ? (
+                                      <a
+                                        href={app.cv_link}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-cyan-600/20 border border-cyan-500/40 text-cyan-300 hover:bg-cyan-600 hover:text-white text-[11px] font-bold transition-colors"
+                                      >
+                                        <ExternalLink className="w-3.5 h-3.5" />
+                                        Open Link
+                                      </a>
+                                    ) : (
+                                      <span className="text-[10px] text-slate-500 font-mono">Email only</span>
+                                    )}
+                                  </td>
+                                </tr>
+                              );
+                            })}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  ) : (
+                    campusApplications.map((app) => {
+                      const meta = statusMeta[app.status] || statusMeta.PENDING;
+                      const isActive = selectedCampusApp?.application_id === app.application_id;
+                      const skillChips = String(app.skills || "")
+                        .split(",")
+                        .map((s) => s.trim())
+                        .filter(Boolean);
+                      return (
+                        <div
+                          key={app.application_id}
+                          onClick={() => {
+                            setSelectedCampusApp(app);
+                            setCampusUpdateStatus(app.status);
+                            setCampusNotes(app.ceo_notes || "");
+                            setCampusSaveFeedback("idle");
+                          }}
+                          className={`bg-slate-900/75 border rounded-2xl p-5 cursor-pointer transition-all ${
+                            isActive
+                              ? "border-indigo-400/70 ring-1 ring-indigo-500/30 bg-gradient-to-br from-slate-900 to-indigo-950/35 shadow-lg shadow-indigo-950/30"
+                              : "border-white/10 hover:border-indigo-500/40"
+                          }`}
+                        >
+                          <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+                            <div className="flex items-start gap-3.5 min-w-0 flex-1">
+                              <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-indigo-500/30 to-cyan-500/20 border border-indigo-400/30 flex items-center justify-center text-sm font-black text-white shrink-0">
+                                {getInitials(app.full_name)}
+                              </div>
+                              <div className="min-w-0 flex-1">
+                                <div className="flex items-center gap-2 flex-wrap mb-1">
+                                  <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold border ${meta.badge}`}>
+                                    <span className={`w-1.5 h-1.5 rounded-full ${meta.dot}`} />
+                                    {meta.label}
+                                  </span>
+                                  <span className="text-[10px] font-mono text-indigo-400">{app.application_id}</span>
+                                  <span className="text-[10px] font-mono text-slate-500">
+                                    • {new Date(app.applied_at).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })}
+                                  </span>
+                                </div>
+                                <h4 className="text-base font-black text-white truncate">{app.full_name}</h4>
+                                <p className="text-xs text-indigo-300 font-semibold">{app.position_applied}</p>
+
+                                <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 mt-2.5 text-xs text-slate-300">
+                                  <span className="inline-flex items-center gap-1.5">
+                                    <Building2 className="w-3.5 h-3.5 text-slate-400" />
+                                    {app.college_name}
+                                  </span>
+                                  <span className="inline-flex items-center gap-1.5 text-slate-400">
+                                    <Mail className="w-3.5 h-3.5" />
+                                    {app.email}
+                                  </span>
+                                  <span className="inline-flex items-center gap-1.5 text-slate-400">
+                                    <Clock className="w-3.5 h-3.5" />
+                                    {app.experience}
+                                  </span>
+                                </div>
+
+                                {skillChips.length > 0 && (
+                                  <div className="flex flex-wrap gap-1.5 mt-3">
+                                    {skillChips.slice(0, 4).map((skill, idx) => (
+                                      <span key={idx} className="px-2 py-0.5 rounded-md bg-white/5 border border-white/10 text-[10px] text-slate-300">
+                                        {skill}
+                                      </span>
+                                    ))}
+                                    {skillChips.length > 4 && (
+                                      <span className="px-2 py-0.5 rounded-md bg-white/5 text-[10px] text-slate-400">
+                                        +{skillChips.length - 4} more
+                                      </span>
+                                    )}
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+
+                            {/* Quick CV Download / View button on card */}
+                            <div className="flex sm:flex-col items-center sm:items-end justify-end gap-2 shrink-0" onClick={(e) => e.stopPropagation()}>
+                              {app.has_cv_file ? (
+                                <a
+                                  href={getCvDownloadUrl(app.application_id)}
+                                  className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-indigo-600/20 border border-indigo-500/40 text-indigo-200 hover:bg-indigo-600 hover:text-white text-xs font-bold transition-colors"
+                                >
+                                  <Download className="w-3.5 h-3.5" />
+                                  Download CV
+                                </a>
+                              ) : app.cv_link ? (
+                                <a
+                                  href={app.cv_link}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-cyan-600/20 border border-cyan-500/40 text-cyan-200 hover:bg-cyan-600 hover:text-white text-xs font-bold transition-colors"
+                                >
+                                  <ExternalLink className="w-3.5 h-3.5" />
+                                  Open CV Link
+                                </a>
+                              ) : (
+                                <span className="text-[10px] font-mono text-slate-500 px-2.5 py-1 rounded-lg bg-slate-800/60">
+                                  CV in email
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })
+                  )}
+
+                  {/* Pagination */}
+                  {campusTotal > 20 && (
+                    <div className="flex items-center justify-between pt-2 px-1">
+                      <button
+                        type="button"
+                        disabled={campusPage <= 1}
+                        onClick={() => {
+                          const next = Math.max(1, campusPage - 1);
+                          setCampusPage(next);
+                          fetchCampusHiringApplications({ page: next });
+                        }}
+                        className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-slate-900 border border-white/10 text-xs font-bold text-slate-300 hover:bg-white/5 disabled:opacity-40 cursor-pointer"
+                      >
+                        <ChevronLeft className="w-4 h-4" />
+                        Previous
+                      </button>
+                      <span className="text-xs font-mono text-slate-400">
+                        Page <strong className="text-white">{campusPage}</strong> of <strong className="text-white">{totalPages}</strong>
+                      </span>
+                      <button
+                        type="button"
+                        disabled={campusPage >= totalPages}
+                        onClick={() => {
+                          const next = Math.min(totalPages, campusPage + 1);
+                          setCampusPage(next);
+                          fetchCampusHiringApplications({ page: next });
+                        }}
+                        className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-slate-900 border border-white/10 text-xs font-bold text-slate-300 hover:bg-white/5 disabled:opacity-40 cursor-pointer"
+                      >
+                        Next
+                        <ChevronRight className="w-4 h-4" />
+                      </button>
+                    </div>
+                  )}
+                </div>
+
+                {/* Candidate Dossier Detail Panel */}
+                <div className="xl:col-span-5">
+                  {selectedCampusApp ? (() => {
+                    const meta = statusMeta[selectedCampusApp.status] || statusMeta.PENDING;
+                    const cleanDigits = String(selectedCampusApp.contact_number || "").replace(/\D/g, "");
+                    const skillList = String(selectedCampusApp.skills || "")
+                      .split(",")
+                      .map((s) => s.trim())
+                      .filter(Boolean);
+                    return (
+                      <div className="bg-gradient-to-b from-slate-900/95 to-slate-950/95 border border-indigo-500/30 rounded-3xl p-6 space-y-5 sticky top-24 shadow-2xl">
+                        {/* Dossier Header */}
+                        <div className="flex items-start justify-between gap-4 border-b border-white/10 pb-5">
+                          <div className="flex items-start gap-3.5 min-w-0">
+                            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-500 to-cyan-500 flex items-center justify-center text-lg font-black text-white shadow-lg shadow-indigo-500/20 shrink-0">
+                              {getInitials(selectedCampusApp.full_name)}
+                            </div>
+                            <div className="min-w-0">
+                              <div className="flex items-center gap-2 flex-wrap mb-1">
+                                <span className="text-[10px] font-mono text-indigo-400">{selectedCampusApp.application_id}</span>
+                                <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-mono font-bold border ${meta.badge}`}>
+                                  <span className={`w-1.5 h-1.5 rounded-full ${meta.dot}`} />
+                                  {meta.label}
+                                </span>
+                              </div>
+                              <h3 className="text-xl font-black text-white leading-tight">{selectedCampusApp.full_name}</h3>
+                              <p className="text-xs text-indigo-300 font-semibold mt-0.5">{selectedCampusApp.position_applied}</p>
+                              <p className="text-[11px] text-slate-400 mt-1">
+                                Applied {new Date(selectedCampusApp.applied_at).toLocaleString("en-IN", { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" })}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Quick Contact Buttons */}
+                        <div className="grid grid-cols-3 gap-2">
+                          <a
+                            href={`tel:${selectedCampusApp.contact_number}`}
+                            className="flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-white/5 border border-white/10 text-xs font-semibold text-slate-200 hover:bg-white/10 transition-colors"
+                          >
+                            <Phone className="w-3.5 h-3.5 text-emerald-400" />
+                            Call
+                          </a>
+                          <a
+                            href={`mailto:${selectedCampusApp.email}`}
+                            className="flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-white/5 border border-white/10 text-xs font-semibold text-slate-200 hover:bg-white/10 transition-colors"
+                          >
+                            <Mail className="w-3.5 h-3.5 text-indigo-400" />
+                            Email
+                          </a>
+                          <a
+                            href={`https://wa.me/${cleanDigits}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-white/5 border border-white/10 text-xs font-semibold text-slate-200 hover:bg-white/10 transition-colors"
+                          >
+                            <MessageSquare className="w-3.5 h-3.5 text-green-400" />
+                            WhatsApp
+                          </a>
+                        </div>
+
+                        {/* Academic & Personal Info Grid */}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                          <div className="bg-slate-900/90 border border-white/5 rounded-2xl p-3.5 sm:col-span-2">
+                            <span className="text-[10px] font-mono uppercase tracking-wider text-slate-400 block mb-1">College / Institute</span>
+                            <span className="text-sm font-bold text-white flex items-center gap-2">
+                              <Building2 className="w-4 h-4 text-indigo-400 shrink-0" />
+                              {selectedCampusApp.college_name}
+                            </span>
+                          </div>
+                          <div className="bg-slate-900/90 border border-white/5 rounded-2xl p-3.5">
+                            <span className="text-[10px] font-mono uppercase tracking-wider text-slate-400 block mb-1">Email Address</span>
+                            <span className="text-xs text-slate-200 break-all">{selectedCampusApp.email}</span>
+                          </div>
+                          <div className="bg-slate-900/90 border border-white/5 rounded-2xl p-3.5">
+                            <span className="text-[10px] font-mono uppercase tracking-wider text-slate-400 block mb-1">Contact Number</span>
+                            <span className="text-xs text-slate-200 font-mono">{selectedCampusApp.contact_number}</span>
+                          </div>
+                          <div className="bg-slate-900/90 border border-white/5 rounded-2xl p-3.5">
+                            <span className="text-[10px] font-mono uppercase tracking-wider text-slate-400 block mb-1">Experience</span>
+                            <span className="text-xs text-white font-semibold">{selectedCampusApp.experience}</span>
+                          </div>
+                          <div className="bg-slate-900/90 border border-white/5 rounded-2xl p-3.5">
+                            <span className="text-[10px] font-mono uppercase tracking-wider text-slate-400 block mb-1">Nationality</span>
+                            <span className="text-xs text-white font-semibold flex items-center gap-1.5">
+                              <Globe className="w-3.5 h-3.5 text-cyan-400" />
+                              {selectedCampusApp.nationality}
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Skills */}
+                        <div className="bg-slate-900/90 border border-white/5 rounded-2xl p-4 space-y-2.5">
+                          <span className="text-[10px] font-mono uppercase tracking-wider text-slate-400 block">Skills & Competencies</span>
+                          {skillList.length > 1 ? (
+                            <div className="flex flex-wrap gap-1.5">
+                              {skillList.map((skill, idx) => (
+                                <span key={idx} className="px-2.5 py-1 rounded-lg bg-indigo-500/15 border border-indigo-400/25 text-xs text-indigo-200 font-medium">
+                                  {skill}
+                                </span>
+                              ))}
+                            </div>
+                          ) : (
+                            <p className="text-xs text-slate-200 leading-relaxed">{selectedCampusApp.skills}</p>
+                          )}
+                        </div>
+
+                        {/* Why Should We Hire */}
+                        <div className="bg-slate-900/90 border border-white/5 rounded-2xl p-4 space-y-1.5">
+                          <span className="text-[10px] font-mono uppercase tracking-wider text-slate-400 block">Why Should We Hire?</span>
+                          <p className="text-xs text-slate-200 leading-relaxed whitespace-pre-wrap">{selectedCampusApp.why_hire}</p>
+                        </div>
+
+                        {/* CV / Resume Section */}
+                        <div className="bg-gradient-to-br from-indigo-950/60 to-slate-900 border border-indigo-500/30 rounded-2xl p-4 space-y-3">
+                          <div className="flex items-center justify-between gap-2">
+                            <span className="text-[10px] font-mono uppercase tracking-wider text-indigo-300 font-bold">
+                              Curriculum Vitae / Resume
+                            </span>
+                            {selectedCampusApp.cv_file_name && (
+                              <span className="px-2 py-0.5 rounded bg-indigo-500/20 text-[10px] font-mono font-bold text-indigo-200 uppercase">
+                                {selectedCampusApp.cv_file_name.split(".").pop()}
+                              </span>
+                            )}
+                          </div>
+
+                          {selectedCampusApp.has_cv_file ? (
+                            <>
+                              <div className="flex items-center gap-2.5 text-xs text-white bg-slate-950/70 border border-white/10 rounded-xl p-3">
+                                <FileText className="w-4 h-4 text-indigo-400 shrink-0" />
+                                <span className="truncate font-medium">{selectedCampusApp.cv_file_name || "Candidate_CV.pdf"}</span>
+                              </div>
+                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                                <a
+                                  href={getCvDownloadUrl(selectedCampusApp.application_id)}
+                                  className="flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold uppercase tracking-wider transition-colors shadow-lg shadow-indigo-600/25"
+                                >
+                                  <Download className="w-4 h-4" />
+                                  Download CV
+                                </a>
+                                {isPdfName(selectedCampusApp.cv_file_name) ? (
+                                  <button
+                                    type="button"
+                                    onClick={() => setPreviewCvApp(selectedCampusApp)}
+                                    className="flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-white/10 hover:bg-white/15 border border-white/15 text-white text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer"
+                                  >
+                                    <Eye className="w-4 h-4" />
+                                    Preview CV
+                                  </button>
+                                ) : (
+                                  <a
+                                    href={getCvViewUrl(selectedCampusApp.application_id)}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-white/10 hover:bg-white/15 border border-white/15 text-white text-xs font-bold uppercase tracking-wider transition-colors"
+                                  >
+                                    <ExternalLink className="w-4 h-4" />
+                                    Open File
+                                  </a>
+                                )}
+                              </div>
+                            </>
+                          ) : selectedCampusApp.cv_link ? (
+                            <a
+                              href={selectedCampusApp.cv_link}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-bold uppercase tracking-wider transition-colors"
+                            >
+                              <ExternalLink className="w-4 h-4" />
+                              Open Resume Link
+                            </a>
+                          ) : (
+                            <div className="flex items-center gap-2.5 px-3 py-2.5 bg-slate-950/60 border border-white/10 rounded-xl text-xs text-slate-400">
+                              <FileText className="w-4 h-4 text-slate-500 shrink-0" />
+                              <span>
+                                {selectedCampusApp.cv_file_name
+                                  ? `${selectedCampusApp.cv_file_name} (attached in email only)`
+                                  : "No CV file attached"}
+                              </span>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* CEO Evaluation & Decision */}
+                        <div className="border-t border-white/10 pt-4 space-y-3">
+                          <span className="text-[10px] font-mono text-slate-400 uppercase tracking-widest block">CEO Evaluation & Decision</span>
+                          <div className="grid grid-cols-3 sm:grid-cols-5 gap-1.5">
+                            {(["PENDING", "REVIEWED", "SHORTLISTED", "SELECTED", "REJECTED"] as const).map((st) => {
+                              const stInfo = statusMeta[st];
+                              const selected = campusUpdateStatus === st;
+                              return (
+                                <button
+                                  key={st}
+                                  type="button"
+                                  onClick={() => setCampusUpdateStatus(st)}
+                                  className={`py-2 px-1.5 rounded-xl text-[10px] font-bold uppercase tracking-wide border transition-all cursor-pointer ${
+                                    selected
+                                      ? `${stInfo.badge} ring-1 ring-white/30`
+                                      : "bg-slate-950/70 border-white/10 text-slate-400 hover:text-white"
+                                  }`}
+                                >
+                                  {stInfo.label}
+                                </button>
+                              );
+                            })}
+                          </div>
+
+                          <textarea
+                            rows={3}
+                            placeholder="Add CEO interview remarks, shortlisting notes, or feedback..."
+                            value={campusNotes}
+                            onChange={(e) => setCampusNotes(e.target.value)}
+                            className="w-full bg-slate-950 border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500/60 resize-none"
+                          />
+
+                          {campusSaveFeedback === "saved" && (
+                            <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-xs font-semibold">
+                              <CheckCircle2 className="w-4 h-4 shrink-0" />
+                              Decision and notes saved successfully.
+                            </div>
+                          )}
+                          {campusSaveFeedback === "error" && (
+                            <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-rose-500/15 border border-rose-500/30 text-rose-300 text-xs font-semibold">
+                              <XCircle className="w-4 h-4 shrink-0" />
+                              Failed to save update. Please try again.
+                            </div>
+                          )}
+
+                          <button
+                            disabled={isSavingCampusStatus}
+                            onClick={() => handleUpdateCampusStatus(selectedCampusApp.application_id)}
+                            className="w-full py-3 bg-indigo-600 text-white text-xs font-black uppercase tracking-widest rounded-xl hover:bg-indigo-500 transition-colors disabled:opacity-50 cursor-pointer shadow-lg shadow-indigo-600/20"
+                          >
+                            {isSavingCampusStatus ? "Saving Decision..." : "Save Status & Notes"}
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })() : (
+                    <div className="bg-slate-900/50 border border-white/10 rounded-3xl p-10 text-center text-slate-400 sticky top-24">
+                      <GraduationCap className="w-10 h-10 text-slate-500 mx-auto mb-3" />
+                      <p className="text-sm font-bold text-white">No Candidate Selected</p>
+                      <p className="text-xs text-slate-400 mt-1">Click any student application on the left to inspect their profile and download their CV.</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Inline PDF Preview Modal */}
+              {previewCvApp && (
+                <div className="fixed inset-0 z-[200] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+                  <div className="bg-slate-900 border border-white/15 rounded-3xl w-full max-w-5xl h-[88vh] flex flex-col overflow-hidden shadow-2xl">
+                    <div className="flex items-center justify-between gap-4 px-6 py-4 border-b border-white/10 bg-slate-950">
+                      <div className="min-w-0">
+                        <h4 className="text-sm font-black text-white truncate">
+                          {previewCvApp.full_name} — {previewCvApp.cv_file_name || "CV Preview"}
+                        </h4>
+                        <p className="text-[11px] font-mono text-slate-400">
+                          {previewCvApp.application_id} • {previewCvApp.college_name}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-2 shrink-0">
+                        <a
+                          href={getCvDownloadUrl(previewCvApp.application_id)}
+                          className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold uppercase tracking-wider transition-colors"
+                        >
+                          <Download className="w-4 h-4" />
+                          Download
+                        </a>
+                        <a
+                          href={getCvViewUrl(previewCvApp.application_id)}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/15 text-white text-xs font-bold uppercase tracking-wider transition-colors"
+                        >
+                          <ExternalLink className="w-4 h-4" />
+                          New Tab
+                        </a>
+                        <button
+                          type="button"
+                          onClick={() => setPreviewCvApp(null)}
+                          className="p-2 rounded-xl bg-white/5 hover:bg-white/15 text-slate-300 hover:text-white transition-colors cursor-pointer"
+                          aria-label="Close preview"
+                        >
+                          <X className="w-5 h-5" />
+                        </button>
+                      </div>
+                    </div>
+                    <div className="flex-1 bg-slate-950">
+                      <iframe
+                        src={getCvViewUrl(previewCvApp.application_id)}
+                        title={`CV Preview - ${previewCvApp.full_name}`}
+                        className="w-full h-full border-0"
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
-          </div>
-        )}
+          );
+        })()}
 
         {currentUser && currentUser.role === "CEO" && activeTab === "users" && (
           <div className="max-w-4xl mx-auto space-y-8">

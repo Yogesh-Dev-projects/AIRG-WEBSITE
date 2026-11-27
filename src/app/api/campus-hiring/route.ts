@@ -63,8 +63,8 @@ export async function POST(request: Request) {
     if (cv_submit_method === "file" && cv_file) {
       dbRecord.cv_file_name = cv_file.name;
       dbRecord.cv_file_type = cv_file.type;
-      // Store base64 for small files, skip for very large
-      if (cv_file.base64 && cv_file.base64.length < 5_000_000) {
+      // Store base64 for all valid uploads up to 4MB (~5.6MB base64)
+      if (cv_file.base64 && cv_file.base64.length < 8_000_000) {
         dbRecord.cv_file_base64 = cv_file.base64;
       }
     } else if (cv_submit_method === "link" && cv_link) {
@@ -248,55 +248,233 @@ export async function POST(request: Request) {
   }
 }
 
+function escapeCsvCell(value: unknown): string {
+  const str = String(value ?? "").replace(/\r?\n/g, " ");
+  if (/[",]/.test(str)) {
+    return `"${str.replace(/"/g, '""')}"`;
+  }
+  return str;
+}
+
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
     const college = searchParams.get("college") || "";
     const position = searchParams.get("position") || "";
     const status = searchParams.get("status") || "";
+    const experience = searchParams.get("experience") || "";
+    const nationality = searchParams.get("nationality") || "";
     const dateRange = searchParams.get("dateRange") || "ALL";
     const search = searchParams.get("search") || "";
-    const page = parseInt(searchParams.get("page") || "1");
-    const limit = parseInt(searchParams.get("limit") || "20");
+    const sort = searchParams.get("sort") || "newest";
+    const exportFormat = searchParams.get("export") || "";
+    const page = Math.max(1, parseInt(searchParams.get("page") || "1", 10));
+    const limit = Math.max(1, Math.min(100, parseInt(searchParams.get("limit") || "20", 10)));
 
     await connectDB();
 
     const filter: any = {};
-    if (college && college !== "ALL") filter.college_name = { $regex: college, $options: "i" };
-    if (position && position !== "ALL") filter.position_applied = { $regex: position, $options: "i" };
+    if (college && college !== "ALL") filter.college_name = college;
+    if (position && position !== "ALL") filter.position_applied = position;
     if (status && status !== "ALL") filter.status = status;
-    if (search) {
+    if (experience && experience !== "ALL") filter.experience = experience;
+    if (nationality && nationality !== "ALL") filter.nationality = nationality;
+    if (search.trim()) {
+      const q = search.trim();
       filter.$or = [
-        { full_name: { $regex: search, $options: "i" } },
-        { email: { $regex: search, $options: "i" } },
-        { college_name: { $regex: search, $options: "i" } },
-        { application_id: { $regex: search, $options: "i" } }
+        { full_name: { $regex: q, $options: "i" } },
+        { email: { $regex: q, $options: "i" } },
+        { contact_number: { $regex: q, $options: "i" } },
+        { college_name: { $regex: q, $options: "i" } },
+        { position_applied: { $regex: q, $options: "i" } },
+        { skills: { $regex: q, $options: "i" } },
+        { application_id: { $regex: q, $options: "i" } }
       ];
     }
 
     // Date filter
     if (dateRange !== "ALL") {
       const now = new Date();
-      let from = new Date();
+      const from = new Date();
       if (dateRange === "TODAY") { from.setHours(0, 0, 0, 0); }
       else if (dateRange === "WEEK") { from.setDate(now.getDate() - 7); }
       else if (dateRange === "MONTH") { from.setMonth(now.getMonth() - 1); }
       filter.applied_at = { $gte: from };
     }
 
-    const total = await CampusHiring.countDocuments(filter);
-    const applications = await CampusHiring.find(filter)
-      .sort({ applied_at: -1 })
-      .skip((page - 1) * limit)
-      .limit(limit)
-      .select("-cv_file_base64") // Don't return huge base64 in list view
-      .lean();
+    const sortMap: Record<string, Record<string, 1 | -1>> = {
+      newest: { applied_at: -1 },
+      oldest: { applied_at: 1 },
+      college_asc: { college_name: 1, applied_at: -1 },
+      name_asc: { full_name: 1, applied_at: -1 },
+    };
+    const sortStage = sortMap[sort] || sortMap.newest;
 
-    // Get unique colleges for filter dropdown
-    const colleges = await CampusHiring.distinct("college_name");
-    const positions = await CampusHiring.distinct("position_applied");
+    // CSV Export for CEO
+    if (exportFormat === "csv") {
+      const rows = await CampusHiring.find(filter)
+        .sort(sortStage)
+        .select("-cv_file_base64")
+        .lean();
 
-    return NextResponse.json({ success: true, applications, total, colleges, positions, page, limit });
+      const header = [
+        "Application ID",
+        "Full Name",
+        "College / Institute",
+        "Position Applied",
+        "Email",
+        "Contact Number",
+        "Nationality",
+        "Experience",
+        "Skills",
+        "Why Should We Hire",
+        "CV Method",
+        "CV File / Link",
+        "Status",
+        "CEO Notes",
+        "Applied Date"
+      ];
+
+      const csvLines = [
+        header.join(","),
+        ...rows.map((r: any) =>
+          [
+            r.application_id,
+            r.full_name,
+            r.college_name,
+            r.position_applied,
+            r.email,
+            r.contact_number,
+            r.nationality,
+            r.experience,
+            r.skills,
+            r.why_hire,
+            r.cv_submit_method,
+            r.cv_link || r.cv_file_name || "",
+            r.status,
+            r.ceo_notes || "",
+            r.applied_at ? new Date(r.applied_at).toISOString() : ""
+          ]
+            .map(escapeCsvCell)
+            .join(",")
+        )
+      ];
+
+      return new NextResponse(csvLines.join("\r\n"), {
+        status: 200,
+        headers: {
+          "Content-Type": "text/csv; charset=utf-8",
+          "Content-Disposition": `attachment; filename="campus-hiring-applications-${new Date().toISOString().slice(0, 10)}.csv"`,
+          "Cache-Control": "no-store",
+        },
+      });
+    }
+
+    const [total, applications, analyticsFacet, colleges, positions, experiences, nationalities] = await Promise.all([
+      CampusHiring.countDocuments(filter),
+      CampusHiring.aggregate([
+        { $match: filter },
+        { $sort: sortStage },
+        { $skip: (page - 1) * limit },
+        { $limit: limit },
+        {
+          $addFields: {
+            has_cv_file: {
+              $ne: [{ $ifNull: ["$cv_file_base64", ""] }, ""]
+            }
+          }
+        },
+        { $project: { cv_file_base64: 0 } }
+      ]),
+      CampusHiring.aggregate([
+        {
+          $facet: {
+            overallCounts: [
+              {
+                $group: {
+                  _id: "$status",
+                  count: { $sum: 1 }
+                }
+              }
+            ],
+            collegeDistribution: [
+              {
+                $group: {
+                  _id: "$college_name",
+                  total: { $sum: 1 },
+                  pending: { $sum: { $cond: [{ $eq: ["$status", "PENDING"] }, 1, 0] } },
+                  reviewed: { $sum: { $cond: [{ $eq: ["$status", "REVIEWED"] }, 1, 0] } },
+                  shortlisted: { $sum: { $cond: [{ $eq: ["$status", "SHORTLISTED"] }, 1, 0] } },
+                  selected: { $sum: { $cond: [{ $eq: ["$status", "SELECTED"] }, 1, 0] } },
+                  rejected: { $sum: { $cond: [{ $eq: ["$status", "REJECTED"] }, 1, 0] } },
+                }
+              },
+              { $sort: { total: -1, _id: 1 } }
+            ],
+            positionDistribution: [
+              {
+                $group: {
+                  _id: "$position_applied",
+                  count: { $sum: 1 }
+                }
+              },
+              { $sort: { count: -1, _id: 1 } }
+            ]
+          }
+        }
+      ]),
+      CampusHiring.distinct("college_name"),
+      CampusHiring.distinct("position_applied"),
+      CampusHiring.distinct("experience"),
+      CampusHiring.distinct("nationality"),
+    ]);
+
+    const facetResult = analyticsFacet[0] || {};
+    const statusMap: Record<string, number> = {};
+    for (const item of facetResult.overallCounts || []) {
+      statusMap[item._id] = item.count;
+    }
+
+    const collegeDistribution = (facetResult.collegeDistribution || []).map((c: any) => ({
+      college: c._id || "Unknown",
+      total: c.total,
+      pending: c.pending,
+      reviewed: c.reviewed,
+      shortlisted: c.shortlisted,
+      selected: c.selected,
+      rejected: c.rejected,
+    }));
+
+    const positionDistribution = (facetResult.positionDistribution || []).map((p: any) => ({
+      position: p._id || "Other",
+      count: p.count,
+    }));
+
+    const overallTotal = Object.values(statusMap).reduce((a, b) => a + b, 0);
+    const stats = {
+      total: overallTotal,
+      pending: statusMap.PENDING || 0,
+      reviewed: statusMap.REVIEWED || 0,
+      shortlisted: statusMap.SHORTLISTED || 0,
+      selected: statusMap.SELECTED || 0,
+      rejected: statusMap.REJECTED || 0,
+      collegesCount: collegeDistribution.length,
+    };
+
+    return NextResponse.json({
+      success: true,
+      applications,
+      total,
+      stats,
+      collegeDistribution,
+      positionDistribution,
+      colleges: (colleges as string[]).sort(),
+      positions: (positions as string[]).sort(),
+      experiences: (experiences as string[]).sort(),
+      nationalities: (nationalities as string[]).sort(),
+      page,
+      limit,
+    });
   } catch (error: any) {
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   }
